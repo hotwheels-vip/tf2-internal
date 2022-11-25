@@ -1,0 +1,368 @@
+#ifndef WEDNESDAY_WTF_KEY_VALUES_HPP
+#define WEDNESDAY_WTF_KEY_VALUES_HPP
+
+#include "color.hpp"
+
+#include <iostream>
+
+namespace sdk
+{
+	using file_handle_t = void*;
+
+	struct c_utl_buffer;
+	struct i_base_file_system;
+	struct c_key_values_growable_string_table;
+
+	enum types_t {
+		type_none = 0,
+		type_string,
+		type_int,
+		type_float,
+		type_ptr,
+		type_wstring,
+		type_color,
+		type_uint64,
+		type_numtypes,
+	};
+
+	struct key_values {
+		// prevent delete being called except through delete_this()
+		~key_values( );
+
+	public:
+		//	by default, the key_values class uses a string table for the key names that is
+		//	limited to 4mb. the game will exit in error if this space is exhausted. in
+		//	general this is preferable for game code for performance and memory fragmentation
+		//	reasons.
+		//
+		//	if this is not acceptable, you can use this call to switch to a table that can grow
+		//	arbitrarily. this call must be made before any key_values objects are allocated or it
+		//	will result in undefined behavior. if you use the growable string table, you cannot
+		//	share key_values pointers directly with any other module. you can serialize them across
+		//	module boundaries. these limitations are acceptable in the steam backend code
+		//	this option was written for, but may not be in other situations. make sure to
+		//	understand the implications before using this.
+		static void set_use_growable_string_table( bool b_use_growable_table );
+
+		key_values( const char* set_name );
+
+		//
+		// auto_delete class to automatically free the keyvalues.
+		// simply construct it with the keyvalues you allocated and it will free them when falls out of scope.
+		// when you decide that keyvalues shouldn't be deleted call assign(null) on it.
+		// if you constructed auto_delete(null) you can later assign the keyvalues to be deleted with assign(p_key_values).
+		// you can also pass temporary key_values object as an argument to a function by wrapping it into key_values::auto_delete
+		// instance:   call_my_function( key_values::auto_delete( new key_values( "test" ) ) )
+		//
+		class auto_delete
+		{
+		public:
+			explicit auto_delete( key_values* p_key_values ) : m_p_key_values( p_key_values ) { }
+
+			explicit auto_delete( const char* pch_kv_name ) : m_p_key_values( new key_values( pch_kv_name ) ) { }
+
+			~auto_delete( void )
+			{
+				if ( m_p_key_values )
+					m_p_key_values->delete_this( );
+			}
+			void assign( key_values* p_key_values )
+			{
+				m_p_key_values = p_key_values;
+			}
+			key_values* operator->( )
+			{
+				return m_p_key_values;
+			}
+			operator key_values*( )
+			{
+				return m_p_key_values;
+			}
+
+		private:
+			auto_delete( const auto_delete& x );            // forbid
+			auto_delete& operator=( const auto_delete& x ); // forbid
+			key_values* m_p_key_values;
+		};
+
+		// quick setup constructors
+		key_values( const char* set_name, const char* first_key, const char* first_value );
+		key_values( const char* set_name, const char* first_key, const wchar_t* first_value );
+		key_values( const char* set_name, const char* first_key, int first_value );
+		key_values( const char* set_name, const char* first_key, const char* first_value, const char* second_key, const char* second_value );
+		key_values( const char* set_name, const char* first_key, int first_value, const char* second_key, int second_value );
+
+		// section name
+		const char* get_name( ) const;
+		void set_name( const char* set_name );
+
+		// gets the name as a unique int
+		int get_name_symbol( ) const
+		{
+			return m_i_key_name;
+		}
+
+		// file access. set uses_escape_sequences true, if resource file/buffer uses escape sequences (eg \n, \t)
+		void uses_escape_sequences( bool state ); // default false
+		void uses_conditionals( bool state );     // default true
+		bool load_from_file( i_base_file_system* filesystem, const char* resource_name, const char* path_id = nullptr, bool refresh_cache = false );
+		bool save_to_file( i_base_file_system* filesystem, const char* resource_name, const char* path_id = nullptr, bool sort_keys = false,
+		                   bool b_allow_empty_string = false, bool b_cache_result = false );
+
+		// read from a buffer...  note that the buffer must be null terminated
+		bool load_from_buffer( const char* resource_name, const char* p_buffer, i_base_file_system* p_file_system = nullptr,
+		                       const char* p_path_id = nullptr );
+
+		// read from a utlbuffer...
+		bool load_from_buffer( const char* resource_name, c_utl_buffer& buf, i_base_file_system* p_file_system = nullptr,
+		                       const char* p_path_id = nullptr );
+
+		// find a key_value, create it if it is not found.
+		// set b_create to true to create the key if it doesn't already exist (which ensures a valid pointer will be returned)
+		key_values* find_key( const char* key_name, bool b_create = false );
+		key_values* find_key( int key_symbol ) const;
+		key_values* create_new_key( );
+		// creates a new key, with an autogenerated name.  name is guaranteed to be an integer, of value 1 higher than the highest other integer key
+		// name
+		void add_sub_key( key_values* p_subkey );   // adds a subkey. make sure the subkey isn't a child of some other keyvalues
+		void remove_sub_key( key_values* sub_key ); // removes a subkey from the list, does not delete it
+
+		// key iteration.
+		//
+		// note: get_first_sub_key/get_next_key will iterate keys and values. use the functions
+		// below if you want to iterate over just the keys or just the values.
+		//
+		key_values* get_first_sub_key( )
+		{
+			return m_p_sub;
+		} // returns the first subkey in the list
+		key_values* get_next_key( )
+		{
+			return m_p_peer;
+		} // returns the next subkey
+		const key_values* get_next_key( ) const
+		{
+			return m_p_peer;
+		} // returns the next subkey
+
+		void set_next_key( key_values* p_dat );
+		key_values* find_last_sub_key( );
+		// returns the last subkey in the list.  this requires a linked list iteration to find the key.  returns null if we don't have any children
+
+		//
+		// these functions can be used to treat it like a true key/values tree instead of
+		// confusing values with keys.
+		//
+		// so if you wanted to iterate all subkeys, then all values, it would look like this:
+		//     for ( key_values *p_key = p_root->get_first_true_sub_key(); p_key; p_key = p_key->get_next_true_sub_key() )
+		//     {
+		//		   msg( "key name: %s\n", p_key->get_name() );
+		//     }
+		//     for ( key_values *p_value = p_root->get_first_value(); p_key; p_key = p_key->get_next_value() )
+		//     {
+		//         msg( "int value: %d\n", p_value->get_int() );  // assuming p_value->get_data_type() == type_int...
+		//     }
+		key_values* get_first_true_sub_key( );
+		key_values* get_next_true_sub_key( );
+
+		key_values* get_first_value( ); // when you get a value back, you can use get_x and pass in null to get the value.
+		key_values* get_next_value( );
+
+		// data access
+		int get_int( const char* key_name = nullptr, int default_value = 0 );
+		uint64_t get_uint64( const char* key_name = nullptr, uint64_t default_value = 0 );
+		float get_float( const char* key_name = nullptr, float default_value = 0.0f );
+		const char* get_string( const char* key_name = nullptr, const char* default_value = "" );
+		const wchar_t* get_w_string( const char* key_name = nullptr, const wchar_t* = L"" );
+		void* get_ptr( const char* key_name = nullptr, void* default_value = nullptr );
+		bool get_bool( const char* key_name = nullptr, bool default_value = false, bool* opt_got_default = nullptr );
+		color get_color( const char* key_name = nullptr /* default value is all black */ );
+		bool is_empty( const char* key_name = nullptr );
+
+		// data access
+		int get_int( int key_symbol, int default_value = 0 );
+		float get_float( int key_symbol, float default_value = 0.0f );
+		const char* get_string( int key_symbol, const char* default_value = "" );
+		const wchar_t* get_w_string( int key_symbol, const wchar_t* = L"" );
+		void* get_ptr( int key_symbol, void* default_value = nullptr );
+		color get_color( int key_symbol /* default value is all black */ );
+		bool is_empty( int key_symbol );
+
+		// key writing
+		void set_w_string( const char* key_name, const wchar_t* value );
+		void set_string( const char* key_name, const char* value );
+		void set_int( const char* key_name, int value );
+		void setuint64( const char* key_name, uint64_t value );
+		void set_float( const char* key_name, float value );
+		void set_ptr( const char* key_name, void* value );
+		void set_color( const char* key_name, color value );
+		void set_bool( const char* key_name, bool value )
+		{
+			set_int( key_name, value ? 1 : 0 );
+		}
+
+		// memory allocation (optimized)
+		void* operator new( size_t i_alloc_size );
+		void* operator new( size_t i_alloc_size, int n_block_use, const char* p_file_name, int n_line );
+		void operator delete( void* p_mem );
+		void operator delete( void* p_mem, int n_block_use, const char* p_file_name, int n_line );
+
+		key_values& operator=( const key_values& src );
+
+		// adds a chain... if we don't find stuff in this keyvalue, we'll look
+		// in the one we're chained to.
+		void chain_key_value( key_values* p_chain );
+
+		void recursive_save_to_file( c_utl_buffer& buf, int indent_level, bool sort_keys = false, bool b_allow_empty_string = false );
+
+		bool write_as_binary( c_utl_buffer& buffer );
+		bool read_as_binary( c_utl_buffer& buffer, int n_stack_depth = 0 );
+
+		// allocate & create a new copy of the keys
+		key_values* make_copy( void ) const;
+
+		// allocate & create a new copy of the keys, including the next keys. this is useful for top level files
+		// that don't use the usual convention of a root key with lots of children (like soundscape files).
+		key_values* make_copy( bool copy_siblings ) const;
+
+		// make a new copy of all subkeys, add them all to the passed-in keyvalues
+		void copy_subkeys( key_values* p_parent ) const;
+
+		// clear out all subkeys, and the current value
+		void clear( void );
+
+		// data type
+		enum types_t {
+			type_none = 0,
+			type_string,
+			type_int,
+			type_float,
+			type_ptr,
+			type_wstring,
+			type_color,
+			type_uint64,
+			type_numtypes,
+		};
+
+		types_t get_data_type( const char* key_name = nullptr );
+
+		// virtual deletion function - ensures that key_values object is deleted from correct heap
+		void delete_this( );
+
+		void set_string_value( const char* str_value );
+
+		// unpack a key values list into a structure
+		void unpack_into_structure( const struct key_values_unpack_structure* p_unpack_table, void* p_dest, size_t dest_size_in_bytes );
+
+		// process conditional keys for widescreen support.
+		bool process_resolution_keys( const char* p_res_string );
+
+		// dump keyvalues recursively into a dump context
+		bool dump( class i_key_values_dump_context* p_dump, int n_indent_level = 0, bool b_sorted = false );
+
+		// merge in another key_values, keeping "our" settings
+		void recursive_merge_key_values( key_values* base_kv );
+
+		void add_subkey_using_known_last_child( key_values* p_sub_key, key_values* p_last_child );
+
+	private:
+		key_values( key_values& ); // prevent copy constructor being used
+
+		key_values* create_key( const char* key_name );
+
+		/// create a child key, given that we know which child is currently the last child.
+		/// this avoids the o(n^2) behaviour when adding children in sequence to kv,
+		/// when create_key() wil have to re-locate the end of the list each time.  this happens,
+		/// for example, every time we load any kv file whatsoever.
+		key_values* create_key_using_known_last_child( const char* key_name, key_values* p_last_child );
+
+		void copy_key_values_from_recursive( const key_values& src );
+		void copy_key_value( const key_values& src, size_t tmp_buffer_size_b, char* tmp_buffer );
+
+		void remove_everything( );
+		//	void recursive_save_to_file( i_base_file_system *filesystem, c_utl_buffer &buffer, int indent_level );
+		//	void write_converted_string( c_utl_buffer &buffer, const char *psz_string );
+
+		// note: if both filesystem and p_buf are non-null, it'll save to both of them.
+		// if filesystem is null, it'll ignore f.
+		void recursive_save_to_file( i_base_file_system* filesystem, file_handle_t f, c_utl_buffer* p_buf, int indent_level, bool sort_keys,
+		                             bool b_allow_empty_string );
+		void save_key_to_file( key_values* dat, i_base_file_system* filesystem, file_handle_t f, c_utl_buffer* p_buf, int indent_level,
+		                       bool sort_keys, bool b_allow_empty_string );
+		void write_converted_string( i_base_file_system* filesystem, file_handle_t f, c_utl_buffer* p_buf, const char* psz_string );
+
+		void recursive_load_from_buffer( const char* resource_name, c_utl_buffer& buf );
+
+		// for handling #include "filename"
+		void append_included_keys( void*& included_keys );
+		void parse_included_keys( const char* resource_name, const char* filetoinclude, i_base_file_system* p_file_system, const char* p_path_id,
+		                          void*& included_keys );
+
+		// for handling #base "filename"
+		void merge_base_keys( void*& base_keys );
+
+		// note: if both filesystem and p_buf are non-null, it'll save to both of them.
+		// if filesystem is null, it'll ignore f.
+		void internal_write( i_base_file_system* filesystem, file_handle_t f, c_utl_buffer* p_buf, const void* p_data, int len );
+
+		void init( );
+		const char* read_token( c_utl_buffer& buf, bool& was_quoted, bool& was_conditional );
+		void write_indents( i_base_file_system* filesystem, file_handle_t f, c_utl_buffer* p_buf, int indent_level );
+
+		void free_allocated_value( );
+		void allocate_value_block( int size );
+
+		int m_i_key_name; // keyname is a symbol defined in key_values_system
+
+		// these are needed out of the union because the api returns string pointers
+		char* m_s_value;
+		wchar_t* m_ws_value;
+
+		// we don't delete these
+		union {
+			int m_i_value;
+			float m_fl_value;
+			void* m_p_value;
+			unsigned char m_color[ 4 ];
+		};
+
+		char m_i_data_type;
+		char m_b_has_escape_sequences; // true, if while parsing this key_value, escape sequences are used (default false)
+		char m_b_evaluate_conditionals;
+		// true, if while parsing this key_value, conditionals blocks are evaluated (default true)
+		char unused[ 1 ];
+
+		key_values* m_p_peer;  // pointer to next key in list
+		key_values* m_p_sub;   // pointer to start of a new sub key list
+		key_values* m_p_chain; // search here if it's not in our list
+
+	private:
+		// statics to implement the optional growable string table
+		// function pointers that will determine which mode we are in
+		static int ( *s_pf_get_symbol_for_string )( const char* name, bool b_create );
+		static const char* ( *s_pf_get_string_for_symbol )( int symbol );
+		static c_key_values_growable_string_table* s_p_growable_string_table;
+
+	public:
+		// functions that invoke the default behavior
+		static int get_symbol_for_string_classic( const char* name, bool b_create = true );
+		static const char* get_string_for_symbol_classic( int symbol );
+
+		// functions that use the growable string table
+		static int get_symbol_for_string_growable( const char* name, bool b_create = true );
+		static const char* get_string_for_symbol_growable( int symbol );
+
+		// functions to get external access to whichever of the above functions we're going to call.
+		static int call_get_symbol_for_string( const char* name, bool b_create = true )
+		{
+			return s_pf_get_symbol_for_string( name, b_create );
+		}
+
+		static const char* call_get_string_for_symbol( int symbol )
+		{
+			return s_pf_get_string_for_symbol( symbol );
+		}
+	};
+} // namespace sdk
+
+#endif // WEDNESDAY_WTF_KEY_VALUES_HPP
