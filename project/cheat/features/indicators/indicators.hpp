@@ -7,6 +7,7 @@
 #include <fmt/format.h>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
+#include <imgui/imgui_notify.h>
 
 class indicators
 {

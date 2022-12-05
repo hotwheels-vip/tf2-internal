@@ -137,10 +137,10 @@ namespace sdk
 			auto entity = reinterpret_cast< c_base_entity* >( server_entity );
 
 			switch ( entity->get_client_class( )->class_id ) {
-			case e_class_ids::cfuncareaportalwindow:
-			case e_class_ids::cfuncrespawnroomvisualizer:
-			case e_class_ids::csniperdot:
-			case e_class_ids::ctfknife:
+			case e_class_ids::c_func_area_portal_window:
+			case e_class_ids::c_func_respawn_room_visualizer:
+			case e_class_ids::c_sniper_dot:
+			case e_class_ids::ctf_knife:
 				return false;
 			}
 

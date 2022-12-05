@@ -1,8 +1,8 @@
 #ifndef E01C1CC3_A723_4DB5_9D4C_86FA3700B808
 #define E01C1CC3_A723_4DB5_9D4C_86FA3700B808
 
-#include "../../features/menu/menu.hpp"
 #include "../../features/indicators/indicators.hpp"
+#include "../../features/menu/menu.hpp"
 #include "../../helpers/include.hpp"
 #include "../hooks.hpp"
 
@@ -13,6 +13,8 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_dx9.h>
 #include <imgui/imgui_impl_win32.h>
+#include <imgui/imgui_notify.h>
+#include <imgui/tahoma.h>
 
 class end_scene
 {
@@ -36,6 +38,11 @@ public:
 		} );
 
 		ImGui::CreateContext( );
+
+		ImFontConfig config{ };
+		config.FontDataOwnedByAtlas = false;
+		ImGui::GetIO( ).Fonts->AddFontFromMemoryTTF( ( char* )tahoma, sizeof( tahoma ), 15.f, &config );
+		ImGui::MergeIconsWithLatestFont( 16.f, false );
 
 		ImGui_ImplDX9_Init( g_interfaces->device );
 		ImGui_ImplWin32_Init( FindWindowA( "Valve001", nullptr ) );

@@ -1,4 +1,4 @@
-#include "visuals/visuals.hpp"
+#include "visuals.hpp"
 
 void visuals::run( )
 {

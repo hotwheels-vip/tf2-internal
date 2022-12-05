@@ -4,7 +4,9 @@
 
 #include "prediction.hpp"
 #include "../../helpers/config/config.hpp"
+#include <chrono>
 #include <deque>
+#include <imgui/imgui_notify.h>
 
 backup< float > cur_time{ };
 backup< float > frame_time{ };
@@ -110,6 +112,10 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 {
 	CONFIG( aimbot_projectile_steps, int );
 
+	using namespace std::chrono;
+
+	auto start = high_resolution_clock::now( );
+
 	static auto gravity_cvar = g_interfaces->cvar->find_var( "sv_gravity" );
 
 	auto gravity  = gravity_cvar->get_float( );
@@ -204,7 +210,7 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 
 		records.push_back( projectile_move_data.abs_origin );
 
-		player->current_command( ) = nullptr;
+		player->current_command( ) = { };
 
 		player->origin( )          = projectile_backup.origin;
 		player->base_velocity( )   = projectile_backup.base_velocity;
@@ -228,6 +234,11 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 		memset( &projectile_move_data, 0, sizeof( sdk::move_data_t ) );
 		memset( &projectile_backup, 0, sizeof( prediction_projectile_backup ) );
 	}
+
+	auto end = std::chrono::high_resolution_clock::now( );
+
+	ImGui::InsertNotification(
+		{ ImGuiToastType_Info, 1000, fmt::format( "Solved linear path in {}ms!", duration_cast< milliseconds >( end - start ).count( ) ).c_str( ) } );
 
 	return records.at( *aimbot_projectile_steps - 1 ) + offset;
 }
