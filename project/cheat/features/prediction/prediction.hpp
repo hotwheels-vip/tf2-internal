@@ -9,6 +9,14 @@
 
 #include <sdk/include.hpp>
 
+struct weapon_info {
+	float speed{ };
+	sdk::vector offset{ };
+
+	float charge{ };
+	float gravity{ };
+};
+
 class prediction
 {
 public:
@@ -46,7 +54,8 @@ public:
 	void set_prediction_player( sdk::c_tf_player* player );
 	void reset( );
 
-	sdk::vector linear( sdk::vector origin, sdk::c_tf_player* player, sdk::vector offset, float speed, bool choke );
+	sdk::vector linear( sdk::vector origin, sdk::c_tf_player* player, sdk::vector offset, weapon_info data, bool choke );
+	sdk::vector quadratic( sdk::vector origin, sdk::c_tf_player* player, sdk::vector offset, weapon_info data, bool choke );
 };
 
 inline prediction* g_prediction = new prediction( );

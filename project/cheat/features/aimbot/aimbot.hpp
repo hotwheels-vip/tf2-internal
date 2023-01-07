@@ -6,20 +6,14 @@
 #define HOTWHEELS_TF2_INTERNAL_AIMBOT_HPP
 
 #include "../../helpers/include.hpp"
+#include "../prediction/prediction.hpp"
+
 #include <easing/easing.h>
 #include <sdk/include.hpp>
 
 class aimbot
 {
 public:
-	struct weapon_info {
-		float speed{ };
-		sdk::vector offset{ };
-
-		float charge{ };
-		float gravity{ };
-	};
-
 	void run( );
 
 	bool running_choke{ };

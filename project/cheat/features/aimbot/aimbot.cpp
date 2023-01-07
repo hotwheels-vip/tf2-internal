@@ -4,9 +4,8 @@
 
 #include "aimbot.hpp"
 #include "../../hooks/cl_move/cl_move.hpp"
-#include "../prediction/prediction.hpp"
 
-aimbot::weapon_info aimbot::get_weapon_info( )
+weapon_info aimbot::get_weapon_info( )
 {
 	switch ( g_entity_list->weapon->get_client_class( )->class_id ) {
 	case sdk::e_class_ids::ctf_rocket_launcher: {
@@ -249,7 +248,7 @@ void aimbot::run( )
 							*aimbot_projectile_feet
 								? sdk::vector{ 0, 0, 2 }
 								: sdk::vector{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z },
-							weapon_info.speed, *aimbot_projectile_invisible );
+							weapon_info, *aimbot_projectile_invisible );
 
 						auto view_angles = math::vector_to_angle( position - offset );
 
@@ -269,7 +268,7 @@ void aimbot::run( )
 						*aimbot_projectile_feet
 							? sdk::vector{ 0, 0, 2 }
 							: sdk::vector{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z },
-						weapon_info.speed, *aimbot_projectile_invisible );
+						weapon_info, *aimbot_projectile_invisible );
 
 					auto view_angles = math::vector_to_angle( position - offset );
 
