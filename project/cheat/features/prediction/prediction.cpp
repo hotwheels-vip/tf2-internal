@@ -8,11 +8,11 @@
 #include <deque>
 #include <imgui/imgui_notify.h>
 
-backup< float > cur_time{ };
-backup< float > frame_time{ };
-backup< int > tick_count{ };
-backup< int > tick_base{ };
-backup< float > fall_velocity{ };
+restore< float > cur_time{ };
+restore< float > frame_time{ };
+restore< int > tick_count{ };
+restore< int > tick_base{ };
+restore< float > fall_velocity{ };
 
 void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 {
@@ -24,10 +24,10 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 	if ( delta_tick > 0 )
 		g_interfaces->prediction->update( delta_tick, delta_tick > 0, last_command, last_outgoing + choked_commands );
 
-	cur_time   = backup( &g_interfaces->globals->cur_time );
-	frame_time = backup( &g_interfaces->globals->frame_time );
-	tick_count = backup( &g_interfaces->globals->tick_count );
-	tick_base  = backup( &player->tick_base( ) );
+	cur_time   = restore( &g_interfaces->globals->cur_time );
+	frame_time = restore( &g_interfaces->globals->frame_time );
+	tick_count = restore( &g_interfaces->globals->tick_count );
+	tick_base  = restore( &player->tick_base( ) );
 
 	reset( );
 
@@ -39,8 +39,8 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 	g_interfaces->globals->cur_time   = ( float )player->tick_base( ) * g_interfaces->globals->interval_per_tick;
 	g_interfaces->globals->frame_time = g_interfaces->globals->interval_per_tick;
 
-	auto first_time_predicted = backup( &g_interfaces->prediction->first_time_predicted );
-	auto in_prediction        = backup( &g_interfaces->prediction->is_in_prediction );
+	auto first_time_predicted = restore( &g_interfaces->prediction->first_time_predicted );
+	auto in_prediction        = restore( &g_interfaces->prediction->is_in_prediction );
 
 	g_interfaces->prediction->first_time_predicted = false;
 	g_interfaces->prediction->is_in_prediction     = true;
@@ -58,7 +58,7 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 
 	g_interfaces->move_helper->process_impacts( );
 
-	fall_velocity = backup( &player->fall_velocity( ) );
+	fall_velocity = restore( &player->fall_velocity( ) );
 
 	running_post_think = true;
 
@@ -66,10 +66,10 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 
 	running_post_think = false;
 
-	fall_velocity.restore( );
-	tick_base.restore( );
-	first_time_predicted.restore( );
-	in_prediction.restore( );
+	fall_velocity.run( );
+	tick_base.run( );
+	first_time_predicted.run( );
+	in_prediction.run( );
 }
 
 void prediction::end( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
@@ -85,9 +85,9 @@ void prediction::end( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 	set_prediction_random_seed( nullptr );
 	set_prediction_player( nullptr );
 
-	cur_time.restore( );
-	frame_time.restore( );
-	tick_count.restore( );
+	cur_time.run( );
+	frame_time.run( );
+	tick_count.run( );
 }
 
 void prediction::set_prediction_random_seed( sdk::c_user_cmd* cmd )
