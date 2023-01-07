@@ -4,6 +4,9 @@
 
 #include "cheat.hpp"
 
+#include <chrono>
+#include <imgui/imgui_notify.h>
+
 DWORD WINAPI shutdown_routine( LPVOID )
 {
 	g_cheat->end( );
@@ -13,6 +16,10 @@ DWORD WINAPI shutdown_routine( LPVOID )
 
 void cheat::run( )
 {
+	using namespace std::chrono;
+
+	auto start = high_resolution_clock::now( );
+
 	g_console->run( );
 	g_console->log< fmt::color::gray >( "[CHEAT] " );
 	g_console->log< fmt::color::sky_blue >( "Console run successful!\n" );
@@ -31,6 +38,12 @@ void cheat::run( )
 	g_hooks->run( );
 	g_console->log< fmt::color::gray >( "[CHEAT] " );
 	g_console->log< fmt::color::sky_blue >( "Hooks run successful!\n" );
+
+	auto end = high_resolution_clock::now( );
+
+	ImGui::InsertNotification(
+		{ ImGuiToastType_Success, 3000,
+	      fmt::format( "Successfully loaded in {0:.2f}s!", duration_cast< milliseconds >( end - start ).count( ) / 1000.f ).c_str( ) } );
 
 	g_input->add_keybind( VK_DELETE, []( bool ) {
 		if ( auto handle = CreateThread( nullptr, 0, shutdown_routine, nullptr, 0, nullptr ) ) {

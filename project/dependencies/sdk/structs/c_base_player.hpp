@@ -86,7 +86,7 @@ namespace sdk
 
 		c_user_cmd*& current_command( )
 		{
-			return *reinterpret_cast< sdk::c_user_cmd** >( reinterpret_cast< std::uintptr_t >( this ) + 0x107C );
+			return *reinterpret_cast< sdk::c_user_cmd** >( reinterpret_cast< std::uintptr_t >( this ) + 0x1184 );
 		}
 
 		vector eye_position( )

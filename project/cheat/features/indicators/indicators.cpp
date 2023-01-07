@@ -10,4 +10,6 @@ void indicators::run( )
 		ImGui::SliderInt( "##Percent", &g_cl_move->stored, 0, 22, "%d", ImGuiSliderFlags_NoInput );
 	}
 	ImGui::End( );
+
+	ImGui::RenderNotifications( );
 }

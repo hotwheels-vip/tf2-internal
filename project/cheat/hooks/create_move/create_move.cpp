@@ -44,10 +44,10 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 
 	send_packet = g_cl_move->choke;
 
-	if ( !g_aimbot->choke )
-		send_packet = g_aimbot->choke;
-
-	g_aimbot->choke = true;
+	if ( g_aimbot->running_choke ) {
+		send_packet = false;
+		g_aimbot->choked_ticks++;
+	}
 
 	verified_cmd->cmd = *cmd;
 	verified_cmd->crc = cmd->get_checksum( );

@@ -22,7 +22,8 @@ public:
 
 	void run( );
 
-	bool choke{ };
+	bool running_choke{ };
+	int choked_ticks{ };
 
 	weapon_info get_weapon_info( );
 	sdk::hitboxes closest_hitbox( sdk::c_tf_player* player, int hitboxes );
