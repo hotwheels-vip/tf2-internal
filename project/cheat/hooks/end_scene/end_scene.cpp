@@ -66,10 +66,7 @@ LONG end_scene::detour( IDirect3DDevice9* device )
 
 	ImGui::NewFrame( );
 
-	CONFIG( menu_animation_speed, float );
-	CONFIG( menu_indicator_transparency, float );
-
-	auto increment_per_frame = 1.f / ( 0.2f / ( 1.f / ImGui::GetIO( ).Framerate ) ) * *menu_animation_speed;
+	auto increment_per_frame = 1.f / ( 0.2f / ( 1.f / ImGui::GetIO( ).Framerate ) ) * 1.f;
 	g_menu->alpha            = std::clamp( g_menu->alpha + ( g_menu->open ? increment_per_frame : -increment_per_frame ), 0.f, 1.f );
 	auto ease_animation      = QuadraticEaseInOut( g_menu->alpha );
 
@@ -80,11 +77,7 @@ LONG end_scene::detour( IDirect3DDevice9* device )
 
 	ImGui::PopStyleVar( );
 
-	ImGui::PushStyleVar( ImGuiStyleVar_Alpha, *menu_indicator_transparency );
-
 	g_indicators->run( );
-
-	ImGui::PopStyleVar( );
 
 	ImGui::EndFrame( );
 

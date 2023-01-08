@@ -29,6 +29,9 @@ void config::save( std::string name )
 			reader[ std::to_string( setting.first ) ] = { setting.second.color_value.x, setting.second.color_value.y, setting.second.color_value.z,
 				                                          setting.second.color_value.w };
 			break;
+		case variable::VARIABLE_VECTOR:
+			reader[ std::to_string( setting.first ) ] = { setting.second.vector_value.x, setting.second.vector_value.y };
+			break;
 		}
 	}
 
@@ -82,6 +85,10 @@ void config::load( std::string name )
 					ImVec4( j[ std::to_string( setting.first ) ][ 0 ].get< float >( ), j[ std::to_string( setting.first ) ][ 1 ].get< float >( ),
 				            j[ std::to_string( setting.first ) ][ 2 ].get< float >( ), j[ std::to_string( setting.first ) ][ 3 ].get< float >( ) );
 				break;
+			case variable::VARIABLE_VECTOR:
+				setting.second.vector_value =
+					ImVec2( j[ std::to_string( setting.first ) ][ 0 ].get< float >( ), j[ std::to_string( setting.first ) ][ 1 ].get< float >( ) );
+				break;
 			}
 		}
 
@@ -104,32 +111,18 @@ void config::run( )
 	insert( HASH( "aimbot_mouse_enabled" ), false );
 	insert( HASH( "aimbot_mouse_fov" ), 0.f );
 	insert( HASH( "aimbot_mouse_smoothing" ), 1.f );
-	insert( HASH( "aimbot_mouse_hitbox_head" ), false );
-	insert( HASH( "aimbot_mouse_hitbox_chest" ), false );
-	insert( HASH( "aimbot_mouse_hitbox_stomach" ), false );
-	insert( HASH( "aimbot_mouse_hitbox_legs" ), false );
-	insert( HASH( "aimbot_mouse_hitbox_arms" ), false );
-	insert( HASH( "aimbot_mouse_curve_linear" ), false );
-	insert( HASH( "aimbot_mouse_curve_quadratic" ), false );
-	insert( HASH( "aimbot_mouse_curve_cubic" ), false );
-	insert( HASH( "aimbot_mouse_curve_quartic" ), true );
-	insert( HASH( "aimbot_mouse_curve_quintic" ), false );
+	insert( HASH( "aimbot_mouse_hitboxes" ), 0 );
+	insert( HASH( "aimbot_mouse_curve_a" ), ImVec2{ 0.f, 0.f } );
+	insert( HASH( "aimbot_mouse_curve_b" ), ImVec2{ 1.f, 1.f } );
 
 	insert( HASH( "aimbot_silent_enabled" ), false );
 	insert( HASH( "aimbot_silent_fov" ), 0.f );
-	insert( HASH( "aimbot_silent_hitbox_head" ), false );
-	insert( HASH( "aimbot_silent_hitbox_chest" ), false );
-	insert( HASH( "aimbot_silent_hitbox_stomach" ), false );
-	insert( HASH( "aimbot_silent_hitbox_legs" ), false );
-	insert( HASH( "aimbot_silent_hitbox_arms" ), false );
+	insert( HASH( "aimbot_silent_hitboxes" ), 0 );
 
 	insert( HASH( "aimbot_projectile_enabled" ), false );
 	insert( HASH( "aimbot_projectile_invisible" ), false );
 	insert( HASH( "aimbot_projectile_feet" ), false );
 	insert( HASH( "aimbot_projectile_steps" ), 2 );
-
-	insert( HASH( "menu_animation_speed" ), 1.f );
-	insert( HASH( "menu_indicator_transparency" ), 0.8f );
 
 	insert( HASH( "menu_disabled_inputs_mouse" ), true );
 	insert( HASH( "menu_disabled_inputs_keyboard" ), true );

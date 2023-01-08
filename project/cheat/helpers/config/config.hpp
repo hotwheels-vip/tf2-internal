@@ -24,7 +24,8 @@ public:
 		VARIABLE_INT,
 		VARIABLE_FLOAT,
 		VARIABLE_COLOR,
-		VARIABLE_STRING
+		VARIABLE_STRING,
+		VARIABLE_VECTOR
 	};
 
 	struct option {
@@ -36,6 +37,7 @@ public:
 		float float_value;
 		std::string string_value;
 		ImVec4 color_value;
+		ImVec2 vector_value;
 
 		option( bool value )
 		{
@@ -66,6 +68,12 @@ public:
 			type        = variable::VARIABLE_COLOR;
 			color_value = value;
 		}
+
+		option( ImVec2 value )
+		{
+			type         = variable::VARIABLE_VECTOR;
+			vector_value = value;
+		}
 	};
 
 	std::unordered_map< std::int32_t, option > settings{ };
@@ -94,6 +102,8 @@ public:
 			return ( T* )&it->second.string_value;
 		case variable::VARIABLE_COLOR:
 			return ( T* )&it->second.color_value;
+		case variable::VARIABLE_VECTOR:
+			return ( T* )&it->second.vector_value;
 		default:
 			return ( T* )nullptr;
 		}

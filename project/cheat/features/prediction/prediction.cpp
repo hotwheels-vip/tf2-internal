@@ -6,7 +6,6 @@
 #include "../../helpers/config/config.hpp"
 #include <chrono>
 #include <deque>
-#include <imgui/imgui_notify.h>
 
 restore< float > cur_time{ };
 restore< float > frame_time{ };
@@ -237,9 +236,6 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 
 	auto end = std::chrono::high_resolution_clock::now( );
 
-	ImGui::InsertNotification(
-		{ ImGuiToastType_Info, 1000, fmt::format( "Solved linear path in {}ms!", duration_cast< milliseconds >( end - start ).count( ) ).c_str( ) } );
-
 	return records.at( *aimbot_projectile_steps - 1 ) + offset;
 }
 
@@ -371,9 +367,6 @@ sdk::vector prediction::quadratic( sdk::vector origin, sdk::c_tf_player* player,
 	}
 
 	auto end = std::chrono::high_resolution_clock::now( );
-
-	ImGui::InsertNotification(
-		{ ImGuiToastType_Info, 1000, fmt::format( "Solved linear path in {}ms!", duration_cast< milliseconds >( end - start ).count( ) ).c_str( ) } );
 
 	return records.at( *aimbot_projectile_steps - 1 ) + offset;
 }
