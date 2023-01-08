@@ -5,10 +5,10 @@
 #ifndef HOTWHEELS_TF2_ENTRY_HPP
 #define HOTWHEELS_TF2_ENTRY_HPP
 
-#pragma
+#pragma comment( lib, "freetype" )
 
-#include <windows.h>
 #include <iostream>
+#include <windows.h>
 
 #include "cheat/cheat.hpp"
 

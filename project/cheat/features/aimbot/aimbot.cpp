@@ -4,9 +4,9 @@
 
 #include "aimbot.hpp"
 #include "../../hooks/cl_move/cl_move.hpp"
-#include "../prediction/prediction.hpp"
+#include <imgui/imgui.h>
 
-aimbot::weapon_info aimbot::get_weapon_info( )
+weapon_info aimbot::get_weapon_info( )
 {
 	switch ( g_entity_list->weapon->get_client_class( )->class_id ) {
 	case sdk::e_class_ids::ctf_rocket_launcher: {
@@ -91,25 +91,14 @@ void aimbot::run( )
 
 	CONFIG( aimbot_mouse_enabled, bool );
 	CONFIG( aimbot_mouse_fov, float );
-	CONFIG( aimbot_mouse_hitbox_head, bool );
-	CONFIG( aimbot_mouse_hitbox_chest, bool );
-	CONFIG( aimbot_mouse_hitbox_stomach, bool );
-	CONFIG( aimbot_mouse_hitbox_arms, bool );
-	CONFIG( aimbot_mouse_hitbox_legs, bool );
-	CONFIG( aimbot_mouse_curve_linear, bool );
-	CONFIG( aimbot_mouse_curve_quadratic, bool );
-	CONFIG( aimbot_mouse_curve_cubic, bool );
-	CONFIG( aimbot_mouse_curve_quartic, bool );
-	CONFIG( aimbot_mouse_curve_quintic, bool );
 	CONFIG( aimbot_mouse_smoothing, float );
+	CONFIG( aimbot_mouse_hitboxes, int );
+	CONFIG( aimbot_mouse_curve_a, ImVec2 );
+	CONFIG( aimbot_mouse_curve_b, ImVec2 );
 
 	CONFIG( aimbot_silent_enabled, bool );
 	CONFIG( aimbot_silent_fov, float );
-	CONFIG( aimbot_silent_hitbox_head, bool );
-	CONFIG( aimbot_silent_hitbox_chest, bool );
-	CONFIG( aimbot_silent_hitbox_stomach, bool );
-	CONFIG( aimbot_silent_hitbox_arms, bool );
-	CONFIG( aimbot_silent_hitbox_legs, bool );
+	CONFIG( aimbot_silent_hitboxes, int );
 
 	CONFIG( aimbot_projectile_enabled, bool );
 	CONFIG( aimbot_projectile_invisible, bool );
@@ -121,38 +110,7 @@ void aimbot::run( )
 		if ( !target )
 			return;
 
-		int hitboxes{ };
-
-		if ( *aimbot_mouse_hitbox_head )
-			hitboxes |= 1 << sdk::hitbox_head;
-
-		if ( *aimbot_mouse_hitbox_chest )
-			hitboxes |= 1 << sdk::hitbox_chest;
-
-		if ( *aimbot_mouse_hitbox_stomach ) {
-			hitboxes |= 1 << sdk::hitbox_stomach;
-			hitboxes |= 1 << sdk::hitbox_pelvis;
-		}
-
-		if ( *aimbot_mouse_hitbox_arms ) {
-			hitboxes |= 1 << sdk::hitbox_left_hand;
-			hitboxes |= 1 << sdk::hitbox_right_hand;
-			hitboxes |= 1 << sdk::hitbox_right_upper_arm;
-			hitboxes |= 1 << sdk::hitbox_right_forearm;
-			hitboxes |= 1 << sdk::hitbox_left_upper_arm;
-			hitboxes |= 1 << sdk::hitbox_left_forearm;
-		}
-
-		if ( *aimbot_mouse_hitbox_legs ) {
-			hitboxes |= 1 << sdk::hitbox_left_foot;
-			hitboxes |= 1 << sdk::hitbox_right_foot;
-			hitboxes |= 1 << sdk::hitbox_left_calf;
-			hitboxes |= 1 << sdk::hitbox_right_calf;
-			hitboxes |= 1 << sdk::hitbox_left_thigh;
-			hitboxes |= 1 << sdk::hitbox_right_thigh;
-		}
-
-		auto target_hitbox = closest_hitbox( target, hitboxes );
+		auto target_hitbox = closest_hitbox( target, *aimbot_mouse_hitboxes );
 
 		sdk::qangle local_angles{ };
 
@@ -173,28 +131,13 @@ void aimbot::run( )
 		position = target->get_hitbox_position( target_hitbox );
 		//} Too performance impacting.
 
-		auto view_angles  = math::vector_to_angle( position - g_entity_list->local->eye_position( ) );
-		auto fov_distance = view_angles - local_angles;
-		auto distance     = fov_distance.normalize( ).length( );
-		float distance_percent{ };
-
-		if ( *aimbot_mouse_curve_linear )
-			distance_percent = ( -( LinearInterpolation( std::clamp( distance / *aimbot_mouse_fov, 0.f, 1.f ) ) ) + 1.f ) * *aimbot_mouse_smoothing;
-
-		if ( *aimbot_mouse_curve_quadratic )
-			distance_percent = ( -( QuadraticEaseIn( std::clamp( distance / *aimbot_mouse_fov, 0.f, 1.f ) ) ) + 1.f ) * *aimbot_mouse_smoothing;
-
-		if ( *aimbot_mouse_curve_cubic )
-			distance_percent = ( -( CubicEaseIn( std::clamp( distance / *aimbot_mouse_fov, 0.f, 1.f ) ) ) + 1.f ) * *aimbot_mouse_smoothing;
-
-		if ( *aimbot_mouse_curve_quartic )
-			distance_percent = ( -( QuarticEaseIn( std::clamp( distance / *aimbot_mouse_fov, 0.f, 1.f ) ) ) + 1.f ) * *aimbot_mouse_smoothing;
-
-		if ( *aimbot_mouse_curve_quintic )
-			distance_percent = ( -( QuinticEaseIn( std::clamp( distance / *aimbot_mouse_fov, 0.f, 1.f ) ) ) + 1.f ) * *aimbot_mouse_smoothing;
-
-		auto smoothed = local_angles + ( fov_distance * distance_percent );
-		auto normal   = smoothed.normalize( );
+		auto view_angles       = math::vector_to_angle( position - g_entity_list->local->eye_position( ) );
+		auto fov_distance      = view_angles - local_angles;
+		auto distance          = fov_distance.normalize( ).length( );
+		int curve_index        = 49 * ( -( std::clamp( distance / *aimbot_mouse_fov, 0.f, 1.f ) ) + 1.f );
+		float distance_percent = g_menu->mouse_curve[ curve_index ].y * *aimbot_mouse_smoothing;
+		auto smoothed          = local_angles + ( fov_distance * distance_percent );
+		auto normal            = smoothed.normalize( );
 
 		g_interfaces->engine_client->set_view_angles( normal );
 	}
@@ -204,37 +147,6 @@ void aimbot::run( )
 
 		if ( !target )
 			return;
-
-		int hitboxes{ };
-
-		if ( *aimbot_silent_hitbox_head )
-			hitboxes |= 1 << sdk::hitbox_head;
-
-		if ( *aimbot_silent_hitbox_chest )
-			hitboxes |= 1 << sdk::hitbox_chest;
-
-		if ( *aimbot_silent_hitbox_stomach ) {
-			hitboxes |= 1 << sdk::hitbox_stomach;
-			hitboxes |= 1 << sdk::hitbox_pelvis;
-		}
-
-		if ( *aimbot_silent_hitbox_arms ) {
-			hitboxes |= 1 << sdk::hitbox_left_hand;
-			hitboxes |= 1 << sdk::hitbox_right_hand;
-			hitboxes |= 1 << sdk::hitbox_right_upper_arm;
-			hitboxes |= 1 << sdk::hitbox_right_forearm;
-			hitboxes |= 1 << sdk::hitbox_left_upper_arm;
-			hitboxes |= 1 << sdk::hitbox_left_forearm;
-		}
-
-		if ( *aimbot_silent_hitbox_legs ) {
-			hitboxes |= 1 << sdk::hitbox_left_foot;
-			hitboxes |= 1 << sdk::hitbox_right_foot;
-			hitboxes |= 1 << sdk::hitbox_left_calf;
-			hitboxes |= 1 << sdk::hitbox_right_calf;
-			hitboxes |= 1 << sdk::hitbox_left_thigh;
-			hitboxes |= 1 << sdk::hitbox_right_thigh;
-		}
 
 		auto weapon_info = get_weapon_info( );
 
@@ -249,7 +161,7 @@ void aimbot::run( )
 							*aimbot_projectile_feet
 								? sdk::vector{ 0, 0, 2 }
 								: sdk::vector{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z },
-							weapon_info.speed, *aimbot_projectile_invisible );
+							weapon_info, *aimbot_projectile_invisible );
 
 						auto view_angles = math::vector_to_angle( position - offset );
 
@@ -269,7 +181,7 @@ void aimbot::run( )
 						*aimbot_projectile_feet
 							? sdk::vector{ 0, 0, 2 }
 							: sdk::vector{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z },
-						weapon_info.speed, *aimbot_projectile_invisible );
+						weapon_info, *aimbot_projectile_invisible );
 
 					auto view_angles = math::vector_to_angle( position - offset );
 
@@ -279,7 +191,7 @@ void aimbot::run( )
 		} else {
 			if ( g_entity_list->cmd->buttons & sdk::in_attack &&
 			     ( g_entity_list->weapon->can_attack_primary( g_entity_list->local ) || g_cl_move->max_shifted ) ) {
-				auto target_hitbox = closest_hitbox( target, hitboxes );
+				auto target_hitbox = closest_hitbox( target, *aimbot_silent_hitboxes );
 				auto view_angles   = math::vector_to_angle( target->get_hitbox_position( target_hitbox ) - g_entity_list->local->eye_position( ) );
 
 				g_entity_list->cmd->view_angles = view_angles;

@@ -9,480 +9,317 @@ void menu::run( )
 	CONFIG( aimbot_mouse_enabled, bool );
 	CONFIG( aimbot_mouse_fov, float );
 	CONFIG( aimbot_mouse_smoothing, float );
-	CONFIG( aimbot_mouse_hitbox_head, bool );
-	CONFIG( aimbot_mouse_hitbox_chest, bool );
-	CONFIG( aimbot_mouse_hitbox_stomach, bool );
-	CONFIG( aimbot_mouse_hitbox_arms, bool );
-	CONFIG( aimbot_mouse_hitbox_legs, bool );
-	CONFIG( aimbot_mouse_curve_linear, bool );
-	CONFIG( aimbot_mouse_curve_quadratic, bool );
-	CONFIG( aimbot_mouse_curve_cubic, bool );
-	CONFIG( aimbot_mouse_curve_quartic, bool );
-	CONFIG( aimbot_mouse_curve_quintic, bool );
+	CONFIG( aimbot_mouse_hitboxes, int );
+	CONFIG( aimbot_mouse_curve_a, ImVec2 );
+	CONFIG( aimbot_mouse_curve_b, ImVec2 );
 
 	CONFIG( aimbot_silent_enabled, bool );
 	CONFIG( aimbot_silent_fov, float );
-	CONFIG( aimbot_silent_hitbox_head, bool );
-	CONFIG( aimbot_silent_hitbox_chest, bool );
-	CONFIG( aimbot_silent_hitbox_stomach, bool );
-	CONFIG( aimbot_silent_hitbox_arms, bool );
-	CONFIG( aimbot_silent_hitbox_legs, bool );
+	CONFIG( aimbot_silent_hitboxes, int );
 
 	CONFIG( aimbot_projectile_enabled, bool );
 	CONFIG( aimbot_projectile_invisible, bool );
 	CONFIG( aimbot_projectile_feet, bool );
 	CONFIG( aimbot_projectile_steps, int );
 
-	CONFIG( menu_animation_speed, float );
-	CONFIG( menu_indicator_transparency, float );
 	CONFIG( menu_disabled_inputs_mouse, bool );
 	CONFIG( menu_disabled_inputs_keyboard, bool );
 
 	//	ImGui::ShowDemoWindow( );
 
-	ImGui::SetNextWindowSize( ImVec2( 600, 400 ) );
+	ImGuiStyle& style = ImGui::GetStyle( );
 
-	if ( ImGui::Begin( "hotwheels.vip", nullptr, ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse ) ) {
-		if ( ImGui::BeginTabBar( "TabBar", ImGuiTabBarFlags_Reorderable ) ) {
-			if ( ImGui::BeginTabItem( "Aimbot" ) ) {
-				if ( ImGui::BeginChild( "Aimbot Child", ImVec2( 0, 0 ), false ) ) {
-					auto id = ImGui::GetID( "AimbotDockSpace" );
+	/* loader ui*/
+	{
+		constexpr auto background_height = 25.f;
 
-					static ImGuiID left{ };
-					static ImGuiID right{ };
-					static ImGuiID right_top{ };
-					static ImGuiID right_bottom{ };
+		ImGui::SetNextWindowSize( ImVec2( 588.f, 559.f ), ImGuiCond_::ImGuiCond_Always );
 
-					if ( ImGui::DockBuilderGetNode( id ) == nullptr ) {
-						ImGui::DockBuilderRemoveNode( id );
-						ImGui::DockBuilderAddNode( id, ImGuiDockNodeFlags_DockSpace );
-						ImGui::DockBuilderSetNodeSize( id, ImGui::GetContentRegionAvail( ) );
+		ImGui::Begin( "hotwheels-ui", 0,
+		              ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse |
+		                  ImGuiWindowFlags_::ImGuiWindowFlags_NoResize );
+		{
+			const auto window = ImGui::GetCurrentWindow( );
 
-						ImGui::DockBuilderSplitNode( id, ImGuiDir_Left, 0.5f, &left, &right );
-						ImGui::DockBuilderSplitNode( right, ImGuiDir_Up, 0.5f, &right_top, &right_bottom );
+			const auto draw_list = window->DrawList;
 
-						ImGui::DockBuilderDockWindow( "Aimbot Mouse", left );
-						ImGui::DockBuilderDockWindow( "Aimbot Silent", right_top );
-						ImGui::DockBuilderDockWindow( "Aimbot Projectile", right_bottom );
+			const auto size     = window->Size;
+			const auto position = window->Pos;
 
-						ImGui::DockBuilderFinish( id );
-					}
+			static int tab_number = 0;
 
-					ImGui::DockSpace( id, ImVec2( 0, 0 ), ImGuiDockNodeFlags_NoResize );
+			/* render title */
+			[ & ]( ) {
+				/* render background */
+				ImGui::PushClipRect( ImVec2( position.x, position.y ), ImVec2( position.x + size.x, position.y + background_height ), false );
+				draw_list->AddRectFilled( ImVec2( position.x, position.y ), ImVec2( position.x + size.x, position.y + background_height ),
+				                          ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, style.Alpha ), style.WindowRounding,
+				                          ImDrawFlags_RoundCornersTop );
+				ImGui::PopClipRect( );
 
-					ImGui::SetNextWindowSize( ImVec2( 297, 0 ) );
+				/* render gradient */
+				RenderFadedGradientLine( draw_list, ImVec2( position.x, position.y + background_height - 1.f ), ImVec2( size.x, 1.f ),
+				                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ) );
 
-					ImGui::Begin( "Aimbot Mouse", nullptr );
-					{
-						ImGui::Checkbox( "Enabled ##Mouse Enabled", aimbot_mouse_enabled );
-						ImGui::Spacing( );
-						ImGui::Text( "Mouse FOV" );
-						ImGui::SliderFloat( "##Mouse FOV", aimbot_mouse_fov, 0.f, 180.f, "%.1f" );
-						ImGui::Text( "Mouse Smoothing" );
-						ImGui::SameLine( );
-						ImGui::TextDisabled( "(?)" );
-						if ( ImGui::IsItemHovered( ImGuiHoveredFlags_DelayShort ) ) {
-							ImGui::BeginTooltip( );
-							ImGui::PushTextWrapPos( ImGui::GetFontSize( ) * 35.0f );
-							ImGui::TextUnformatted( "Multiplier to the curve." );
-							ImGui::PopTextWrapPos( );
-							ImGui::EndTooltip( );
-						}
-						ImGui::SliderFloat( "##Mouse Smoothing", aimbot_mouse_smoothing, 0.f, 1.f, "%.1f" );
-						ImGui::Text( "Mouse Hitboxes" );
+				constexpr const char* title_text = "hotwheels";
+				const auto title_text_size       = verdana_bd_11->CalcTextSizeA( verdana_bd_11->FontSize, FLT_MAX, 0.f, title_text );
 
-						auto preview_text = std::string( ) + ( *aimbot_mouse_hitbox_head ? "Head, " : "" ) +
-						                    ( *aimbot_mouse_hitbox_chest ? "Chest, " : "" ) + ( *aimbot_mouse_hitbox_stomach ? "Stomach, " : "" ) +
-						                    ( *aimbot_mouse_hitbox_legs ? "Legs, " : "" ) + ( *aimbot_mouse_hitbox_arms ? "Arms" : "" );
+				constexpr const char* vip_title_text = ".vip";
+				const auto vip_title_text_size       = verdana_bd_11->CalcTextSizeA( verdana_bd_11->FontSize, FLT_MAX, 0.f, vip_title_text );
 
-						if ( ImGui::BeginCombo( "##Mouse Hitboxes", preview_text.c_str( ) ) ) {
-							ImGui::Selectable( "Head", aimbot_mouse_hitbox_head, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Chest", aimbot_mouse_hitbox_chest, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Stomach", aimbot_mouse_hitbox_stomach, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Legs", aimbot_mouse_hitbox_legs, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Arms", aimbot_mouse_hitbox_arms, ImGuiSelectableFlags_DontClosePopups );
+				draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize,
+				                    ImVec2( position.x + ( ( size.x - title_text_size.x - vip_title_text_size.x ) / 2.f ),
+				                            position.y + ( ( background_height - title_text_size.y ) / 2.f ) ),
+				                    ImColor( 1.f, 1.f, 1.f, style.Alpha ), title_text );
 
-							ImGui::EndCombo( );
-						}
+				draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize,
+				                    ImVec2( position.x + ( ( size.x + title_text_size.x - vip_title_text_size.x ) / 2.f ),
+				                            position.y + ( ( background_height - title_text_size.y ) / 2.f ) ),
+				                    ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ), vip_title_text );
+			}( );
 
-						ImGui::Text( "Mouse Curve" );
+			/* render tabs */
+			[ & ]( ) {
+				/* render background */
+				ImGui::PushClipRect( ImVec2( position.x, position.y + size.y - background_height ),
+				                     ImVec2( position.x + size.x, position.y + size.y ), false );
+				draw_list->AddRectFilled(
+					ImVec2( position.x, position.y + size.y - background_height ), ImVec2( position.x + size.x, position.y + size.y ),
+					ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, style.Alpha ), style.WindowRounding, ImDrawFlags_RoundCornersBottom );
+				ImGui::PopClipRect( );
 
-						preview_text = std::string( ) + ( *aimbot_mouse_curve_linear ? "Linear" : "" ) +
-						               ( *aimbot_mouse_curve_quadratic ? "Quadratic" : "" ) + ( *aimbot_mouse_curve_cubic ? "Cubic" : "" ) +
-						               ( *aimbot_mouse_curve_quartic ? "Quartic " : "" ) + ( *aimbot_mouse_curve_quintic ? "Quintic" : "" );
+				/* render gradient */
+				RenderFadedGradientLine( draw_list, ImVec2( position.x, position.y + size.y - background_height ), ImVec2( size.x, 1.f ),
+				                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ) );
 
-						if ( ImGui::BeginCombo( "##Mouse Curve", preview_text.c_str( ) ) ) {
-							if ( ImGui::Selectable( "Linear", aimbot_mouse_curve_linear ) ) {
-								*aimbot_mouse_curve_quadratic = false;
-								*aimbot_mouse_curve_cubic     = false;
-								*aimbot_mouse_curve_quartic   = false;
-								*aimbot_mouse_curve_quintic   = false;
-							}
-							if ( ImGui::Selectable( "Quadratic", aimbot_mouse_curve_quadratic ) ) {
-								*aimbot_mouse_curve_linear  = false;
-								*aimbot_mouse_curve_cubic   = false;
-								*aimbot_mouse_curve_quartic = false;
-								*aimbot_mouse_curve_quintic = false;
-							}
-							if ( ImGui::Selectable( "Cubic", aimbot_mouse_curve_cubic ) ) {
-								*aimbot_mouse_curve_quadratic = false;
-								*aimbot_mouse_curve_linear    = false;
-								*aimbot_mouse_curve_quartic   = false;
-								*aimbot_mouse_curve_quintic   = false;
-							}
-							if ( ImGui::Selectable( "Quartic", aimbot_mouse_curve_quartic ) ) {
-								*aimbot_mouse_curve_quadratic = false;
-								*aimbot_mouse_curve_cubic     = false;
-								*aimbot_mouse_curve_linear    = false;
-								*aimbot_mouse_curve_quintic   = false;
-							}
-							if ( ImGui::Selectable( "Quintic", aimbot_mouse_curve_quintic ) ) {
-								*aimbot_mouse_curve_quadratic = false;
-								*aimbot_mouse_curve_cubic     = false;
-								*aimbot_mouse_curve_quartic   = false;
-								*aimbot_mouse_curve_linear    = false;
-							}
+				/* tab logic */
+				std::vector< const char* > tab_names = { "aimbot", "visuals", "movement", "misc", "settings" };
+				for ( int iterator = { }; iterator < tab_names.size( ); iterator++ ) {
+					if ( !( iterator < tab_names.size( ) ) )
+						break;
 
-							ImGui::EndCombo( );
-						}
+					const char* const tab_name = tab_names[ iterator ];
 
-						float values[ 50 ]{ };
+					const auto hashed_tab_name = ImHashStr( tab_name );
 
-						for ( int i = 0; i < 50; i++ ) {
-							if ( aimbot_mouse_curve_linear )
-								values[ i ] = ( -( LinearInterpolation( i / 50.f ) ) + 1.f ) * *aimbot_mouse_smoothing;
+					const auto text_size = verdana_bd_11->CalcTextSizeA( verdana_bd_11->FontSize, FLT_MAX, 0.f, tab_name );
 
-							if ( *aimbot_mouse_curve_quadratic )
-								values[ i ] = ( -( QuadraticEaseIn( i / 50.f ) ) + 1.f ) * *aimbot_mouse_smoothing;
+					const int tab_width    = ( size.x / static_cast< int >( tab_names.size( ) ) );
+					const int tab_center_x = ( tab_width * iterator ) + ( tab_width / 2 );
 
-							if ( *aimbot_mouse_curve_cubic )
-								values[ i ] = ( -( CubicEaseIn( i / 50.f ) ) + 1.f ) * *aimbot_mouse_smoothing;
+					const auto text_position =
+						ImVec2( tab_center_x - ( text_size.x / 2 ), ( size.y - ( background_height + text_size.y ) / 2.f ) - 1.f );
 
-							if ( *aimbot_mouse_curve_quartic )
-								values[ i ] = ( -( QuarticEaseIn( i / 50.f ) ) + 1.f ) * *aimbot_mouse_smoothing;
+					const bool hovered = ImGui::IsMouseHoveringRect(
+						ImVec2( position.x + text_position.x, position.y + text_position.y ),
+						ImVec2( position.x + text_position.x + text_size.x, position.y + text_position.y + text_size.y ) );
 
-							if ( *aimbot_mouse_curve_quintic )
-								values[ i ] = ( -( QuinticEaseIn( i / 50.f ) ) + 1.f ) * *aimbot_mouse_smoothing;
-						}
+					const bool selected = iterator == tab_number;
 
-						ImGui::PlotLines( "##Graph", values, 50, 0, 0, 0, 1 );
-					}
-					ImGui::End( );
+					auto hovered_text_animation =
+						ImAnimationHelper( hashed_tab_name + ImHashStr( "hovered-text-animation" ), ImGui::GetIO( ).DeltaTime );
+					hovered_text_animation.Update( 2.f, hovered ? 2.f : -2.f, 0.5f );
 
-					ImGui::SetNextWindowSize( ImVec2( 297, 0 ) );
+					auto selected_animation = ImAnimationHelper( hashed_tab_name + ImHashStr( "selected-animation" ), ImGui::GetIO( ).DeltaTime );
+					selected_animation.Update( 2.f, selected ? 2.f : -2.f );
 
-					ImGui::Begin( "Aimbot Silent", nullptr );
-					{
-						ImGui::Checkbox( "Enabled ##Silent Enabled", aimbot_silent_enabled );
-						ImGui::Text( "Silent FOV" );
-						ImGui::SliderFloat( "##Silent FOV", aimbot_silent_fov, 0.f, 180.f, "%.1f" );
+					draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize, ImVec2( position.x + text_position.x, position.y + text_position.y ),
+					                    ImColor::Blend( ImColor( 1.f, 1.f, 1.f, hovered_text_animation.AnimationData->second ),
+					                                    ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ),
+					                                    selected_animation.AnimationData->second ),
+					                    tab_name );
 
-						ImGui::Text( "Silent Hitboxes" );
-
-						auto preview_text = std::string( ) + ( *aimbot_silent_hitbox_head ? "Head, " : "" ) +
-						                    ( *aimbot_silent_hitbox_chest ? "Chest, " : "" ) + ( *aimbot_silent_hitbox_stomach ? "Stomach, " : "" ) +
-						                    ( *aimbot_silent_hitbox_legs ? "Legs, " : "" ) + ( *aimbot_silent_hitbox_arms ? "Arms" : "" );
-
-						if ( ImGui::BeginCombo( "##Silent Hitboxes", preview_text.c_str( ) ) ) {
-							ImGui::Selectable( "Head", aimbot_silent_hitbox_head, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Chest", aimbot_silent_hitbox_chest, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Stomach", aimbot_silent_hitbox_stomach, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Legs", aimbot_silent_hitbox_legs, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Arms", aimbot_silent_hitbox_arms, ImGuiSelectableFlags_DontClosePopups );
-
-							ImGui::EndCombo( );
-						}
-					}
-					ImGui::End( );
-
-					ImGui::SetNextWindowSize( ImVec2( 297, 0 ) );
-					ImGui::Begin( "Aimbot Projectile", nullptr );
-					{
-						ImGui::Checkbox( "Enabled ##Projectile Enabled", aimbot_projectile_enabled );
-						ImGui::Checkbox( "Projectile Invisible", aimbot_projectile_invisible );
-						ImGui::SameLine( );
-						ImGui::TextDisabled( "(?)" );
-						if ( ImGui::IsItemHovered( ImGuiHoveredFlags_DelayShort ) ) {
-							ImGui::BeginTooltip( );
-							ImGui::PushTextWrapPos( ImGui::GetFontSize( ) * 35.0f );
-							ImGui::TextUnformatted(
-								"Makes your projectile aimbot invisible to spectators when used with silent aim. Often called p-silent." );
-							ImGui::PopTextWrapPos( );
-							ImGui::EndTooltip( );
-						}
-						ImGui::Checkbox( "Projectile Feet", aimbot_projectile_feet );
-						ImGui::SameLine( );
-						ImGui::TextDisabled( "(?)" );
-						if ( ImGui::IsItemHovered( ImGuiHoveredFlags_DelayShort ) ) {
-							ImGui::BeginTooltip( );
-							ImGui::PushTextWrapPos( ImGui::GetFontSize( ) * 35.0f );
-							ImGui::TextUnformatted( "Targets feet to ideally send a person higher in the air." );
-							ImGui::TextColored( ImVec4( 1.f, 0.f, 0.f, 1.f ), "WARNING: Less chance of hitting projectiles!" );
-							ImGui::PopTextWrapPos( );
-							ImGui::EndTooltip( );
-						}
-						ImGui::Text( "Projectile Steps" );
-						ImGui::SameLine( );
-						ImGui::TextDisabled( "(?)" );
-						if ( ImGui::IsItemHovered( ImGuiHoveredFlags_DelayShort ) ) {
-							ImGui::BeginTooltip( );
-							ImGui::PushTextWrapPos( ImGui::GetFontSize( ) * 35.0f );
-							ImGui::TextUnformatted( "Steps the aimbot will take to find the best target." );
-							ImGui::TextColored( ImVec4( 1.f, 0.f, 0.f, 1.f ), "WARNING: Higher values will cause more lag!" );
-							ImGui::PopTextWrapPos( );
-							ImGui::EndTooltip( );
-						}
-						ImGui::SliderInt( "##Projectile Steps", aimbot_projectile_steps, 1, 50 );
-					}
-					ImGui::End( );
-
-					ImGui::EndChild( );
+					if ( hovered && ImGui::IsMouseClicked( ImGuiMouseButton_Left ) )
+						tab_number = iterator;
 				}
+			}( );
 
-				ImGui::EndTabItem( );
-			}
+			/* set next working position for the elements */
+			ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) + 25.f );
 
-			if ( ImGui::BeginTabItem( "Config", nullptr ) ) {
-				if ( ImGui::BeginChild( "Config Child", ImVec2( 0, 0 ), false ) ) {
-					auto id = ImGui::GetID( "ConfigDockSpace" );
+			switch ( tab_number ) {
+			// aimbart
+			case 0: {
+				if ( ImGui::BeginChild(
+						 "mouse aimbot",
+						 ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ( ImGui::GetContentRegionAvail( ).y / 2.f ) - background_height - 20.f ),
+						 true, 0, true ) ) {
+					// err, head, chest, pelvis, limbs
+					std::vector< bool > buffer_hitboxes = { ( bool )( *aimbot_mouse_hitboxes & 1 << sdk::hitbox_head ),
+						                                    ( bool )( *aimbot_mouse_hitboxes & 1 << sdk::hitbox_chest ),
+						                                    ( bool )( *aimbot_mouse_hitboxes & 1 << sdk::hitbox_pelvis ),
+						                                    ( bool )( *aimbot_mouse_hitboxes & 1 << sdk::hitbox_right_thigh ) };
 
-					static ImGuiID left{ };
-					static ImGuiID right{ };
+					ImGui::Checkbox( "mouse enabled", aimbot_mouse_enabled );
+					ImGui::SliderFloat( "mouse fov", aimbot_mouse_fov, 0.f, 180.f, "%.1f" );
+					ImGui::SliderFloat( "mouse smoothing", aimbot_mouse_smoothing, 0.f, 1.f, "%.2f" );
+					ImGui::MultiCombo( "mouse hitboxes", buffer_hitboxes, { "head", "chest", "pelvis", "limbs" }, buffer_hitboxes.size( ) );
 
-					if ( ImGui::DockBuilderGetNode( id ) == nullptr ) {
-						ImGui::DockBuilderRemoveNode( id );
-						ImGui::DockBuilderAddNode( id, ImGuiDockNodeFlags_DockSpace );
-						ImGui::DockBuilderSetNodeSize( id, ImGui::GetWindowSize( ) );
-
-						ImGui::DockBuilderSplitNode( id, ImGuiDir_Left, 0.5f, &left, &right );
-
-						ImGui::DockBuilderDockWindow( "Menu Settings", left );
-						ImGui::DockBuilderDockWindow( "Cheat Settings", right );
-
-						ImGui::DockBuilderFinish( id );
+					if ( buffer_hitboxes[ 0 ] ) {
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_head;
+					} else {
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_head );
+					}
+					if ( buffer_hitboxes[ 1 ] ) {
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_lower_chest;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_chest;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_upper_chest;
+					} else {
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_lower_chest );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_chest );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_upper_chest );
+					}
+					if ( buffer_hitboxes[ 2 ] ) {
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_pelvis;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_stomach;
+					} else {
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_pelvis );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_stomach );
+					}
+					if ( buffer_hitboxes[ 3 ] ) {
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_right_thigh;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_left_thigh;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_right_calf;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_left_calf;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_right_foot;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_left_foot;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_right_hand;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_left_hand;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_right_upper_arm;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_right_forearm;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_left_upper_arm;
+						*aimbot_mouse_hitboxes |= 1 << sdk::hitbox_left_forearm;
+					} else {
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_right_thigh );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_left_thigh );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_right_calf );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_left_calf );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_right_foot );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_left_foot );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_right_hand );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_left_hand );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_right_upper_arm );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_right_forearm );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_left_upper_arm );
+						*aimbot_mouse_hitboxes &= ~( 1 << sdk::hitbox_left_forearm );
 					}
 
-					ImGui::DockSpace( id, ImVec2( 0, 0 ), ImGuiDockNodeFlags_NoResize );
+					Points_t points = { *aimbot_mouse_curve_a, *aimbot_mouse_curve_b };
 
-					ImGui::SetNextWindowSize( ImVec2( 297, 0 ) );
-
-					ImGui::Begin( "Menu Settings" );
-					{
-						bool open = ImGui::TreeNode( "Menu Colors" );
-
-						ImGui::SameLine( );
-						ImGui::TextDisabled( "(?)" );
-						if ( ImGui::IsItemHovered( ImGuiHoveredFlags_DelayShort ) ) {
-							ImGui::BeginTooltip( );
-							ImGui::PushTextWrapPos( ImGui::GetFontSize( ) * 35.0f );
-							ImGui::TextUnformatted( "Only saves to themes" );
-							ImGui::PopTextWrapPos( );
-							ImGui::EndTooltip( );
-						}
-
-						if ( open ) {
-							for ( auto& color : ImGui::GetStyle( ).Colors ) {
-								const char* name = ImGui::GetStyleColorName( ( int )( &color - ImGui::GetStyle( ).Colors ) );
-								float color_array[ 4 ]{ color.x, color.y, color.z, color.w };
-
-								ImGui::ColorEdit4( name, color_array, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoSidePreview );
-
-								color.x = color_array[ 0 ];
-								color.y = color_array[ 1 ];
-								color.z = color_array[ 2 ];
-								color.w = color_array[ 3 ];
-							}
-
-							ImGui::TreePop( );
-						}
-
-						auto preview_text =
-							std::string( ) + ( *menu_disabled_inputs_mouse ? "Mouse, " : "" ) + ( *menu_disabled_inputs_keyboard ? "Keyboard" : "" );
-
-						ImGui::Spacing( );
-
-						ImGui::Text( "Disabled Inputs" );
-						if ( ImGui::BeginCombo( "##Menu Disabled Inputs", preview_text.c_str( ) ) ) {
-							ImGui::Selectable( "Mouse", menu_disabled_inputs_mouse, ImGuiSelectableFlags_DontClosePopups );
-							ImGui::Selectable( "Keyboard", menu_disabled_inputs_keyboard, ImGuiSelectableFlags_DontClosePopups );
-
-							ImGui::EndCombo( );
-						}
-
-						ImGui::Spacing( );
-
-						ImGui::Text( "Animation Speed" );
-						ImGui::SliderFloat( "##Menu Animation Speed", menu_animation_speed, 0.1f, 2.0f, "%.1f" );
-						ImGui::Text( "Indicator Transparency" );
-						ImGui::SliderFloat( "##Menu Indicator Transparency", menu_indicator_transparency, 0.1f, 1.f, "%.1f" );
-
-						ImGui::End( );
-					}
-
-					ImGui::SetNextWindowSize( ImVec2( 297, 0 ) );
-
-					ImGui::Begin( "Cheat Settings" );
-					{
-						static std::string last_config{ };
-
-						ImGui::Text( "Config List" );
-						ImGui::SameLine( );
-						ImGui::TextDisabled( "(?)" );
-						if ( ImGui::IsItemHovered( ImGuiHoveredFlags_DelayShort ) ) {
-							ImGui::BeginTooltip( );
-							ImGui::PushTextWrapPos( ImGui::GetFontSize( ) * 35.0f );
-							ImGui::TextUnformatted( "Right click on the config list / config for actions" );
-							ImGui::PopTextWrapPos( );
-							ImGui::EndTooltip( );
-						}
-
-						if ( ImGui::BeginListBox( "##Configs", ImVec2( 279, 0 ) ) ) {
-							if ( ImGui::BeginPopupContextWindow( "##Configs Context" ) ) {
-								static char config_name[ 128 ]{ };
-
-								ImGui::PushItemWidth( 272 );
-								ImGui::InputText( "##Config Name", config_name, sizeof( config_name ) );
-								ImGui::PopItemWidth( );
-
-								if ( ImGui::Button( "Create", ImVec2( 272, 0 ) ) ) {
-									if ( !std::filesystem::exists( fmt::format( "C:\\Hotwheels\\Configs\\{}.hw", config_name ) ) ) {
-										g_config->save( fmt::format( "C:\\Hotwheels\\Configs\\{}.hw", config_name ) );
-										ImGui::CloseCurrentPopup( );
-									}
-								}
-
-								ImGui::EndPopup( );
-							}
-
-							for ( auto entry : std::filesystem::directory_iterator( "C:\\Hotwheels\\Configs" ) ) {
-								if ( entry.path( ).extension( ) != ".hw" )
-									continue;
-
-								std::string file_name{ entry.path( ).filename( ).string( ) };
-								file_name.erase( file_name.end( ) - 3, file_name.end( ) );
-
-								bool selected = last_config.contains( file_name.c_str( ) );
-
-								if ( ImGui::Selectable( file_name.c_str( ), selected ) ) {
-									last_config = file_name;
-								}
-
-								if ( ImGui::BeginPopupContextItem( fmt::format( "##Config Context {}", file_name ).c_str( ) ) ) {
-									if ( ImGui::Button( "Delete" ) ) {
-										std::filesystem::remove( entry.path( ).string( ) );
-
-										ImGui::CloseCurrentPopup( );
-									}
-
-									ImGui::EndPopup( );
-								}
-							}
-							ImGui::EndListBox( );
-						}
-
-						auto config_name_short = last_config;
-
-						if ( config_name_short.length( ) > 8 ) {
-							config_name_short.erase( 8, config_name_short.length( ) - 8 );
-							config_name_short += "...";
-						}
-
-						if ( ImGui::Button( fmt::format( "Load {}", config_name_short ).c_str( ), ImVec2( 135, 0 ) ) ) {
-							g_config->load( fmt::format( "C:\\Hotwheels\\Configs\\{}.hw", last_config ) );
-						}
-
-						ImGui::SameLine( );
-
-						if ( ImGui::Button( fmt::format( "Save {}", config_name_short ).c_str( ), ImVec2( 136, 0 ) ) ) {
-							g_config->save( fmt::format( "C:\\Hotwheels\\Configs\\{}.hw", last_config ) );
-						}
-
-						static std::string last_theme{ };
-
-						ImGui::Text( "Theme List" );
-						ImGui::SameLine( );
-						ImGui::TextDisabled( "(?)" );
-						if ( ImGui::IsItemHovered( ImGuiHoveredFlags_DelayShort ) ) {
-							ImGui::BeginTooltip( );
-							ImGui::PushTextWrapPos( ImGui::GetFontSize( ) * 35.0f );
-							ImGui::TextUnformatted( "Right click on the theme list / config for actions" );
-							ImGui::PopTextWrapPos( );
-							ImGui::EndTooltip( );
-						}
-
-						if ( ImGui::BeginListBox( "##Themes", ImVec2( 279, 0 ) ) ) {
-							if ( ImGui::BeginPopupContextWindow( "##Themes Context" ) ) {
-								static char theme_name[ 128 ]{ };
-
-								ImGui::PushItemWidth( 272 );
-								ImGui::InputText( "##Theme Name", theme_name, sizeof( theme_name ) );
-								ImGui::PopItemWidth( );
-
-								if ( ImGui::Button( "Create", ImVec2( 272, 0 ) ) ) {
-									if ( !std::filesystem::exists( fmt::format( "C:\\Hotwheels\\Themes\\{}.hw", theme_name ) ) ) {
-										g_themes->save( fmt::format( "C:\\Hotwheels\\Themes\\{}.hw", theme_name ) );
-										ImGui::CloseCurrentPopup( );
-									}
-								}
-
-								ImGui::EndPopup( );
-							}
-
-							for ( auto entry : std::filesystem::directory_iterator( "C:\\Hotwheels\\Themes" ) ) {
-								if ( entry.path( ).extension( ) != ".hw" )
-									continue;
-
-								std::string file_name{ entry.path( ).filename( ).string( ) };
-								file_name.erase( file_name.end( ) - 3, file_name.end( ) );
-
-								bool selected = last_theme.contains( file_name.c_str( ) );
-
-								if ( ImGui::Selectable( file_name.c_str( ), selected ) ) {
-									last_theme = file_name;
-								}
-
-								if ( ImGui::BeginPopupContextItem( fmt::format( "##Theme Context {}", file_name ).c_str( ) ) ) {
-									if ( ImGui::Button( "Delete" ) ) {
-										std::filesystem::remove( entry.path( ).string( ) );
-
-										ImGui::CloseCurrentPopup( );
-									}
-
-									ImGui::EndPopup( );
-								}
-							}
-							ImGui::EndListBox( );
-						}
-
-						auto theme_name_short = last_theme;
-
-						if ( theme_name_short.length( ) > 8 ) {
-							theme_name_short.erase( 8, theme_name_short.length( ) - 8 );
-							theme_name_short += "...";
-						}
-
-						if ( ImGui::Button( fmt::format( "Load {}##theme", theme_name_short ).c_str( ), ImVec2( 135, 0 ) ) ) {
-							g_themes->load( fmt::format( "C:\\Hotwheels\\Themes\\{}.hw", last_theme ) );
-						}
-
-						ImGui::SameLine( );
-
-						if ( ImGui::Button( fmt::format( "Save {}##theme", theme_name_short ).c_str( ), ImVec2( 136, 0 ) ) ) {
-							g_themes->save( fmt::format( "C:\\Hotwheels\\Themes\\{}.hw", last_theme ) );
-						}
-
-						ImGui::End( );
+					if ( ImGui::CurveEditor( "mouse curve", &points, mouse_curve, 50 ) ) {
+						*aimbot_mouse_curve_a = points.PointA;
+						*aimbot_mouse_curve_b = points.PointB;
 					}
 
 					ImGui::EndChild( );
 				}
 
-				ImGui::EndTabItem( );
-			}
+				ImGui::SameLine( );
+				ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
 
-			ImGui::EndTabBar( );
+				if ( ImGui::BeginChild(
+						 "silent aimbot",
+						 ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y / 2.f ) - background_height - 20.f ), true, 0,
+						 true ) ) {
+					// err, head, chest, pelvis, limbs
+					std::vector< bool > buffer_hitboxes = { ( bool )( *aimbot_silent_hitboxes & 1 << sdk::hitbox_head ),
+						                                    ( bool )( *aimbot_silent_hitboxes & 1 << sdk::hitbox_chest ),
+						                                    ( bool )( *aimbot_silent_hitboxes & 1 << sdk::hitbox_pelvis ),
+						                                    ( bool )( *aimbot_silent_hitboxes & 1 << sdk::hitbox_right_thigh ) };
+
+					ImGui::Checkbox( "silent enabled", aimbot_silent_enabled );
+					ImGui::SliderFloat( "silent fov", aimbot_silent_fov, 0.f, 180.f, "%.1f" );
+					ImGui::MultiCombo( "silent hitboxes", buffer_hitboxes, { "head", "chest", "pelvis", "limbs" }, buffer_hitboxes.size( ) );
+
+					if ( buffer_hitboxes[ 0 ] ) {
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_head;
+					} else {
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_head );
+					}
+					if ( buffer_hitboxes[ 1 ] ) {
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_lower_chest;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_chest;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_upper_chest;
+					} else {
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_lower_chest );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_chest );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_upper_chest );
+					}
+					if ( buffer_hitboxes[ 2 ] ) {
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_pelvis;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_stomach;
+					} else {
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_pelvis );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_stomach );
+					}
+					if ( buffer_hitboxes[ 3 ] ) {
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_right_thigh;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_left_thigh;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_right_calf;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_left_calf;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_right_foot;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_left_foot;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_right_hand;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_left_hand;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_right_upper_arm;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_right_forearm;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_left_upper_arm;
+						*aimbot_silent_hitboxes |= 1 << sdk::hitbox_left_forearm;
+					} else {
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_right_thigh );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_left_thigh );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_right_calf );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_left_calf );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_right_foot );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_left_foot );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_right_hand );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_left_hand );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_right_upper_arm );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_right_forearm );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_left_upper_arm );
+						*aimbot_silent_hitboxes &= ~( 1 << sdk::hitbox_left_forearm );
+					}
+
+					ImGui::EndChild( );
+				}
+
+				if ( ImGui::BeginChild(
+						 "projectile aimbot",
+						 ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ), true, 0,
+						 true ) ) {
+					ImGui::Checkbox( "projectile enabled", aimbot_projectile_enabled );
+					ImGui::Checkbox( "projectile invisible", aimbot_projectile_invisible );
+					ImGui::SliderInt( "projectile steps", aimbot_projectile_steps, 0, 100, "%d" );
+
+					int buffer_target = *aimbot_projectile_feet ? 1 : 0;
+
+					ImGui::Combo( "projectile target", &buffer_target, "best\0feet\0" );
+
+					if ( buffer_target == 0 ) {
+						*aimbot_projectile_feet = false;
+					} else {
+						*aimbot_projectile_feet = true;
+					}
+
+					ImGui::EndChild( );
+				}
+
+				ImGui::SameLine( );
+				ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
+
+				if ( ImGui::BeginChild( "other aimbot",
+				                        ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ),
+				                        true, 0, true ) ) {
+					ImGui::EndChild( );
+				}
+
+				break;
+			}
+			case 5: {
+			}
+			}
 		}
-
-		ImGui::End( );
 	}
+
+	ImGui::End( );
 }
