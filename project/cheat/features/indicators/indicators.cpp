@@ -3,11 +3,14 @@
 
 void indicators::run( )
 {
+	ImGui::SetNextWindowSize( ImVec2( 150.f, 40.f ), ImGuiCond_::ImGuiCond_Always );
+
 	ImGui::Begin( "Double Tap", nullptr,
-	              ( g_menu->open ? ImGuiWindowFlags_None : ImGuiWindowFlags_NoTitleBar ) | ImGuiWindowFlags_AlwaysAutoResize |
-	                  ImGuiWindowFlags_NoResize );
+	              ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize );
 	{
-		ImGui::SliderInt( "##Percent", &g_cl_move->stored, 0, 22, "%d", ImGuiSliderFlags_NoInput );
+		auto buffer_stored = g_cl_move->stored; // prevent the user from falsifying the value
+
+		ImGui::SliderInt( "Shiftable Ticks", &buffer_stored, 0, 22, "%d", ImGuiSliderFlags_NoInput );
 	}
 	ImGui::End( );
 }

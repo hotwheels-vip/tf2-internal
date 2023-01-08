@@ -53,12 +53,13 @@ void menu::run( )
 				/* render background */
 				ImGui::PushClipRect( ImVec2( position.x, position.y ), ImVec2( position.x + size.x, position.y + background_height ), false );
 				draw_list->AddRectFilled( ImVec2( position.x, position.y ), ImVec2( position.x + size.x, position.y + background_height ),
-				                          ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ), style.WindowRounding, ImDrawFlags_RoundCornersTop );
+				                          ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, style.Alpha ), style.WindowRounding,
+				                          ImDrawFlags_RoundCornersTop );
 				ImGui::PopClipRect( );
 
 				/* render gradient */
 				RenderFadedGradientLine( draw_list, ImVec2( position.x, position.y + background_height - 1.f ), ImVec2( size.x, 1.f ),
-				                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ) );
+				                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ) );
 
 				constexpr const char* title_text = "hotwheels";
 				const auto title_text_size       = verdana_bd_11->CalcTextSizeA( verdana_bd_11->FontSize, FLT_MAX, 0.f, title_text );
@@ -69,12 +70,12 @@ void menu::run( )
 				draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize,
 				                    ImVec2( position.x + ( ( size.x - title_text_size.x - vip_title_text_size.x ) / 2.f ),
 				                            position.y + ( ( background_height - title_text_size.y ) / 2.f ) ),
-				                    ImColor( 1.f, 1.f, 1.f ), title_text );
+				                    ImColor( 1.f, 1.f, 1.f, style.Alpha ), title_text );
 
 				draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize,
 				                    ImVec2( position.x + ( ( size.x + title_text_size.x - vip_title_text_size.x ) / 2.f ),
 				                            position.y + ( ( background_height - title_text_size.y ) / 2.f ) ),
-				                    ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ), vip_title_text );
+				                    ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ), vip_title_text );
 			}( );
 
 			/* render tabs */
@@ -82,14 +83,14 @@ void menu::run( )
 				/* render background */
 				ImGui::PushClipRect( ImVec2( position.x, position.y + size.y - background_height ),
 				                     ImVec2( position.x + size.x, position.y + size.y ), false );
-				draw_list->AddRectFilled( ImVec2( position.x, position.y + size.y - background_height ),
-				                          ImVec2( position.x + size.x, position.y + size.y ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ),
-				                          style.WindowRounding, ImDrawFlags_RoundCornersBottom );
+				draw_list->AddRectFilled(
+					ImVec2( position.x, position.y + size.y - background_height ), ImVec2( position.x + size.x, position.y + size.y ),
+					ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, style.Alpha ), style.WindowRounding, ImDrawFlags_RoundCornersBottom );
 				ImGui::PopClipRect( );
 
 				/* render gradient */
 				RenderFadedGradientLine( draw_list, ImVec2( position.x, position.y + size.y - background_height ), ImVec2( size.x, 1.f ),
-				                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ) );
+				                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ) );
 
 				/* tab logic */
 				std::vector< const char* > tab_names = { "aimbot", "visuals", "movement", "misc", "settings" };
@@ -124,7 +125,8 @@ void menu::run( )
 
 					draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize, ImVec2( position.x + text_position.x, position.y + text_position.y ),
 					                    ImColor::Blend( ImColor( 1.f, 1.f, 1.f, hovered_text_animation.AnimationData->second ),
-					                                    ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ), selected_animation.AnimationData->second ),
+					                                    ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ),
+					                                    selected_animation.AnimationData->second ),
 					                    tab_name );
 
 					if ( hovered && ImGui::IsMouseClicked( ImGuiMouseButton_Left ) )
@@ -312,6 +314,8 @@ void menu::run( )
 				}
 
 				break;
+			}
+			case 5: {
 			}
 			}
 		}

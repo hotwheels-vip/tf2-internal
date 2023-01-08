@@ -1050,8 +1050,9 @@ bool ImGui::ScrollbarEx( const ImRect& bb_frame, ImGuiID id, ImGuiAxis axis, ImS
 		grab_rect =
 			ImRect( bb.Min.x, ImLerp( bb.Min.y, bb.Max.y, grab_v_norm ), bb.Max.x, ImLerp( bb.Min.y, bb.Max.y, grab_v_norm ) + grab_h_pixels );
 	window->DrawList->AddRectFilled( grab_rect.Min, grab_rect.Max,
-	                                 ImColor::Blend( ImColor( 51 / 255.f, 51 / 255.f, 51 / 255.f, 1.f ),
-	                                                 ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ), scrollbar_animation.AnimationData->second ),
+	                                 ImColor::Blend( ImColor( 51 / 255.f, 51 / 255.f, 51 / 255.f, g.Style.Alpha ),
+	                                                 ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ),
+	                                                 scrollbar_animation.AnimationData->second ),
 	                                 style.ScrollbarRounding );
 
 	return held;
@@ -1269,12 +1270,13 @@ bool ImGui::Checkbox( const char* label, bool* v )
 	const bool render_decorations = frame_animation.AnimationData->second != 1.f;
 
 	if ( render_decorations )
-		RenderFrame( check_bb.Min, check_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ), true, style.FrameRounding );
+		RenderFrame( check_bb.Min, check_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ), true, style.FrameRounding );
 
-	RenderFrame( check_bb.Min, check_bb.Max, ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], 1.f * frame_animation.AnimationData->second ), true,
+	RenderFrame( check_bb.Min, check_bb.Max,
+	             ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], 1.f * frame_animation.AnimationData->second * g.Style.Alpha ), true,
 	             style.FrameRounding );
 
-	window->DrawList->AddRect( check_bb.Min, check_bb.Max, ImColor( 50, 50, 50, 100 ), style.FrameRounding );
+	window->DrawList->AddRect( check_bb.Min, check_bb.Max, ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ), style.FrameRounding );
 
 	auto text_animation = ImAnimationHelper( id + 1u, ImGui::GetIO( ).DeltaTime );
 	text_animation.Update( hovered || *v ? 4.f : -4.f, 1.f, 0.5f, 1.f );
@@ -1770,9 +1772,10 @@ bool ImGui::BeginCombo( const char* label, const char* preview_value, ImGuiCombo
 	const float value_x2 = ImMax( frame_bb.Min.x, frame_bb.Max.x );
 	RenderNavHighlight( frame_bb, id );
 	if ( !( flags & ImGuiComboFlags_NoPreview ) ) {
-		window->DrawList->AddRectFilled( frame_bb.Min, ImVec2( value_x2, frame_bb.Max.y ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ),
-		                                 style.PopupRounding );
-		window->DrawList->AddRect( frame_bb.Min, ImVec2( value_x2, frame_bb.Max.y ), ImColor( 50, 50, 50, 100 ), style.FrameRounding );
+		window->DrawList->AddRectFilled( frame_bb.Min, ImVec2( value_x2, frame_bb.Max.y ),
+		                                 ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ), style.PopupRounding );
+		window->DrawList->AddRect( frame_bb.Min, ImVec2( value_x2, frame_bb.Max.y ), ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ),
+		                           style.FrameRounding );
 	}
 
 	if ( !( flags & ImGuiComboFlags_NoArrowButton ) ) {
@@ -1797,7 +1800,7 @@ bool ImGui::BeginCombo( const char* label, const char* preview_value, ImGuiCombo
 
 		const ImVec2 arrow_draw_position = ImVec2( value_x2 + style.FramePadding.y - 20.f, frame_bb.Min.y + style.FramePadding.y );
 
-		RenderArrow( arrow_draw_position, ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ) );
+		RenderArrow( arrow_draw_position, ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ) );
 	}
 
 	auto text_animation = ImAnimationHelper( id + ImHashStr( "text-animation" ), ImGui::GetIO( ).DeltaTime );
@@ -1805,8 +1808,8 @@ bool ImGui::BeginCombo( const char* label, const char* preview_value, ImGuiCombo
 
 	const ImColor text_color = GetColorU32( ImGuiCol_Text );
 
-	PushStyleColor( ImGuiCol_Text,
-	                ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z, text_color.Value.w * text_animation.AnimationData->second ) );
+	PushStyleColor( ImGuiCol_Text, ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z,
+	                                       text_color.Value.w * text_animation.AnimationData->second * g.Style.Alpha ) );
 
 	// Render preview and label
 	if ( preview_value != NULL && !( flags & ImGuiComboFlags_NoPreview ) ) {
@@ -1872,12 +1875,12 @@ bool ImGui::BeginCombo( const char* label, const char* preview_value, ImGuiCombo
 	// Horizontally align ourselves with the framed text
 	PushStyleVar( ImGuiStyleVar_::ImGuiStyleVar_WindowPadding, ImVec2( style.FramePadding.x, style.WindowPadding.y - 4.f ) );
 	PushStyleVar( ImGuiStyleVar_::ImGuiStyleVar_ScrollbarSize, 0.f );
-	PushStyleColor( ImGuiCol_::ImGuiCol_PopupBg, ImVec4( 25 / 255.f, 25 / 255.f, 25 / 255.f, 1.f ) );
+	PushStyleColor( ImGuiCol_::ImGuiCol_PopupBg, ImVec4( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ) );
 	bool ret = Begin( name, NULL, window_flags );
 
 	PushClipRect( ImGui::GetWindowPos( ), ImGui::GetWindowSize( ) + ImGui::GetWindowPos( ), false );
-	ImGui::GetWindowDrawList( )->AddRect( ImGui::GetWindowPos( ), ImGui::GetWindowSize( ) + ImGui::GetWindowPos( ), ImColor( 50, 50, 50, 100 ),
-	                                      style.FrameRounding );
+	ImGui::GetWindowDrawList( )->AddRect( ImGui::GetWindowPos( ), ImGui::GetWindowSize( ) + ImGui::GetWindowPos( ),
+	                                      ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ), style.FrameRounding );
 	PopClipRect( );
 
 	PopStyleColor( );
@@ -2112,11 +2115,11 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 	const ImGuiIO& io       = ImGui::GetIO( );
 	const ImGuiContext& g   = *GImGui;
 
-	const ImRect frame_bb( window->DC.CursorPos + ImVec2( 18.f, 0.f ),
-	                       window->DC.CursorPos + ImVec2( 18.f, 0.f ) + ImVec2( ImGui::GetContentRegionAvail( ).x - 29.f, 100.f ) );
-	const ImRect total_bb( window->DC.CursorPos + ImVec2( 18.f, 0.f ), window->DC.CursorPos + ImVec2( 18.f, 0.f ) +
-	                                                                       ImVec2( ImGui::GetContentRegionAvail( ).x - 29.f, 100.f ) + label_size +
-	                                                                       ImVec2( 0.f, 5.f ) );
+	ImRect frame_bb( window->DC.CursorPos + ImVec2( 18.f, 0.f ),
+	                 window->DC.CursorPos + ImVec2( 18.f, 0.f ) + ImVec2( ImGui::GetContentRegionAvail( ).x - 29.f, 100.f ) );
+	ImRect total_bb( window->DC.CursorPos + ImVec2( 18.f, 0.f ), window->DC.CursorPos + ImVec2( 18.f, 0.f ) +
+	                                                                 ImVec2( ImGui::GetContentRegionAvail( ).x - 29.f, 100.f ) + label_size +
+	                                                                 ImVec2( 0.f, 5.f ) );
 
 	ItemSize( total_bb, style.FramePadding.y );
 	if ( !ItemAdd( total_bb, id, &frame_bb ) )
@@ -2125,10 +2128,13 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 	const bool hovered = IsItemHovered( );
 
 	// Draw the label
-	RenderText( ImVec2( frame_bb.Min.x, frame_bb.Max.y + 5.f ), label );
+	RenderText( ImVec2( frame_bb.Min.x, frame_bb.Min.y ), label );
+
+	// Push the frame_bb down from the text size
+	frame_bb = ImRect( frame_bb.Min + ImVec2( 0.f, label_size.y + 5.f ), frame_bb.Max );
 
 	// Draw the curve editor
-	RenderFrame( frame_bb.Min, frame_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ), true, g.Style.FrameRounding );
+	RenderFrame( frame_bb.Min, frame_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ), true, g.Style.FrameRounding );
 
 	window->DrawList->AddRect( frame_bb.Min, frame_bb.Max, ImColor( 50, 50, 50, 100 ), g.Style.FrameRounding );
 
@@ -2147,11 +2153,13 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 	                                              ImClamp( point_position_b.y, frame_bb.Min.y + point_size, frame_bb.Max.y - point_size ) );
 	ImAnimationHelper point_a_animation = ImAnimationHelper( id + ImHashStr( "active-animation-point-a" ), ImGui::GetIO( ).DeltaTime );
 
-	window->DrawList->AddCircleFilled( point_position_a_clamped, point_size / 2, ImColor( 1.f, 1.f, 1.f, point_a_animation.AnimationData->second ) );
+	window->DrawList->AddCircleFilled( point_position_a_clamped, point_size / 2,
+	                                   ImColor( 1.f, 1.f, 1.f, point_a_animation.AnimationData->second * g.Style.Alpha ) );
 
 	ImAnimationHelper point_b_animation = ImAnimationHelper( id + ImHashStr( "active-animation-point-b" ), ImGui::GetIO( ).DeltaTime );
 
-	window->DrawList->AddCircleFilled( point_position_b_clamped, point_size / 2, ImColor( 1.f, 1.f, 1.f, point_b_animation.AnimationData->second ) );
+	window->DrawList->AddCircleFilled( point_position_b_clamped, point_size / 2,
+	                                   ImColor( 1.f, 1.f, 1.f, point_b_animation.AnimationData->second * g.Style.Alpha ) );
 
 	// Calculate button bb for each point
 	const auto point_a_bb =
@@ -2215,7 +2223,7 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 			const auto prev_point_position = ImVec2( frame_bb.Min.x + ( frame_bb.Max.x - frame_bb.Min.x ) * prev_pos.x,
 			                                         frame_bb.Min.y + ( frame_bb.Max.y - frame_bb.Min.y ) * ( 1.f + -prev_pos.y ) );
 
-			window->DrawList->AddLine( prev_point_position, point_position, ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ), 2.f );
+			window->DrawList->AddLine( prev_point_position, point_position, ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ), 2.f );
 		}
 	}
 
@@ -3613,9 +3621,9 @@ bool ImGui::SliderScalar( const char* label, ImGuiDataType data_type, void* p_da
 		}
 	}
 
-	RenderFrame( frame_bb.Min, frame_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, 1.f ), true, g.Style.FrameRounding );
+	RenderFrame( frame_bb.Min, frame_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ), true, g.Style.FrameRounding );
 
-	window->DrawList->AddRect( frame_bb.Min, frame_bb.Max, ImColor( 50, 50, 50, 100 ), g.Style.FrameRounding );
+	window->DrawList->AddRect( frame_bb.Min, frame_bb.Max, ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ), g.Style.FrameRounding );
 
 	// Slider behavior
 	int percent              = 0;
@@ -3654,7 +3662,7 @@ bool ImGui::SliderScalar( const char* label, ImGuiDataType data_type, void* p_da
 	// Render grab
 	if ( grab_bb.Max.x > grab_bb.Min.x )
 		window->DrawList->AddRectFilled( frame_bb.Min, ImVec2( frame_bb.Min.x + old_value_data->second, frame_bb.Max.y ),
-		                                 ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], 1.f ),
+		                                 ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ),
 		                                 old_value_data->second > 1.f ? g.Style.FrameRounding : 0.f );
 
 	char value_buf[ 64 ]      = { };
@@ -3667,8 +3675,8 @@ bool ImGui::SliderScalar( const char* label, ImGuiDataType data_type, void* p_da
 
 	const ImColor text_color = GetColorU32( ImGuiCol_Text );
 
-	PushStyleColor( ImGuiCol_Text,
-	                ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z, text_color.Value.w * text_animation.AnimationData->second ) );
+	PushStyleColor( ImGuiCol_Text, ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z,
+	                                       text_color.Value.w * text_animation.AnimationData->second * g.Style.Alpha ) );
 	RenderText( ImVec2( frame_bb.Max.x - CalcTextSize( value_buf ).x + 1.f, total_bb.Min.y + style.FramePadding.y - 3 ), value_buf, value_buf_end );
 
 	if ( label_size.x > 0.0f )
