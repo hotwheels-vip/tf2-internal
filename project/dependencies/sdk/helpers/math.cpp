@@ -1,4 +1,5 @@
 #include "math.hpp"
+#include <algorithm>
 
 void math::angle_to_vector( const sdk::qangle& angle, sdk::vector* forward, sdk::vector* right, sdk::vector* up )
 {
@@ -101,7 +102,7 @@ sdk::vector math::solve_quadratic( sdk::vector a, sdk::vector v, sdk::vector p, 
 	auto t4 = std::powf( ( std::powf( a.x, 2.f ) + std::powf( a.y, 2.f ) + std::powf( a.z, 2.f ) ) / 4.f, 4.f ); // (num)t^4
 	auto t3 = std::powf( a.x * v.x + a.y * v.y + a.z * v.z, 3.f );                                               // (num)t^3
 	auto t2 = std::powf( std::powf( v.x, 2.f ) + std::powf( v.y, 2.f ) + std::powf( v.z, 2.f ) /*- s^2*/ + p0.x * a.x + p0.y * a.y + p0.z * a.z,
-	                     2.f );                          // (num)t^2
+	                     2.f );                             // (num)t^2
 	auto t  = 2 * ( p0.x * v.x + p0.y * v.y + p0.z * v.z ); // (num)t
 	auto l  = std::powf( p.x, 2.f ) + std::powf( p.y, 2.f ) + std::powf( p.z, 2.f );
 
@@ -109,4 +110,12 @@ sdk::vector math::solve_quadratic( sdk::vector a, sdk::vector v, sdk::vector p, 
 	auto s  = l / ts;
 
 	return { s, s, s };
+}
+
+float math::remap_val_clamped( float val, float a, float b, float c, float d )
+{
+	float v = ( val - a ) / ( b - a );
+	v       = std::clamp( v, 0.f, 1.f );
+
+	return c + ( d - c ) * v;
 }

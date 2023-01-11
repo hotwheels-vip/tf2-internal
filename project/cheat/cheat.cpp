@@ -5,6 +5,7 @@
 #include "cheat.hpp"
 
 #include <chrono>
+#include <themida/ThemidaSDK.h>
 
 DWORD WINAPI shutdown_routine( LPVOID )
 {

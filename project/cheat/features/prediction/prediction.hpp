@@ -13,8 +13,9 @@ struct weapon_info {
 	float speed{ };
 	sdk::vector offset{ };
 
-	float charge{ };
+	bool next_tick{ };
 	float gravity{ };
+	bool can_headshot{ };
 };
 
 class prediction
@@ -55,7 +56,7 @@ public:
 	void reset( );
 
 	sdk::vector linear( sdk::vector origin, sdk::c_tf_player* player, sdk::vector offset, weapon_info data, bool choke );
-	sdk::vector quadratic( sdk::vector origin, sdk::c_tf_player* player, sdk::vector offset, weapon_info data, bool choke );
+	sdk::qangle quadratic( sdk::vector origin, sdk::c_tf_player* player, sdk::vector offset, weapon_info data, bool choke );
 };
 
 inline prediction* g_prediction = new prediction( );

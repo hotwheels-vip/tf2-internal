@@ -28,6 +28,8 @@ namespace math
 	float calculate_angle_fov( const sdk::qangle& ang1, const sdk::qangle& ang2 );
 
 	sdk::vector solve_quadratic( sdk::vector a, sdk::vector v, sdk::vector p, sdk::vector p0 );
+
+	float remap_val_clamped( float val, float a, float b, float c, float d );
 } // namespace math
 
 #endif // WEDNESDAY_WTF_MATH_HPP

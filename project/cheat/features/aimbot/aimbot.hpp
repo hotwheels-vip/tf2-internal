@@ -16,8 +16,8 @@ class aimbot
 public:
 	void run( );
 
-	bool running_choke{ };
-	int choked_ticks{ };
+	bool projectile_choke{ };
+	bool projectile_next_holding_tick{ };
 
 	weapon_info get_weapon_info( );
 	sdk::hitboxes closest_hitbox( sdk::c_tf_player* player, int hitboxes );

@@ -44,9 +44,9 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 
 	send_packet = g_cl_move->choke;
 
-	if ( g_aimbot->running_choke ) {
-		send_packet = false;
-		g_aimbot->choked_ticks++;
+	if ( g_aimbot->projectile_choke ) {
+		send_packet                = false;
+		g_aimbot->projectile_choke = false;
 	}
 
 	verified_cmd->cmd = *cmd;

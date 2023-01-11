@@ -113,8 +113,6 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 
 	using namespace std::chrono;
 
-	auto start = high_resolution_clock::now( );
-
 	static auto gravity_cvar = g_interfaces->cvar->find_var( "sv_gravity" );
 
 	auto gravity  = gravity_cvar->get_float( );
@@ -184,8 +182,7 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 
 		if ( i == 0 ) {
 			auto pred_time = origin.dist_to( position ) / data.speed;
-			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 );
-			pred_time += choke ? g_interfaces->globals->interval_per_tick : 0.f;
+			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 ) * choke ? 2.f : 1.f;
 
 			g_interfaces->prediction->is_in_prediction     = true;
 			g_interfaces->prediction->first_time_predicted = true;
@@ -196,8 +193,7 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 
 		} else {
 			auto pred_time = origin.dist_to( records.at( i - 1 ) ) / data.speed;
-			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 );
-			pred_time += choke ? g_interfaces->globals->interval_per_tick : 0.f;
+			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 ) * choke ? 2.f : 1.f;
 
 			g_interfaces->prediction->is_in_prediction     = true;
 			g_interfaces->prediction->first_time_predicted = true;
@@ -234,19 +230,36 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 		memset( &projectile_backup, 0, sizeof( prediction_projectile_backup ) );
 	}
 
-	auto end = std::chrono::high_resolution_clock::now( );
-
 	return records.at( *aimbot_projectile_steps - 1 ) + offset;
 }
 
-sdk::vector prediction::quadratic( sdk::vector origin, sdk::c_tf_player* player, sdk::vector offset, weapon_info data, bool choke )
+sdk::vector solve_quadratic( sdk::vector start, sdk::vector end, weapon_info info )
+{
+	static auto g0 = g_interfaces->cvar->find_var( "sv_gravity" );
+
+	sdk::vector m = end - start;
+	float dx      = sqrt( m.x * m.x + m.y * m.y );
+	float dy      = m.z;
+	float v       = info.speed;
+	float g       = g0->get_float( ) * info.gravity;
+
+	float a = v * v * v * v - g * ( g * dx * dx + 2.f * dy * v * v );
+
+	if ( a < 0.f )
+		return { };
+
+	float pitch = atan( ( v * v - sqrt( a ) ) / ( g * dx ) );
+	float yaw   = atan2( m.y, m.x );
+
+	return { pitch, yaw, dx / ( cos( pitch ) * v ) };
+}
+
+sdk::qangle prediction::quadratic( sdk::vector origin, sdk::c_tf_player* player, sdk::vector offset, weapon_info data, bool choke )
 {
 	CONFIG( aimbot_projectile_steps, int );
 
 	using namespace std::chrono;
 
-	auto start = high_resolution_clock::now( );
-
 	static auto gravity_cvar = g_interfaces->cvar->find_var( "sv_gravity" );
 
 	auto gravity  = gravity_cvar->get_float( );
@@ -315,7 +328,7 @@ sdk::vector prediction::quadratic( sdk::vector origin, sdk::c_tf_player* player,
 		projectile_move_data.side_move = ( projectile_move_data.velocity.x - forward.x * projectile_move_data.forward_move ) / right.x;
 
 		if ( i == 0 ) {
-			auto pred_time = origin.dist_to( position ) / data.speed;
+			auto pred_time = solve_quadratic( origin, position, data ).z;
 			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 );
 			pred_time += choke ? g_interfaces->globals->interval_per_tick : 0.f;
 
@@ -325,9 +338,14 @@ sdk::vector prediction::quadratic( sdk::vector origin, sdk::c_tf_player* player,
 
 			for ( int j = 0; j < pred_time / g_interfaces->globals->interval_per_tick; j++ )
 				g_interfaces->game_movement->process_movement( player, &projectile_move_data );
+
+			// pred_time = solve_quadratic( origin, projectile_move_data.abs_origin, data ).z;
+
+			// for ( int j = 0; j < pred_time / g_interfaces->globals->interval_per_tick; j++ )
+			//	g_interfaces->game_movement->process_movement( player, &projectile_move_data );
 
 		} else {
-			auto pred_time = origin.dist_to( records.at( i - 1 ) ) / data.speed;
+			auto pred_time = solve_quadratic( origin, records.at( i - 1 ), data ).z;
 			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 );
 			pred_time += choke ? g_interfaces->globals->interval_per_tick : 0.f;
 
@@ -337,6 +355,11 @@ sdk::vector prediction::quadratic( sdk::vector origin, sdk::c_tf_player* player,
 
 			for ( int j = 0; j < pred_time / g_interfaces->globals->interval_per_tick; j++ )
 				g_interfaces->game_movement->process_movement( player, &projectile_move_data );
+
+			// pred_time = solve_quadratic( origin, projectile_move_data.abs_origin, data ).z;
+
+			// for ( int j = 0; j < pred_time / g_interfaces->globals->interval_per_tick; j++ )
+			// g_interfaces->game_movement->process_movement( player, &projectile_move_data );
 		}
 
 		records.push_back( projectile_move_data.abs_origin );
@@ -366,7 +389,9 @@ sdk::vector prediction::quadratic( sdk::vector origin, sdk::c_tf_player* player,
 		memset( &projectile_backup, 0, sizeof( prediction_projectile_backup ) );
 	}
 
-	auto end = std::chrono::high_resolution_clock::now( );
+	auto final = records.at( *aimbot_projectile_steps - 1 ) + offset;
+	auto solve = solve_quadratic( origin, final, data );
+	sdk::qangle convert{ -RAD2DEG( solve.x ), RAD2DEG( solve.y ), 0 };
 
-	return records.at( *aimbot_projectile_steps - 1 ) + offset;
+	return convert.normalize( );
 }

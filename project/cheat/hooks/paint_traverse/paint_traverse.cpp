@@ -6,6 +6,8 @@
 
 void paint_traverse::detour( void* ecx, void* edx, unsigned int panel, bool force_repaint, bool allow_force )
 {
+	CONFIG( menu_disabled_inputs, int );
+
 	g_paint_traverse->_hook.call( ecx, edx, panel, force_repaint, allow_force );
 
 	static unsigned int overlay_panel{ };
@@ -17,7 +19,7 @@ void paint_traverse::detour( void* ecx, void* edx, unsigned int panel, bool forc
 	}
 
 	if ( overlay_panel == panel ) {
-		g_interfaces->panel->set_mouse_input_enabled( panel, g_menu->open && *g_config->find< bool >( HASH( "menu_disabled_inputs_mouse" ) ) );
-		g_interfaces->panel->set_key_board_input_enabled( panel, g_menu->open && *g_config->find< bool >( HASH( "menu_disabled_inputs_keyboard" ) ) );
+		g_interfaces->panel->set_mouse_input_enabled( panel, g_menu->open && ( *menu_disabled_inputs & 1 << 0 ) );
+		g_interfaces->panel->set_key_board_input_enabled( panel, g_menu->open && ( *menu_disabled_inputs & 1 << 1 ) );
 	}
 }
