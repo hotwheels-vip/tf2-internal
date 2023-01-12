@@ -1,16 +1,17 @@
 #pragma once
 
+#include "../hooks.hpp"
+
 #include "../../features/menu/menu.hpp"
 #include "../../helpers/include.hpp"
-#include "../hooks.hpp"
 
 class send_net_msg
 {
 private:
-	hook< bool( __fastcall )( void*, void*, sdk::i_net_message&, bool, bool ), bool > _hook{ };
+	hook< bool( __fastcall )( sdk::i_net_channel*, void*, sdk::i_net_message&, bool, bool ), bool > _hook{ };
 
 public:
-	static bool __fastcall detour( void* ecx, void* edx, sdk::i_net_message& message, bool unk1, bool unk2 );
+	static bool __fastcall detour( sdk::i_net_channel* ecx, void* edx, sdk::i_net_message& message, bool unk1, bool unk2 );
 
 	void run( )
 	{

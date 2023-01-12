@@ -1,7 +1,7 @@
-#ifndef CF3E922A_4A80_4F7F_9F20_6FA83B70BD8C
-#define CF3E922A_4A80_4F7F_9F20_6FA83B70BD8C
+#pragma once
 
 #include "../console/console.hpp"
+
 #include <Windows.h>
 #include <hash/hash.hpp>
 #include <iostream>
@@ -156,5 +156,3 @@ public:
 };
 
 inline signatures g_signatures{ };
-
-#endif // CF3E922A_4A80_4F7F_9F20_6FA83B70BD8C

@@ -1,10 +1,7 @@
-//
-// Created by liga on 11/13/2022.
-//
-
 #include "netvars.hpp"
 
 #include "../interfaces/interfaces.hpp"
+
 #include <sdk/include.hpp>
 
 std::uint32_t netvars::get_offset( sdk::recv_table* table, const char* netvar_name )

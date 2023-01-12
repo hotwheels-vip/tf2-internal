@@ -182,7 +182,8 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 
 		if ( i == 0 ) {
 			auto pred_time = origin.dist_to( position ) / data.speed;
-			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 ) * choke ? 2.f : 1.f;
+			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 );
+			pred_time += choke ? g_interfaces->globals->interval_per_tick : 0.f;
 
 			g_interfaces->prediction->is_in_prediction     = true;
 			g_interfaces->prediction->first_time_predicted = true;
@@ -193,7 +194,8 @@ sdk::vector prediction::linear( sdk::vector origin, sdk::c_tf_player* player, sd
 
 		} else {
 			auto pred_time = origin.dist_to( records.at( i - 1 ) ) / data.speed;
-			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 ) * choke ? 2.f : 1.f;
+			pred_time += g_interfaces->engine_client->get_net_channel_info( )->get_latency( 0 );
+			pred_time += choke ? g_interfaces->globals->interval_per_tick : 0.f;
 
 			g_interfaces->prediction->is_in_prediction     = true;
 			g_interfaces->prediction->first_time_predicted = true;

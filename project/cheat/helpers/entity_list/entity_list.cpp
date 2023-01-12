@@ -1,7 +1,3 @@
-//
-// Created by liga on 11/15/2022.
-//
-
 #include "entity_list.hpp"
 
 void entity_list::run( sdk::c_user_cmd* _cmd )

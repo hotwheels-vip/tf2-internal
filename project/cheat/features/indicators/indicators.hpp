@@ -2,6 +2,7 @@
 
 #include "../../helpers/include.hpp"
 #include "../menu/menu.hpp"
+
 #include <easing/easing.h>
 #include <filesystem>
 #include <fmt/format.h>

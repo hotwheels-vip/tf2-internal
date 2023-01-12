@@ -1,11 +1,7 @@
-//
-// Created by liga on 11/15/2022.
-//
-
-#ifndef HOTWHEELS_TF2_INTERNAL_ENTITY_LIST_HPP
-#define HOTWHEELS_TF2_INTERNAL_ENTITY_LIST_HPP
+#pragma once
 
 #include "../interfaces/interfaces.hpp"
+
 #include <array>
 #include <iostream>
 #include <sdk/include.hpp>
@@ -25,5 +21,3 @@ public:
 };
 
 inline entity_list* g_entity_list = new entity_list( );
-
-#endif // HOTWHEELS_TF2_INTERNAL_ENTITY_LIST_HPP

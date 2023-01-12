@@ -1,9 +1,7 @@
-//
-// Created by liga on 11/15/2022.
-//
-
 #include "aimbot.hpp"
+
 #include "../../hooks/cl_move/cl_move.hpp"
+
 #include <imgui/imgui.h>
 
 weapon_info aimbot::get_weapon_info( )
@@ -108,8 +106,8 @@ sdk::vector best_projectile_position( sdk::c_tf_player* target, bool can_headsho
 	CONFIG( aimbot_projectile_feet, bool );
 
 	sdk::vector ideal_foot_offset{ 0, 0, 2 };
-	sdk::vector head_offset   = target->get_hitbox_position( sdk::hitbox_head ) - target->get_abs_origin( );
-	sdk::vector pelvis_offset = target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( );
+	sdk::vector head_offset{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_head ) - target->get_abs_origin( ) ).z };
+	sdk::vector pelvis_offset{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z };
 
 	if ( can_headshot )
 		return head_offset;
@@ -206,6 +204,8 @@ void aimbot::run( )
 				                                            *aimbot_projectile_invisible );
 
 				g_entity_list->cmd->view_angles = view_angles;
+
+				projectile_choke = *aimbot_projectile_invisible && !g_cl_move->shifted;
 
 				projectile_next_holding_tick = false;
 			}

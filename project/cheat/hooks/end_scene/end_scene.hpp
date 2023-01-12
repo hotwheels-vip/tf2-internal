@@ -1,10 +1,10 @@
-#ifndef E01C1CC3_A723_4DB5_9D4C_86FA3700B808
-#define E01C1CC3_A723_4DB5_9D4C_86FA3700B808
+#pragma once
+
+#include "../hooks.hpp"
 
 #include "../../features/indicators/indicators.hpp"
 #include "../../features/menu/menu.hpp"
 #include "../../helpers/include.hpp"
-#include "../hooks.hpp"
 
 #include <Windows.h>
 #include <d3dx9.h>
@@ -42,6 +42,13 @@ public:
 
 		ImGui_ImplDX9_Init( g_interfaces->device );
 		ImGui_ImplWin32_Init( FindWindowA( "Valve001", nullptr ) );
+
+		std::filesystem::create_directories( "C:\\Hotwheels\\" );
+		std::filesystem::create_directories( "C:\\Hotwheels\\Configs" );
+		std::filesystem::create_directories( "C:\\Hotwheels\\Menu" );
+		std::filesystem::create_directories( "C:\\Hotwheels\\Themes" );
+
+		ImGui::GetIO( ).IniFilename = "C:\\Hotwheels\\Menu\\Config.ini";
 
 		auto& style = ImGui::GetStyle( );
 		auto& io    = ImGui::GetIO( );
@@ -121,5 +128,3 @@ public:
 };
 
 inline end_scene* g_end_scene = new end_scene( );
-
-#endif // E01C1CC3_A723_4DB5_9D4C_86FA3700B808

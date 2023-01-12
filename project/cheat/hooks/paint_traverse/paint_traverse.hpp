@@ -1,13 +1,9 @@
-//
-// Created by liga on 11/12/2022.
-//
+#pragma once
 
-#ifndef HOTWHEELS_TF2_INTERNAL_PAINT_TRAVERSE_HPP
-#define HOTWHEELS_TF2_INTERNAL_PAINT_TRAVERSE_HPP
+#include "../hooks.hpp"
 
 #include "../../features/menu/menu.hpp"
 #include "../../helpers/include.hpp"
-#include "../hooks.hpp"
 
 class paint_traverse
 {
@@ -29,5 +25,3 @@ public:
 };
 
 inline paint_traverse* g_paint_traverse = new paint_traverse( );
-
-#endif // HOTWHEELS_TF2_INTERNAL_PAINT_TRAVERSE_HPP

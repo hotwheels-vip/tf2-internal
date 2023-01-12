@@ -29,8 +29,8 @@ void __cdecl cl_move::detour( float accumulated_extra_samples, bool final_tick )
 		return;
 	}
 
-	//if ( ( ( sdk::i_net_channel* )g_interfaces->engine_client )->get_choked_packets( ) > 1 )
-		//return;
+	// if ( ( ( sdk::i_net_channel* )g_interfaces->engine_client )->get_choked_packets( ) > 1 )
+	// return;
 
 	if ( g_input->key_state< input::KEY_DOWN >( 'E' ) || ( g_entity_list->cmd->buttons & sdk::in_attack && final_tick ) ) {
 		g_cl_move->max_shifted = g_cl_move->stored;

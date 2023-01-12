@@ -1,7 +1,3 @@
-//
-// Created by liga on 11/12/2022.
-//
-
 #include "paint_traverse.hpp"
 
 void paint_traverse::detour( void* ecx, void* edx, unsigned int panel, bool force_repaint, bool allow_force )

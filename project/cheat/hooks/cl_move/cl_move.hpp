@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../hooks.hpp"
+
 #include "../../features/menu/menu.hpp"
 #include "../../helpers/include.hpp"
-#include "../hooks.hpp"
 
 class cl_move
 {
@@ -29,12 +30,12 @@ public:
 		//		charge = false;
 		// } );
 
-		 //g_input->add_keybind( 'e', [ ]( bool down ) {
-			//if ( down )
-			//	g_cl_move->shift = true;
-			//else
-			//	shift = false;
-		 //} );
+		// g_input->add_keybind( 'e', [ ]( bool down ) {
+		// if ( down )
+		//	g_cl_move->shift = true;
+		// else
+		//	shift = false;
+		//} );
 
 		_hook.create( g_signatures[ HASH( "55 8B EC 83 EC 38 83 3D ? ? ? ? ?" ) ], detour, "cl_move" );
 	}

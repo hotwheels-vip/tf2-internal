@@ -1,7 +1,3 @@
-//
-// Created by liga on 11/11/2022.
-//
-
 #include "menu.hpp"
 
 void menu::run( )

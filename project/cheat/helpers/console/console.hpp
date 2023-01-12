@@ -1,5 +1,4 @@
-#ifndef DC61F3B3_BE78_4958_9120_33C500E3F369
-#define DC61F3B3_BE78_4958_9120_33C500E3F369
+#pragma once
 
 #include "../../../dependencies/fmt/color.h"
 #include "../../../dependencies/fmt/core.h"
@@ -28,5 +27,3 @@ public:
 };
 
 inline console* g_console = new console( );
-
-#endif // DC61F3B3_BE78_4958_9120_33C500E3F369

@@ -1,11 +1,7 @@
-//
-// Created by liga on 11/11/2022.
-//
-
-#ifndef HOTWHEELS_TF2_INTERNAL_MENU_HPP
-#define HOTWHEELS_TF2_INTERNAL_MENU_HPP
+#pragma once
 
 #include "../../helpers/include.hpp"
+
 #include <easing/easing.h>
 #include <filesystem>
 #include <fmt/format.h>
@@ -32,5 +28,3 @@ public:
 };
 
 inline menu* g_menu = new menu( );
-
-#endif // HOTWHEELS_TF2_INTERNAL_MENU_HPP

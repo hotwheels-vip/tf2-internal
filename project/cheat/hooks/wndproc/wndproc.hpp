@@ -1,9 +1,4 @@
-//
-// Created by liga on 11/11/2022.
-//
-
-#ifndef HOTWHEELS_TF2_INTERNAL_WNDPROC_HPP
-#define HOTWHEELS_TF2_INTERNAL_WNDPROC_HPP
+#pragma once
 
 #include "../../helpers/include.hpp"
 #include <imgui/imgui.h>
@@ -31,5 +26,3 @@ public:
 };
 
 inline wndproc* g_wndproc = new wndproc( );
-
-#endif // HOTWHEELS_TF2_INTERNAL_WNDPROC_HPP

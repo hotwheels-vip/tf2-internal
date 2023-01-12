@@ -1,8 +1,5 @@
-//
-// Created by liga on 11/11/2022.
-//
-
 #include "config.hpp"
+
 #include <imgui/imgui.h>
 
 void config::save( std::string name )

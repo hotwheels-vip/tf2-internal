@@ -1,5 +1,4 @@
-#ifndef A1A98090_7F67_411B_8BF7_DFAAB0282246
-#define A1A98090_7F67_411B_8BF7_DFAAB0282246
+#pragma once
 
 #include "config/config.hpp"
 #include "console/console.hpp"
@@ -9,5 +8,3 @@
 #include "memory/memory.hpp"
 #include "netvars/netvars.hpp"
 #include "restore/restore.hpp"
-
-#endif // A1A98090_7F67_411B_8BF7_DFAAB0282246

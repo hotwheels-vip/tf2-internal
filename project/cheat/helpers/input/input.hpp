@@ -1,9 +1,4 @@
-//
-// Created by liga on 11/11/2022.
-//
-
-#ifndef HOTWHEELS_TF2_INTERNAL_INPUT_HPP
-#define HOTWHEELS_TF2_INTERNAL_INPUT_HPP
+#pragma once
 
 #pragma warning( disable : 4244 )
 
@@ -94,5 +89,3 @@ public:
 };
 
 inline input* g_input = new input( );
-
-#endif // HOTWHEELS_TF2_INTERNAL_INPUT_HPP

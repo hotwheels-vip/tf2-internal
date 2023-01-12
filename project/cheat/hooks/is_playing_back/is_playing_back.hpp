@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../../helpers/include.hpp"
 #include "../hooks.hpp"
+
+#include "../../helpers/include.hpp"
 
 class is_playing_back
 {

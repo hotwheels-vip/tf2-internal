@@ -1,4 +1,5 @@
 #include "process_tick.hpp"
+
 #include "../cheat/features/tickbase/tickbase.hpp"
 
 bool __fastcall process_tick::detour( void* ecx, void* edx, void* msg )

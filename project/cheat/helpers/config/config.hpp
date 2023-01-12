@@ -1,9 +1,4 @@
-//
-// Created by liga on 11/11/2022.
-//
-
-#ifndef HOTWHEELS_TF2_INTERNAL_CONFIG_HPP
-#define HOTWHEELS_TF2_INTERNAL_CONFIG_HPP
+#pragma once
 
 #include <fstream>
 #include <hash/hash.hpp>
@@ -122,5 +117,3 @@ public:
 inline themes* g_themes = new themes( );
 
 #define CONFIG( name, type ) static type* name = g_config->find< type >( HASH( #name ) )
-
-#endif // HOTWHEELS_TF2_INTERNAL_CONFIG_HPP

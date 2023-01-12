@@ -1,8 +1,5 @@
-//
-// Created by liga on 11/13/2022.
-//
-
 #include "create_move.hpp"
+
 #include "../../features/aimbot/aimbot.hpp"
 #include "../../features/movement/movement.hpp"
 #include "../../features/prediction/prediction.hpp"
