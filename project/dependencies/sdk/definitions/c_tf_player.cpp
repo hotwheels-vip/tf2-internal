@@ -1,4 +1,6 @@
 #include "../structs/c_tf_player.hpp"
+#include "../../../cheat/features/aimbot/aimbot.hpp"
+#include "../../../cheat/helpers/entity_list/entity_list.hpp"
 #include "../../../cheat/helpers/interfaces/interfaces.hpp"
 #include "../enums/trace_defs.hpp"
 
@@ -20,7 +22,12 @@ bool sdk::c_tf_player::can_hit( const vector pos, sdk::c_base_entity* ent )
 	sdk::c_game_trace trace;
 	sdk::c_trace_filter_hitscan filter;
 	sdk::ray_t ray;
-	ray.init( this->eye_position( ), pos );
+
+	if ( g_entity_list->weapon && g_aimbot->get_weapon_info( ).speed != 0 )
+		ray.init( this->eye_position( ), pos, { -2, -2, -2 }, { 2, 2, 2 } );
+	else
+		ray.init( this->eye_position( ), pos );
+
 	filter.skip = this;
 
 	g_interfaces->engine_trace->trace_ray( ray, ( MASK_SHOT | CONTENTS_GRATE ), &filter, &trace );

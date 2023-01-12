@@ -1,7 +1,3 @@
-//
-// Created by liga on 11/13/2022.
-//
-
 #include "entry.hpp"
 
 DWORD WINAPI entry( LPVOID )

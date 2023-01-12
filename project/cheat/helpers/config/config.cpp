@@ -1,8 +1,5 @@
-//
-// Created by liga on 11/11/2022.
-//
-
 #include "config.hpp"
+
 #include <imgui/imgui.h>
 
 void config::save( std::string name )
@@ -124,8 +121,7 @@ void config::run( )
 	insert( HASH( "aimbot_projectile_feet" ), false );
 	insert( HASH( "aimbot_projectile_steps" ), 2 );
 
-	insert( HASH( "menu_disabled_inputs_mouse" ), true );
-	insert( HASH( "menu_disabled_inputs_keyboard" ), true );
+	insert( HASH( "menu_disabled_inputs" ), 3 ); // 0b11
 }
 
 void config::end( ) { }

@@ -1,8 +1,10 @@
 #include "hooks.hpp"
+
 #include "cl_move/cl_move.hpp"
 #include "create_move/create_move.hpp"
 #include "end_scene/end_scene.hpp"
 #include "frame_stage_notify/frame_stage_notify.hpp"
+#include "get_time/get_time.hpp"
 #include "is_playing_back/is_playing_back.hpp"
 #include "item_post_frame/item_post_frame.hpp"
 #include "paint_traverse/paint_traverse.hpp"
@@ -10,7 +12,6 @@
 #include "run_command/run_command.hpp"
 #include "send_net_msg/send_net_msg.hpp"
 #include "wndproc/wndproc.hpp"
-#include "get_time/get_time.hpp"
 
 void hooks::run( )
 {

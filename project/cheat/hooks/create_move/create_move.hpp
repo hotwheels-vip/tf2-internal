@@ -1,12 +1,8 @@
-//
-// Created by liga on 11/13/2022.
-//
+#pragma once
 
-#ifndef HOTWHEELS_TF2_INTERNAL_CREATE_MOVE_HPP
-#define HOTWHEELS_TF2_INTERNAL_CREATE_MOVE_HPP
+#include "../hooks.hpp"
 
 #include "../../helpers/include.hpp"
-#include "../hooks.hpp"
 
 class create_move
 {
@@ -28,5 +24,3 @@ public:
 };
 
 inline create_move* g_create_move = new create_move( );
-
-#endif // HOTWHEELS_TF2_INTERNAL_CREATE_MOVE_HPP

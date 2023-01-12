@@ -1,7 +1,7 @@
-#ifndef AD4C31F0_EFA5_40FE_8CED_D3CE58E874F0
-#define AD4C31F0_EFA5_40FE_8CED_D3CE58E874F0
+#pragma once
 
 #include "../helpers/include.hpp"
+
 #include <imgui/imgui.h>
 #include <minhook/include/MinHook.h>
 
@@ -40,7 +40,7 @@ public:
 
 			return;
 		}
-		
+
 		g_console->log< fmt::color::gray >( "[HOOK] " );
 		g_console->log< fmt::color::sky_blue >( "Disabled hook for {}!\n", hook_name.data( ) );
 	}
@@ -53,7 +53,7 @@ public:
 
 			return;
 		}
-		
+
 		g_console->log< fmt::color::gray >( "[HOOK] " );
 		g_console->log< fmt::color::sky_blue >( "Enabled hook for {}!\n", hook_name.data( ) );
 	}
@@ -66,7 +66,7 @@ public:
 
 			return;
 		}
-		
+
 		g_console->log< fmt::color::gray >( "[HOOK] " );
 		g_console->log< fmt::color::sky_blue >( "Removed hook for {}!\n", hook_name.data( ) );
 	}
@@ -86,5 +86,3 @@ public:
 };
 
 inline hooks* g_hooks = new hooks( );
-
-#endif // AD4C31F0_EFA5_40FE_8CED_D3CE58E874F0

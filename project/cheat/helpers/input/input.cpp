@@ -1,7 +1,3 @@
-//
-// Created by liga on 11/11/2022.
-//
-
 #include "input.hpp"
 
 void input::think( UINT uMsg, WPARAM wParam, LPARAM lParam )

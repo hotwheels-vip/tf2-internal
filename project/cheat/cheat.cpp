@@ -1,10 +1,7 @@
-//
-// Created by liga on 11/13/2022.
-//
-
 #include "cheat.hpp"
 
 #include <chrono>
+#include <themida/ThemidaSDK.h>
 
 DWORD WINAPI shutdown_routine( LPVOID )
 {

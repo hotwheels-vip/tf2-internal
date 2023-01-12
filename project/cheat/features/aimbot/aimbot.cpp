@@ -1,36 +1,51 @@
-//
-// Created by liga on 11/15/2022.
-//
-
 #include "aimbot.hpp"
+
 #include "../../hooks/cl_move/cl_move.hpp"
+
 #include <imgui/imgui.h>
 
 weapon_info aimbot::get_weapon_info( )
 {
 	switch ( g_entity_list->weapon->get_client_class( )->class_id ) {
 	case sdk::e_class_ids::ctf_rocket_launcher: {
-		sdk::vector right;
-		sdk::qangle eye_angles{ g_entity_list->local->eye_angles_x( ), g_entity_list->local->eye_angles_y( ), 0 };
-		sdk::qangle punch_angle{ g_entity_list->local->punch_angle( ).x, g_entity_list->local->punch_angle( ).y,
-			                     g_entity_list->local->punch_angle( ).z };
+		static auto flip_viewmodel = g_interfaces->cvar->find_var( "cl_flipviewmodels" );
 
-		math::angle_to_vector( eye_angles + punch_angle, NULL, &right, NULL );
+		sdk::vector forward{ }, right{ }, up{ };
 
-		return { 1100.f, sdk::vector( 0, 0, -8 ) + right * 12 };
+		math::angle_to_vector( g_entity_list->cmd->view_angles, &forward, &right, &up );
+
+		sdk::vector offset = forward * 23.5f + right * 12.f + up * -3.f;
+
+		return { 1100.f, offset };
 	}
 	case sdk::e_class_ids::ctf_rocket_launcher_direct_hit: {
-		sdk::vector right;
-		sdk::qangle eye_angles{ g_entity_list->local->eye_angles_x( ), g_entity_list->local->eye_angles_y( ), 0 };
-		sdk::qangle punch_angle{ g_entity_list->local->punch_angle( ).x, g_entity_list->local->punch_angle( ).y,
-			                     g_entity_list->local->punch_angle( ).z };
+		static auto flip_viewmodel = g_interfaces->cvar->find_var( "cl_flipviewmodels" );
 
-		math::angle_to_vector( eye_angles + punch_angle, NULL, &right, NULL );
+		sdk::vector forward{ }, right{ }, up{ };
 
-		return { 1980.f, sdk::vector( 0, 0, -8 ) + right * 12 };
+		math::angle_to_vector( g_entity_list->cmd->view_angles, &forward, &right, &up );
+
+		sdk::vector offset = forward * 23.5f + right * 12.f + up * -3.f;
+
+		return { 1980.f, offset };
+	}
+	case sdk::e_class_ids::ctf_compound_bow: {
+		static auto flip_viewmodel = g_interfaces->cvar->find_var( "cl_flipviewmodels" );
+
+		sdk::vector forward{ }, right{ }, up{ };
+
+		math::angle_to_vector( g_entity_list->cmd->view_angles, &forward, &right, &up );
+
+		sdk::vector offset = forward * 23.5f + right * -8.f + up * -3.f;
+
+		auto weapon = ( sdk::c_tf_pipebomb_launcher* )g_entity_list->weapon;
+		auto charge = g_interfaces->globals->cur_time - weapon->charge_begin_time( );
+
+		return { math::remap_val_clamped( charge, 0.f, 1.f, 1800.f, 2600.f ), offset, true, math::remap_val_clamped( charge, 0.f, 1.f, 0.5f, 0.1f ),
+			     true };
 	}
 	default:
-		return { -1.f, {} };
+		return { 0.f, {} };
 	}
 
 	return { };
@@ -81,6 +96,25 @@ sdk::c_tf_player* aimbot::closest_player( float max_fov )
 	return closest;
 }
 
+bool should_run_aimbot( )
+{
+	return g_entity_list->weapon->can_attack_primary( g_entity_list->local ) || g_cl_move->shifted;
+}
+
+sdk::vector best_projectile_position( sdk::c_tf_player* target, bool can_headshot = false )
+{
+	CONFIG( aimbot_projectile_feet, bool );
+
+	sdk::vector ideal_foot_offset{ 0, 0, 2 };
+	sdk::vector head_offset{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_head ) - target->get_abs_origin( ) ).z };
+	sdk::vector pelvis_offset{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z };
+
+	if ( can_headshot )
+		return head_offset;
+
+	return *aimbot_projectile_feet ? ideal_foot_offset : pelvis_offset;
+}
+
 void aimbot::run( )
 {
 	if ( !g_entity_list->cmd )
@@ -120,16 +154,7 @@ void aimbot::run( )
 
 		auto weapon_info = get_weapon_info( );
 
-		// if ( weapon_info.speed > -1.f && *aimbot_projectile_enabled ) {
-		//	auto offset = g_entity_list->local->eye_position( ) + weapon_info.offset;
-		//	position    = g_prediction->linear(
-		//              offset, target,
-		//              *aimbot_projectile_feet ? sdk::vector{ 0, 0, 2 }
-		//								   : sdk::vector{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z },
-		//              weapon_info.speed, *aimbot_projectile_invisible );
-		//} else {
 		position = target->get_hitbox_position( target_hitbox );
-		//} Too performance impacting.
 
 		auto view_angles       = math::vector_to_angle( position - g_entity_list->local->eye_position( ) );
 		auto fov_distance      = view_angles - local_angles;
@@ -150,47 +175,42 @@ void aimbot::run( )
 
 		auto weapon_info = get_weapon_info( );
 
-		if ( weapon_info.speed > -1.f && *aimbot_projectile_enabled ) {
-			if ( g_entity_list->cmd->buttons & sdk::in_attack &&
-			     ( g_entity_list->weapon->can_attack_primary( g_entity_list->local ) || g_cl_move->max_shifted ) ) {
-				if ( *aimbot_projectile_invisible ) {
-					if ( !g_aimbot->choked_ticks ) {
-						auto offset   = g_entity_list->local->eye_position( ) + weapon_info.offset;
-						auto position = g_prediction->linear(
-							offset, target,
-							*aimbot_projectile_feet
-								? sdk::vector{ 0, 0, 2 }
-								: sdk::vector{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z },
-							weapon_info, *aimbot_projectile_invisible );
+		if ( weapon_info.next_tick && ( g_entity_list->cmd->buttons & sdk::in_attack ) )
+			projectile_next_holding_tick = true;
 
-						auto view_angles = math::vector_to_angle( position - offset );
+		if ( weapon_info.speed && *aimbot_projectile_enabled ) {
+			if ( g_entity_list->cmd->buttons & sdk::in_attack && should_run_aimbot( ) && !weapon_info.next_tick ) {
+				auto offset = g_entity_list->local->eye_position( ) + weapon_info.offset;
 
-						g_aimbot->running_choke         = true;
-						g_aimbot->choked_ticks          = 0;
-						g_entity_list->cmd->view_angles = view_angles;
-					}
-
-					if ( g_aimbot->choked_ticks == 2 ) {
-						g_aimbot->choked_ticks  = 0;
-						g_aimbot->running_choke = false;
-					}
-				} else {
-					auto offset   = g_entity_list->local->eye_position( ) + weapon_info.offset;
-					auto position = g_prediction->linear(
-						offset, target,
-						*aimbot_projectile_feet
-							? sdk::vector{ 0, 0, 2 }
-							: sdk::vector{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z },
-						weapon_info, *aimbot_projectile_invisible );
+				if ( weapon_info.gravity == 0.f ) {
+					auto position =
+						g_prediction->linear( offset, target, best_projectile_position( target ), weapon_info, *aimbot_projectile_invisible );
 
 					auto view_angles = math::vector_to_angle( position - offset );
 
 					g_entity_list->cmd->view_angles = view_angles;
+				} else {
+					auto view_angles = g_prediction->quadratic( offset, target, best_projectile_position( target, weapon_info.can_headshot ),
+					                                            weapon_info, *aimbot_projectile_invisible );
+
+					g_entity_list->cmd->view_angles = view_angles;
 				}
+
+				projectile_choke = *aimbot_projectile_invisible && !g_cl_move->shifted;
+			} else if ( !( g_entity_list->cmd->buttons & sdk::in_attack ) && projectile_next_holding_tick ) {
+				auto offset = g_entity_list->local->eye_position( ) + weapon_info.offset;
+
+				auto view_angles = g_prediction->quadratic( offset, target, best_projectile_position( target, weapon_info.can_headshot ), weapon_info,
+				                                            *aimbot_projectile_invisible );
+
+				g_entity_list->cmd->view_angles = view_angles;
+
+				projectile_choke = *aimbot_projectile_invisible && !g_cl_move->shifted;
+
+				projectile_next_holding_tick = false;
 			}
 		} else {
-			if ( g_entity_list->cmd->buttons & sdk::in_attack &&
-			     ( g_entity_list->weapon->can_attack_primary( g_entity_list->local ) || g_cl_move->max_shifted ) ) {
+			if ( g_entity_list->cmd->buttons & sdk::in_attack && should_run_aimbot( ) ) {
 				auto target_hitbox = closest_hitbox( target, *aimbot_silent_hitboxes );
 				auto view_angles   = math::vector_to_angle( target->get_hitbox_position( target_hitbox ) - g_entity_list->local->eye_position( ) );
 

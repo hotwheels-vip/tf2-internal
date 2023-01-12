@@ -1,14 +1,9 @@
-//
-// Created by liga on 11/13/2022.
-//
-
-#ifndef HOTWHEELS_TF2_INTERNAL_CHEAT_HPP
-#define HOTWHEELS_TF2_INTERNAL_CHEAT_HPP
+#pragma once
 
 #include <windows.h>
 
-#include "hooks/hooks.hpp"
 #include "helpers/include.hpp"
+#include "hooks/hooks.hpp"
 
 class cheat
 {
@@ -20,5 +15,3 @@ public:
 };
 
 inline cheat* g_cheat = new cheat( );
-
-#endif // HOTWHEELS_TF2_INTERNAL_CHEAT_HPP

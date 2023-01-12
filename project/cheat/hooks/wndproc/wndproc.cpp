@@ -1,8 +1,5 @@
-//
-// Created by liga on 11/11/2022.
-//
-
 #include "wndproc.hpp"
+
 #include "../cheat/features/menu/menu.hpp"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );

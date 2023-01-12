@@ -1,9 +1,4 @@
-//
-// Created by liga on 11/13/2022.
-//
-
-#ifndef HOTWHEELS_TF2_INTERNAL_NETVARS_HPP
-#define HOTWHEELS_TF2_INTERNAL_NETVARS_HPP
+#pragma once
 
 #include <iostream>
 
@@ -20,5 +15,3 @@ public:
 };
 
 inline netvars* g_netvars = new netvars( );
-
-#endif // HOTWHEELS_TF2_INTERNAL_NETVARS_HPP

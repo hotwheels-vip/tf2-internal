@@ -1,5 +1,4 @@
-#ifndef C036D64A_B5D1_4003_8FCC_BB5786663F83
-#define C036D64A_B5D1_4003_8FCC_BB5786663F83
+#pragma once
 
 #include "../memory/memory.hpp"
 
@@ -48,5 +47,3 @@ public:
 };
 
 inline interfaces* g_interfaces = new interfaces( );
-
-#endif // C036D64A_B5D1_4003_8FCC_BB5786663F83
