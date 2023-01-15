@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_GAME_EVENT_HPP
-#define WEDNESDAY_WTF_I_GAME_EVENT_HPP
+#pragma once
 
 namespace sdk
 {
@@ -21,5 +20,3 @@ namespace sdk
 		virtual void set_string( const char* key_name, const char* value )                               = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_GAME_EVENT_HPP

@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_MATERIAL_HPP
-#define WEDNESDAY_WTF_I_MATERIAL_HPP
+#pragma once
 
 #include "c_tf_player.hpp"
 
@@ -73,5 +72,3 @@ namespace sdk
 		virtual int get_reference_count( ) const                                                                               = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_MATERIAL_HPP

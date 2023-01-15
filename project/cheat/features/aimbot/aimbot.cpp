@@ -2,12 +2,16 @@
 
 #include "../../hooks/cl_move/cl_move.hpp"
 
-#include <imgui/imgui.h>
+// #include <imgui/imgui.h>
 
+bool should_run_aimbot( )
+{
+	return g_entity_list->weapon->can_attack_primary( g_entity_list->local ) || g_cl_move->shifted;
+}
 weapon_info aimbot::get_weapon_info( )
 {
 	switch ( g_entity_list->weapon->get_client_class( )->class_id ) {
-	case sdk::e_class_ids::ctf_rocket_launcher: {
+	case sdk::class_ids::ctf_rocket_launcher: {
 		static auto flip_viewmodel = g_interfaces->cvar->find_var( "cl_flipviewmodels" );
 
 		sdk::vector forward{ }, right{ }, up{ };
@@ -18,7 +22,7 @@ weapon_info aimbot::get_weapon_info( )
 
 		return { 1100.f, offset };
 	}
-	case sdk::e_class_ids::ctf_rocket_launcher_direct_hit: {
+	case sdk::class_ids::ctf_rocket_launcher_direct_hit: {
 		static auto flip_viewmodel = g_interfaces->cvar->find_var( "cl_flipviewmodels" );
 
 		sdk::vector forward{ }, right{ }, up{ };
@@ -29,7 +33,7 @@ weapon_info aimbot::get_weapon_info( )
 
 		return { 1980.f, offset };
 	}
-	case sdk::e_class_ids::ctf_compound_bow: {
+	case sdk::class_ids::ctf_compound_bow: {
 		static auto flip_viewmodel = g_interfaces->cvar->find_var( "cl_flipviewmodels" );
 
 		sdk::vector forward{ }, right{ }, up{ };
@@ -50,29 +54,7 @@ weapon_info aimbot::get_weapon_info( )
 
 	return { };
 }
-
-sdk::hitboxes aimbot::closest_hitbox( sdk::c_tf_player* player, int hitboxes )
-{
-	float current_fov            = 360.f;
-	sdk::hitboxes current_hitbox = sdk::hitboxes::hitbox_head;
-
-	for ( int i = 0; i < sdk::hitbox_max; i++ ) {
-		if ( !( hitboxes & ( 1 << i ) ) )
-			continue;
-
-		auto view_angles = math::vector_to_angle( player->get_hitbox_position( i ) - g_entity_list->local->eye_position( ) );
-		auto fov         = math::calculate_angle_fov( g_entity_list->cmd->view_angles, view_angles );
-
-		if ( fov <= current_fov ) {
-			current_fov    = fov;
-			current_hitbox = static_cast< sdk::hitboxes >( i );
-		}
-	}
-
-	return current_hitbox;
-}
-
-sdk::c_tf_player* aimbot::closest_player( float max_fov )
+sdk::c_tf_player* closest_player( float max_fov )
 {
 	float fov                 = max_fov;
 	sdk::c_tf_player* closest = nullptr;
@@ -95,12 +77,26 @@ sdk::c_tf_player* aimbot::closest_player( float max_fov )
 
 	return closest;
 }
-
-bool should_run_aimbot( )
+sdk::hitboxes closest_hitbox( sdk::c_tf_player* player, int hitboxes )
 {
-	return g_entity_list->weapon->can_attack_primary( g_entity_list->local ) || g_cl_move->shifted;
-}
+	float current_fov            = 360.f;
+	sdk::hitboxes current_hitbox = sdk::hitboxes::hitbox_head;
 
+	for ( int i = 0; i < sdk::hitbox_max; i++ ) {
+		if ( !( hitboxes & ( 1 << i ) ) )
+			continue;
+
+		auto view_angles = math::vector_to_angle( player->get_hitbox_position( i ) - g_entity_list->local->eye_position( ) );
+		auto fov         = math::calculate_angle_fov( g_entity_list->cmd->view_angles, view_angles );
+
+		if ( fov <= current_fov ) {
+			current_fov    = fov;
+			current_hitbox = static_cast< sdk::hitboxes >( i );
+		}
+	}
+
+	return current_hitbox;
+}
 sdk::vector best_projectile_position( sdk::c_tf_player* target, bool can_headshot = false )
 {
 	CONFIG( aimbot_projectile_feet, bool );

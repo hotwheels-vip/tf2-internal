@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_BUTTONS_HPP
-#define WEDNESDAY_WTF_BUTTONS_HPP
+#pragma once
 
 namespace sdk
 {
@@ -32,5 +31,3 @@ namespace sdk
 		in_lookspin  = ( 1 << 25 )
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_BUTTONS_HPP

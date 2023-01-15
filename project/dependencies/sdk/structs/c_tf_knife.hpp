@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_TF_KNIFE_HPP
-#define WEDNESDAY_WTF_C_TF_KNIFE_HPP
+#pragma once
 
 #include "c_tf_weapon_base.hpp"
 
@@ -13,5 +12,3 @@ namespace sdk
 		NETVAR( knife_melt_timestamp, float, "CTFKnife", "m_flKnifeMeltTimestamp" );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_TF_KNIFE_HPP

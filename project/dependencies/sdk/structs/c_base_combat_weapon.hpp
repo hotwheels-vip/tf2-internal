@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_BASE_COMBAT_WEAPON_HPP
-#define WEDNESDAY_WTF_C_BASE_COMBAT_WEAPON_HPP
+#pragma once
 
 #include "c_base_animating.hpp"
 
@@ -28,5 +27,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_BASE_COMBAT_WEAPON_HPP

@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_CLIENT_MODE_HPP
-#define WEDNESDAY_WTF_I_CLIENT_MODE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -67,5 +66,3 @@ namespace sdk
 		virtual void on_demo_record_stop( )                                                                                                   = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CLIENT_MODE_HPP

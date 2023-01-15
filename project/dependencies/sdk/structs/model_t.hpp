@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_MODEL_T_HPP
-#define WEDNESDAY_WTF_MODEL_T_HPP
+#pragma once
 
 #include "vector.hpp"
 
@@ -20,4 +19,3 @@ namespace sdk
 	};                          // size=0x0150
 
 } // namespace sdk
-#endif // WEDNESDAY_WTF_MODEL_T_HPP

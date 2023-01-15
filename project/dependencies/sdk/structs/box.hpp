@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_BOX_HPP
-#define WEDNESDAY_WTF_BOX_HPP
+#pragma once
 
 namespace sdk
 {
@@ -17,5 +16,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_BOX_HPP

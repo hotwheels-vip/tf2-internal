@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_HITBOXES_HPP
-#define WEDNESDAY_WTF_HITBOXES_HPP
+#pragma once
 
 namespace sdk
 {
@@ -26,5 +25,3 @@ namespace sdk
 		hitbox_max
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_HITBOXES_HPP

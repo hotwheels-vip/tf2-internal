@@ -1,8 +1,7 @@
-#ifndef WEDNESDAY_WTF_CLIENT_CLASS_HPP
-#define WEDNESDAY_WTF_CLIENT_CLASS_HPP
+#pragma once
 
-#include "dt_recv.hpp"
 #include "../enums/class_ids.hpp"
+#include "dt_recv.hpp"
 
 namespace sdk
 {
@@ -14,8 +13,6 @@ namespace sdk
 		const char* network_name;
 		recv_table* recv_table;
 		client_class* next;
-		sdk::e_class_ids class_id;
+		sdk::class_ids class_id;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_CLIENT_CLASS_HPP

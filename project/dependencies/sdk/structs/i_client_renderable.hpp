@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_CLIENT_RENDERABLE_HPP
-#define WEDNESDAY_WTF_I_CLIENT_RENDERABLE_HPP
+#pragma once
 
 #include "matrix.hpp"
 #include "qangle.hpp"
@@ -126,5 +125,3 @@ namespace sdk
 		virtual bool ignores_z_buffer( void ) const = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CLIENT_RENDERABLE_HPP

@@ -1,9 +1,8 @@
-#ifndef WEDNESDAY_WTF_CLASS_IDS_HPP
-#define WEDNESDAY_WTF_CLASS_IDS_HPP
+#pragma once
 
 namespace sdk
 {
-	enum class e_class_ids : int {
+	enum class class_ids : int {
 		cai_base_npc,
 		c_base_animating,
 		c_base_animating_overlay,
@@ -369,5 +368,3 @@ namespace sdk
 		spore_trail
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_CLASS_IDS_HPP

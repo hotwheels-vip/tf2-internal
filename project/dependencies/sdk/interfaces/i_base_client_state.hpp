@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_BASE_CLIENT_STATE_HPP
-#define WEDNESDAY_WTF_I_BASE_CLIENT_STATE_HPP
+#pragma once
 
 #include "../../helpers/memory/memory.hpp"
 #include "i_net_channel.hpp"
@@ -29,5 +28,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_BASE_CLIENT_STATE_HPP

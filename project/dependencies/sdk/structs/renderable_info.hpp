@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_RENDERABLE_INFO_HPP
-#define WEDNESDAY_WTF_RENDERABLE_INFO_HPP
+#pragma once
 
 #include "i_client_renderable.hpp"
 
@@ -21,5 +20,3 @@ namespace sdk
 		signed char translucency_calculated_view;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_RENDERABLE_INFO_HPP

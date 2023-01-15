@@ -1,5 +1,5 @@
-#ifndef WEDNESDAY_WTF_C_CON_COMMAND_BASE_HPP
-#define WEDNESDAY_WTF_C_CON_COMMAND_BASE_HPP
+#pragma once
+
 namespace sdk
 {
 
@@ -29,4 +29,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-#endif // WEDNESDAY_WTF_C_CON_COMMAND_BASE_HPP

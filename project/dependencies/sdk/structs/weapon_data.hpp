@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_WEAPON_DATA_HPP
-#define WEDNESDAY_WTF_WEAPON_DATA_HPP
+#pragma once
 
 namespace sdk
 {
@@ -23,5 +22,3 @@ namespace sdk
 		bool use_rapid_fire_crits;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_WEAPON_DATA_HPP

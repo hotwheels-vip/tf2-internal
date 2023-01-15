@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_VECTOR_HPP
-#define WEDNESDAY_WTF_VECTOR_HPP
+#pragma once
 
 #include <cmath>
 #include <iostream>
@@ -222,5 +221,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_VECTOR_HPP

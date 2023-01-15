@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_BF_RW_HPP
-#define WEDNESDAY_WTF_BF_RW_HPP
+#pragma once
 
 #include "../structs/vector.hpp"
 #include <iostream>
@@ -707,5 +706,3 @@ namespace sdk
 	}
 
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_BF_RW_HPP

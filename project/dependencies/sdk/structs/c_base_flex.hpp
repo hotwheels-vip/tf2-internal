@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_BASE_FLEX_HPP
-#define WEDNESDAY_WTF_C_BASE_FLEX_HPP
+#pragma once
 
 #include "c_base_animating_overlay.hpp"
 
@@ -12,5 +11,3 @@ namespace sdk
 		NETVAR( view_target, vector, "CBaseFlex", "m_viewtarget" );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_BASE_FLEX_HPP

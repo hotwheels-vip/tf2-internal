@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_ECON_ENTITY_HPP
-#define WEDNESDAY_WTF_C_ECON_ENTITY_HPP
+#pragma once
 
 #include "../macros.hpp"
 
@@ -10,5 +9,3 @@ namespace sdk
 		NETVAR( item_definition_index, int, "CEconEntity", "m_iItemDefinitionIndex" );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_ECON_ENTITY_HPP

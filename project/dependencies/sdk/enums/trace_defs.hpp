@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_TRACE_DEFS_HPP
-#define WEDNESDAY_WTF_TRACE_DEFS_HPP
+#pragma once
 
 // lower bits are stronger, and will eat weaker brushes completely
 #define CONTENTS_EMPTY 0 // No contents
@@ -101,5 +100,3 @@
 // everything that blocks corpse movement
 // UNDONE: Not used yet / may be deleted
 #define MASK_DEADSOLID ( CONTENTS_SOLID | CONTENTS_PLAYERCLIP | CONTENTS_WINDOW | CONTENTS_GRATE )
-
-#endif // WEDNESDAY_WTF_TRACE_DEFS_HPP

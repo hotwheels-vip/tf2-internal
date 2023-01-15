@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_CVAR_FLAGS_HPP
-#define WEDNESDAY_WTF_CVAR_FLAGS_HPP
+#pragma once
 
 namespace sdk
 {
@@ -36,5 +35,3 @@ namespace sdk
 		fcvar_material_thread_mask    = ( fcvar_reload_materials | fcvar_reload_textures | fcvar_material_system_thread )
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_CVAR_FLAGS_HPP

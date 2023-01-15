@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_TF_COND_HPP
-#define WEDNESDAY_WTF_TF_COND_HPP
+#pragma once
 
 namespace sdk
 {
@@ -90,5 +89,3 @@ namespace sdk
 		tf_cond_ex_ignore_states = ( tf_cond_ex_pyro_heal )
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_TF_COND_HPP

@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_VIEW_SETUP_HPP
-#define WEDNESDAY_WTF_C_VIEW_SETUP_HPP
+#pragma once
 
 #include "../enums/stereo_eye.hpp"
 #include "matrix.hpp"
@@ -82,5 +81,3 @@ namespace sdk
 		view_matrix view_to_projection;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_VIEW_SETUP_HPP

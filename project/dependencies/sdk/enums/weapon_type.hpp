@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_WEAPON_TYPE_HPP
-#define WEDNESDAY_WTF_WEAPON_TYPE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -116,5 +115,3 @@ namespace sdk
 		tf_weapon_flame_ball
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_WEAPON_TYPE_HPP

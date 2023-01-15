@@ -1,9 +1,4 @@
-//
-// Created by blanket on 2/26/2022.
-//
-
-#ifndef WEDNESDAY_WTF_I_MODEL_INFO_HPP
-#define WEDNESDAY_WTF_I_MODEL_INFO_HPP
+#pragma once
 
 #include "../structs/qangle.hpp"
 #include "../structs/studio_hdr.hpp"
@@ -124,4 +119,3 @@ namespace sdk
 		virtual void unregister_model_load_callback( int modelindex, i_model_load_callback* p_callback )                                         = 0;
 	};
 } // namespace sdk
-#endif // WEDNESDAY_WTF_I_MODEL_INFO_HPP

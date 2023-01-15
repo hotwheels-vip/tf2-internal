@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_MATERIAL_SYSTEM_HPP
-#define WEDNESDAY_WTF_I_MATERIAL_SYSTEM_HPP
+#pragma once
 
 #include "../structs/c_tf_player.hpp"
 #include "../structs/i_material.hpp"
@@ -212,5 +211,3 @@ namespace sdk
 		virtual bool verify_texture_compositor_templates( )                                                                                 = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_MATERIAL_SYSTEM_HPP

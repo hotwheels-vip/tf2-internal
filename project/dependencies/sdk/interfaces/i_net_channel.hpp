@@ -1,8 +1,7 @@
-#ifndef WEDNESDAY_WTF_I_NET_CHANNEL_HPP
-#define WEDNESDAY_WTF_I_NET_CHANNEL_HPP
+#pragma once
 
-#include "../structs/bf_rw.hpp"
 #include "../macros.hpp"
+#include "../structs/bf_rw.hpp"
 
 namespace sdk
 {
@@ -196,4 +195,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-#endif // WEDNESDAY_WTF_I_NET_CHANNEL_HPP

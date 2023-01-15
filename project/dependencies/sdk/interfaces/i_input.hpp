@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_INPUT_HPP
-#define WEDNESDAY_WTF_I_INPUT_HPP
+#pragma once
 
 #include "../structs/c_verified_cmd.hpp"
 
@@ -116,5 +115,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_INPUT_HPP

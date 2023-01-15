@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_TF_WEAPON_INFO_HPP
-#define WEDNESDAY_WTF_C_TF_WEAPON_INFO_HPP
+#pragma once
 
 #include "file_weapon_info.hpp"
 #include "weapon_data.hpp"
@@ -53,5 +52,3 @@ namespace sdk
 		bool dont_drop;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_TF_WEAPON_INFO_HPP

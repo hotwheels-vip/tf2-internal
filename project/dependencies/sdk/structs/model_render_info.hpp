@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_MODEL_RENDER_INFO_HPP
-#define WEDNESDAY_WTF_MODEL_RENDER_INFO_HPP
+#pragma once
 
 #include "c_tf_player.hpp"
 
@@ -22,5 +21,3 @@ namespace sdk
 		model_instance_handle_t instance;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_MODEL_RENDER_INFO_HPP

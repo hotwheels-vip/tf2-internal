@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_TF_PLAYER_HPP
-#define WEDNESDAY_WTF_C_TF_PLAYER_HPP
+#pragma once
 
 #include "c_base_player.hpp"
 
@@ -184,5 +183,3 @@ namespace sdk
 		void pre_think( );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_TF_PLAYER_HPP

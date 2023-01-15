@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_STEREO_EYE_HPP
-#define WEDNESDAY_WTF_STEREO_EYE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -10,5 +9,3 @@ namespace sdk
 		stereo_eye_max   = 3,
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_STEREO_EYE_HPP

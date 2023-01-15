@@ -1,9 +1,4 @@
-//
-// Created by Liga on 2/25/2022.
-//
-
-#ifndef WEDNESDAY_WTF_C_BASE_ENTITY_HPP
-#define WEDNESDAY_WTF_C_BASE_ENTITY_HPP
+#pragma once
 
 #include "../macros.hpp"
 
@@ -140,5 +135,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_BASE_ENTITY_HPP

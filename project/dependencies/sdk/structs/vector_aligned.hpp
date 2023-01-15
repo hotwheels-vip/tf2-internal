@@ -1,6 +1,7 @@
-#ifndef WEDNESDAY_WTF_VECTOR_ALIGNED_HPP
-#define WEDNESDAY_WTF_VECTOR_ALIGNED_HPP
+#pragma once
+
 #include "vector.hpp"
+
 namespace sdk
 {
 	class __declspec( align( 16 ) ) vector_aligned : public vector
@@ -35,4 +36,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-#endif // WEDNESDAY_WTF_VECTOR_ALIGNED_HPP

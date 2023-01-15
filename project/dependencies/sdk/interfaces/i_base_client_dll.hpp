@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_BASE_CLIENT_DLL_HPP
-#define WEDNESDAY_WTF_I_BASE_CLIENT_DLL_HPP
+#pragma once
 
 namespace sdk
 {
@@ -224,5 +223,3 @@ namespace sdk
 		virtual bool is_connected_user_info_change_allowed( i_con_var* p_cvar ) = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_BASE_CLIENT_DLL_HPP

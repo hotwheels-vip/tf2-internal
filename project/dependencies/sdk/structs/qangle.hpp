@@ -1,5 +1,4 @@
-#ifndef SKELETONS_Cpitch_QANGLE_HPP
-#define SKELETONS_Cpitch_QANGLE_HPP
+#pragma once
 
 #include <cmath>
 #include <iostream>
@@ -110,5 +109,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_QANGLE_HPP

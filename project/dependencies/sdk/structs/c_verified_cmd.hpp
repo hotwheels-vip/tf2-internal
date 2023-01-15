@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_VERIFIED_CMD_HPP
-#define WEDNESDAY_WTF_C_VERIFIED_CMD_HPP
+#pragma once
 
 #include "c_user_cmd.hpp"
 
@@ -11,5 +10,3 @@ namespace sdk
 		CRC32_t crc;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_VERIFIED_CMD_HPP

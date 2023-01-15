@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_BASE_HANDLE_HPP
-#define WEDNESDAY_WTF_C_BASE_HANDLE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -8,5 +7,3 @@ namespace sdk
 		unsigned long index;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_BASE_HANDLE_HPP

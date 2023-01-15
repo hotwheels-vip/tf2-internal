@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_TF_PIPEBOMB_LAUNCHER_HPP
-#define WEDNESDAY_WTF_C_TF_PIPEBOMB_LAUNCHER_HPP
+#pragma once
 
 #include "c_tf_weapon_base.hpp"
 
@@ -11,5 +10,3 @@ namespace sdk
 		NETVAR( charge_begin_time, float, "CTFPipebombLauncher", "m_flChargeBeginTime" );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_TF_PIPEBOMB_LAUNCHER_HPP

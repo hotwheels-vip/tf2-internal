@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_WEAPON_STRANGE_TYPE_HPP
-#define WEDNESDAY_WTF_WEAPON_STRANGE_TYPE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -9,5 +8,3 @@ namespace sdk
 		strange_is_strange  = 1,
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_WEAPON_STRANGE_TYPE_HPP

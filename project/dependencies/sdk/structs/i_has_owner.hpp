@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_HAS_OWNER_HPP
-#define WEDNESDAY_WTF_I_HAS_OWNER_HPP
+#pragma once
 
 #include "c_base_entity.hpp"
 
@@ -10,5 +9,3 @@ namespace sdk
 		virtual c_base_entity* get_owner_via_interface( ) = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_HAS_OWNER_HPP

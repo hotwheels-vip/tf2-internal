@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_MATH_HPP
-#define WEDNESDAY_WTF_MATH_HPP
+#pragma once
 
 #include <cmath>
 #include <directxmath.h>
@@ -31,5 +30,3 @@ namespace math
 
 	float remap_val_clamped( float val, float a, float b, float c, float d );
 } // namespace math
-
-#endif // WEDNESDAY_WTF_MATH_HPP

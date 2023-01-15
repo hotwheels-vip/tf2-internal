@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_TF_MINIGUN_HPP
-#define WEDNESDAY_WTF_C_TF_MINIGUN_HPP
+#pragma once
 
 #include "c_tf_weapon_base.hpp"
 
@@ -11,5 +10,3 @@ namespace sdk
 		NETVAR( crit_shot, bool, "CTFMinigun", "m_bCritShot" );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_TF_MINIGUN_HPP

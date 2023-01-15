@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_PANEL_HPP
-#define WEDNESDAY_WTF_I_PANEL_HPP
+#pragma once
 
 #include "../structs/vpanel.hpp"
 #include <iostream>
@@ -109,5 +108,3 @@ namespace sdk
 		virtual void set_sibling_pin( vpanel vgui_panel, vpanel new_sibling, std::byte i_my_corner_to_pin, std::byte i_sibling_corner_to_pin_to ) = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_PANEL_HPP

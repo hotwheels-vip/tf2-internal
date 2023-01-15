@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_RENDER_VIEW_HPP
-#define WEDNESDAY_WTF_I_RENDER_VIEW_HPP
+#pragma once
 
 #include "../structs/c_tf_player.hpp"
 #include "../structs/color.hpp"
@@ -165,5 +164,3 @@ namespace sdk
 		                                  draw_brush_model_mode_t mode )                                                            = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_RENDER_VIEW_HPP

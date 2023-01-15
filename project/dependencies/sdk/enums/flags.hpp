@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_FLAGS_HPP
-#define WEDNESDAY_WTF_FLAGS_HPP
+#pragma once
 
 namespace sdk
 {
@@ -38,5 +37,3 @@ namespace sdk
 		unblockable_by_player = ( 1 << 31 )
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_FLAGS_HPP
