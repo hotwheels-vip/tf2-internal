@@ -1,8 +1,8 @@
 #ifndef WEDNESDAY_WTF_PLAYER_INFO_HPP
 #define WEDNESDAY_WTF_PLAYER_INFO_HPP
 
-#include <valve/crc32.hpp>
 #include <iostream>
+#include <sdk/crc32.hpp>
 
 namespace sdk
 {

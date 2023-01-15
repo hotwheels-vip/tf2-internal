@@ -106,9 +106,7 @@ sdk::vector best_projectile_position( sdk::c_tf_player* target, bool can_headsho
 	CONFIG( aimbot_projectile_feet, bool );
 
 	sdk::vector ideal_foot_offset{ 0, 0, 2 };
-	sdk::vector head_offset{
-		0, 0, ( target->get_hitbox_position( sdk::hitbox_head ) - target->get_abs_origin( ) ).z + 1.f
-	}; // adding 1 to hopefully avoid hitting other hitboxes
+	sdk::vector head_offset{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_head ) - target->get_abs_origin( ) ).z };
 	sdk::vector pelvis_offset{ 0, 0, ( target->get_hitbox_position( sdk::hitbox_pelvis ) - target->get_abs_origin( ) ).z };
 
 	if ( can_headshot )

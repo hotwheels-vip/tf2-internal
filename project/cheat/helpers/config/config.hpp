@@ -107,13 +107,4 @@ public:
 
 inline config* g_config = new config( );
 
-class themes : public config
-{
-public:
-	void save( std::string name );
-	void load( std::string name );
-};
-
-inline themes* g_themes = new themes( );
-
 #define CONFIG( name, type ) static type* name = g_config->find< type >( HASH( #name ) )

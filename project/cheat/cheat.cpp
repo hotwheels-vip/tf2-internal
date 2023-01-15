@@ -12,30 +12,22 @@ DWORD WINAPI shutdown_routine( LPVOID )
 
 void cheat::run( )
 {
-	using namespace std::chrono;
+	using namespace spdlog;
 
-	auto start = high_resolution_clock::now( );
+	stopwatch stopwatch;
 
 	g_console->run( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Console run successful!\n" );
+	info( "console initialized in {}ms", stopwatch );
 	g_config->run( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Config run successful!\n" );
+	info( "config initialized in {}ms", stopwatch );
 	g_modules->run( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Modules run successful!\n" );
+	info( "modules initialized in {}ms", stopwatch );
 	g_signatures.run( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Signatures run successful!\n" );
+	info( "signatures initialized in {}ms", stopwatch );
 	g_interfaces->run( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Interfaces run successful!\n" );
+	info( "interfaces initialized in {}ms", stopwatch );
 	g_hooks->run( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Hooks run successful!\n" );
-
-	auto end = high_resolution_clock::now( );
+	info( "hooks initialized in {}ms", stopwatch );
 
 	g_input->add_keybind( VK_DELETE, []( bool ) {
 		if ( auto handle = CreateThread( nullptr, 0, shutdown_routine, nullptr, 0, nullptr ) ) {
@@ -46,21 +38,20 @@ void cheat::run( )
 
 void cheat::end( )
 {
+	using namespace spdlog;
+
+	stopwatch stopwatch;
+
 	g_hooks->end( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Hooks end successful!\n" );
+	info( "hooks uninitialized in {}ms", stopwatch );
 	g_interfaces->end( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Interfaces end successful!\n" );
+	info( "interfaces uninitialized in {}ms", stopwatch );
 	g_signatures.end( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Signatures end successful!\n" );
+	info( "signatures uninitialized in {}ms", stopwatch );
 	g_modules->end( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Modules end successful!\n" );
+	info( "modules uninitialized in {}ms", stopwatch );
 	g_config->end( );
-	g_console->log< fmt::color::gray >( "[CHEAT] " );
-	g_console->log< fmt::color::sky_blue >( "Config end successful!\n" );
+	info( "config uninitialized in {}ms", stopwatch );
 	g_console->end( );
 
 	FreeLibraryAndExitThread( instance, 0 );

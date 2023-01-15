@@ -1,8 +1,8 @@
 #ifndef WEDNESDAY_WTF_C_USER_CMD_HPP
 #define WEDNESDAY_WTF_C_USER_CMD_HPP
 
-#include <valve/crc32.hpp>
 #include "../structs/qangle.hpp"
+#include <sdk/crc32.hpp>
 
 namespace sdk
 {
