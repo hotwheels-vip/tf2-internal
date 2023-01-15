@@ -16,11 +16,12 @@ private:
 public:
 	void create( auto source, auto destination, const char* name = "undefined" )
 	{
-		auto thing = MH_CreateHook( ( void* )source, ( void* )destination, &original );
+		using namespace spdlog;
 
-		if ( thing != MH_OK ) {
-			g_console->log< fmt::color::gray >( "[HOOK] " );
-			g_console->log< fmt::color::red >( "Failed to create hook for {}!\n", name );
+		auto ret = MH_CreateHook( ( void* )source, ( void* )destination, &original );
+
+		if ( ret != MH_OK ) {
+			error( "failed to create hook for {} (error code {})", name, ret );
 
 			return;
 		}
@@ -28,47 +29,52 @@ public:
 		this->source = source;
 		hook_name    = name;
 
-		g_console->log< fmt::color::gray >( "[HOOK] " );
-		g_console->log< fmt::color::sky_blue >( "Created hook for {}!\n", name );
+		info( "created hook for {}", name );
 	}
 
 	void disable( )
 	{
-		if ( MH_DisableHook( source ) != MH_OK ) {
-			g_console->log< fmt::color::gray >( "[HOOK] " );
-			g_console->log< fmt::color::red >( "Failed to disable hook for {}!\n", hook_name.data( ) );
+		using namespace spdlog;
+
+		auto ret = MH_DisableHook( source );
+
+		if ( ret != MH_OK ) {
+			error( "failed to disable hook for {} (error code {})", hook_name, ret );
 
 			return;
 		}
 
-		g_console->log< fmt::color::gray >( "[HOOK] " );
-		g_console->log< fmt::color::sky_blue >( "Disabled hook for {}!\n", hook_name.data( ) );
+		info( "disabled hook for {}", hook_name );
 	}
 
 	void enable( )
 	{
-		if ( MH_EnableHook( source ) != MH_OK ) {
-			g_console->log< fmt::color::gray >( "[HOOK] " );
-			g_console->log< fmt::color::red >( "Failed to enable hook for {}!\n", hook_name.data( ) );
+		using namespace spdlog;
+
+		auto ret = MH_EnableHook( source );
+
+		if ( ret != MH_OK ) {
+			error( "failed to enable hook for {} (error code {})", hook_name, ret );
 
 			return;
 		}
 
-		g_console->log< fmt::color::gray >( "[HOOK] " );
-		g_console->log< fmt::color::sky_blue >( "Enabled hook for {}!\n", hook_name.data( ) );
+		info( "enabled hook for {}", hook_name );
 	}
 
 	void remove( )
 	{
-		if ( MH_RemoveHook( source ) != MH_OK ) {
-			g_console->log< fmt::color::gray >( "[HOOK] " );
-			g_console->log< fmt::color::red >( "Failed to remove hook for {}!\n", hook_name.data( ) );
+		using namespace spdlog;
+
+		auto ret = MH_RemoveHook( source );
+
+		if ( ret != MH_OK ) {
+			error( "failed to remove hook for {} (error code {})", hook_name, ret );
 
 			return;
 		}
 
-		g_console->log< fmt::color::gray >( "[HOOK] " );
-		g_console->log< fmt::color::sky_blue >( "Removed hook for {}!\n", hook_name.data( ) );
+		info( "removed hook for {}", hook_name );
 	}
 
 	template< typename... ARGS >

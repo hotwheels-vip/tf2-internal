@@ -1,5 +1,7 @@
 #include "interfaces.hpp"
 
+#include <spdlog/spdlog.h>
+
 void interfaces::run( )
 {
 	engine_client   = reinterpret_cast< sdk::i_engine_client* >( get_interface( "engine.dll", HASH( "VEngineClient013" ) ) );
@@ -29,6 +31,8 @@ void interfaces::end( ) { }
 
 void* interfaces::get_interface( const char* modules, std::uint32_t hash )
 {
+	using namespace spdlog;
+
 	//	std::vector< const char* > vModules = { "client.dll",         "engine.dll",        "localize.dll",        "materialsystem.dll",
 	//		                                    "vguimatsurface.dll", "vgui2.dll",         "shaderapidx9.dll",    "gameoverlayrenderer.dll",
 	//		                                    "vphysics.dll",       "vstdlib.dll",       "tier0.dll",           "inputsystem.dll",
@@ -62,8 +66,7 @@ void* interfaces::get_interface( const char* modules, std::uint32_t hash )
 		buffer[ size ] = '\0';
 
 		if ( RT_HASH( buffer ) == hash ) {
-			g_console->log< fmt::color::gray >( "[INTERFACE] " );
-			g_console->log< fmt::color::sky_blue >( "Found interface {}!\n", buffer );
+			info( "found interface {} at {}", buffer, found_interface->get( ) );
 
 			return found_interface->get( );
 		}
@@ -71,8 +74,7 @@ void* interfaces::get_interface( const char* modules, std::uint32_t hash )
 		found_interface = found_interface->next;
 	}
 
-	g_console->log< fmt::color::gray >( "[INTERFACE] " );
-	g_console->log< fmt::color::red >( "Failed to find interface {}!\n", buffer );
+	error( "failed to find interface with hash {}", hash );
 
 	return nullptr;
 }

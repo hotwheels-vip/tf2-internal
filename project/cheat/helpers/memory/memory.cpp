@@ -1,5 +1,7 @@
 #include "memory.hpp"
 
+#include <spdlog/spdlog.h>
+
 std::uintptr_t memory::find_pattern( std::uint8_t* region_start, std::uintptr_t region_size, const char* pattern )
 {
 	std::vector< int > bytes = pattern_to_bytes( pattern );
@@ -66,6 +68,8 @@ std::uintptr_t* virtuals::get_virtual_function( void* pAddress, std::size_t iInd
 
 void signatures::run( )
 {
+	using namespace spdlog;
+
 	std::vector< signature > signatures{ { "8B 0D ? ? ? ? FF 75 ? D9 45 ? 51 8B 01 D9 1C ? FF 75", g_client },
 		                                 { "55 8B EC 56 8B 75 ? 85 F6 74 ? 8B 16 8B CE", g_client },
 		                                 { "8B 0D ? ? ? ? 8B 02 D9 05", g_client },
@@ -115,12 +119,10 @@ void signatures::run( )
 		auto pattern = i.module->Scan( i.pattern );
 
 		if ( !pattern.address_ ) {
-			g_console->log< fmt::color::gray >( "[SIGNATURE] " );
-			g_console->log< fmt::color::red >( "Failed to find signature {}!\n", i.pattern );
+			error( "failed to find signature for pattern {}", i.pattern );
 		}
 
-		g_console->log< fmt::color::gray >( "[SIGNATURE] " );
-		g_console->log< fmt::color::sky_blue >( "Found signature {}!\n", i.pattern );
+		info( "found signature for pattern {} at {}", i.pattern, pattern.address_ );
 
 		database.insert( std::make_pair( RT_HASH( i.pattern ), pattern ) );
 	}

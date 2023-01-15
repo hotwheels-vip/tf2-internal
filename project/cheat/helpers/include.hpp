@@ -1,5 +1,8 @@
 #pragma once
 
+#include <spdlog/spdlog.h>
+#include <spdlog/stopwatch.h>
+
 #include "config/config.hpp"
 #include "console/console.hpp"
 #include "entity_list/entity_list.hpp"
