@@ -79,6 +79,8 @@ LONG end_scene::detour( IDirect3DDevice9* device )
 
 	g_indicators->run( );
 
+	g_visuals->run( );
+
 	ImGui::EndFrame( );
 
 	ImGui::Render( );

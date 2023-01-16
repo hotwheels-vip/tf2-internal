@@ -71,7 +71,7 @@ public:
 		}
 	};
 
-	std::unordered_map< std::int32_t, option > settings{ };
+	std::unordered_map< std::string, option > settings{ };
 
 	void run( );
 	void end( );
@@ -79,12 +79,12 @@ public:
 	void save( std::string name );
 	void load( std::string name );
 
-	void insert( std::int32_t hash, option value );
+	void insert( std::string name, option value );
 
 	template< typename T >
-	T* find( std::uint32_t hash )
+	T* find( std::string name )
 	{
-		auto it = settings.find( hash );
+		auto it = settings.find( name );
 
 		switch ( it->second.type ) {
 		case variable::VARIABLE_BOOL:
@@ -107,4 +107,4 @@ public:
 
 inline config* g_config = new config( );
 
-#define CONFIG( name, type ) static type* name = g_config->find< type >( HASH( #name ) )
+#define CONFIG( name, type ) static type* name = g_config->find< type >( #name )

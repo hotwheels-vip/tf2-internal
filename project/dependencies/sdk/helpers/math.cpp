@@ -1,6 +1,9 @@
 #include "math.hpp"
 #include <algorithm>
 
+#include "../../../cheat/hooks/paint_traverse/paint_traverse.hpp"
+#include "../cheat/helpers/include.hpp"
+
 void math::angle_to_vector( const sdk::qangle& angle, sdk::vector* forward, sdk::vector* right, sdk::vector* up )
 {
 	float sp, sy, sr, cp, cy, cr;
@@ -118,4 +121,39 @@ float math::remap_val_clamped( float val, float a, float b, float c, float d )
 	v       = std::clamp( v, 0.f, 1.f );
 
 	return c + ( d - c ) * v;
+}
+
+std::pair< ImVec2, bool > math::world_to_screen( sdk::vector position )
+{
+	auto on_screen = true;
+
+	const auto matrix = g_paint_traverse->matrix;
+
+	// not really needed but prevents useless math to be done
+	if ( !matrix.data ) {
+		on_screen = false;
+		return std::make_pair( ImVec2{ }, on_screen );
+	}
+
+	float width = matrix[ 3 ][ 0 ] * position.x + matrix[ 3 ][ 1 ] * position.y + matrix[ 3 ][ 2 ] * position.z + matrix[ 3 ][ 3 ];
+
+	if ( width < 0.001f ) {
+		on_screen = false;
+
+		return std::make_pair( ImVec2{ }, on_screen );
+	}
+
+	float inverse = 1.f / width;
+
+	ImVec2 screen;
+
+	screen.x = ( matrix[ 0 ][ 0 ] * position.x + matrix[ 0 ][ 1 ] * position.y + matrix[ 0 ][ 2 ] * position.z + matrix[ 0 ][ 3 ] ) * inverse;
+	screen.y = ( matrix[ 1 ][ 0 ] * position.x + matrix[ 1 ][ 1 ] * position.y + matrix[ 1 ][ 2 ] * position.z + matrix[ 1 ][ 3 ] ) * inverse;
+
+	auto screen_size = ImGui::GetIO( ).DisplaySize;
+
+	screen.x = ( screen_size.x * 0.5f ) + ( screen.x * screen_size.x ) * 0.5f;
+	screen.y = ( screen_size.y * 0.5f ) - ( screen.y * screen_size.y ) * 0.5f;
+
+	return std::make_pair( screen, on_screen );
 }

@@ -11,13 +11,18 @@ private:
 	hook< void( __cdecl )( float, bool ), void > _hook{ };
 
 public:
-	bool charge{ };
-	bool shift{ };
+	bool force_charge{ };
+	bool force_shift{ };
+
 	bool choke = true;
+
 	int stored{ };
 
 	int shifted{ };
 	int max_shifted{ };
+
+	bool shifting{ };
+	bool charging{ };
 
 	static void __cdecl detour( float accumulated_extra_samples, bool final_tick );
 

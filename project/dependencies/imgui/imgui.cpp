@@ -5795,7 +5795,7 @@ bool ImGui::BeginChildEx( const char* name, ImGuiID id, const ImVec2& size_arg, 
 
 	const auto draw_position = child_window->Pos - ImVec2( 0.f, 20.f );
 
-	if ( show_text ) {
+	if ( show_text && name ) {
 		parent_window->DrawList->AddRectFilled(
 			draw_position, draw_position + ImVec2( child_window->Size.x, 20.f ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ),
 			g.Style.WindowRounding - 2.f /* NOTE ~ float ~ liga, if u see this baby , ,, . . . Am very Sorry X D */,
@@ -5881,8 +5881,8 @@ void ImGui::EndChild( )
 				top_shadow_animation.Update( 2.f, window->Scroll.y != 0.f ? 2.f : -4.f );
 
 				/* top shadow */
-				window->DrawList->AddRectFilledMultiColor( window->Pos + ImVec2( 0.f, 1.f ),
-				                                           window->Pos + ImVec2( 0.f, 1.f ) + ImVec2( window->Size.x, shadow_height ),
+				window->DrawList->AddRectFilledMultiColor(
+					window->Pos + ImVec2( 0.f, 1.f ), window->Pos + ImVec2( 0.f, 1.f ) + ImVec2( window->Size.x, shadow_height ),
 					ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * shadow_opacity * g.Style.Alpha ),
 					ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * shadow_opacity * g.Style.Alpha ),
 					ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * 0.f * g.Style.Alpha ),
@@ -5893,9 +5893,9 @@ void ImGui::EndChild( )
 				bottom_shadow_animation.Update( 2.f, window->Scroll.y != window->ScrollMax.y != 0.f ? 2.f : -2.f );
 
 				/* bottom shadow */
-				window->DrawList->AddRectFilledMultiColor( window->Pos + ImVec2( 0.f, window->Size.y - shadow_height ),
-				                                           window->Pos + ImVec2( 0.f, window->Size.y - shadow_height ) +
-				                                               ImVec2( window->Size.x, shadow_height ),
+				window->DrawList->AddRectFilledMultiColor(
+					window->Pos + ImVec2( 0.f, window->Size.y - shadow_height ),
+					window->Pos + ImVec2( 0.f, window->Size.y - shadow_height ) + ImVec2( window->Size.x, shadow_height ),
 					ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * 0.f * g.Style.Alpha ),
 					ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * 0.f * g.Style.Alpha ),
 					ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * shadow_opacity * g.Style.Alpha ),

@@ -4,6 +4,7 @@
 
 #include "../../features/indicators/indicators.hpp"
 #include "../../features/menu/menu.hpp"
+#include "../../features/visuals/visuals.hpp"
 #include "../../helpers/include.hpp"
 
 #include <Windows.h>

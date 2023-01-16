@@ -14,20 +14,20 @@ void cheat::run( )
 {
 	using namespace spdlog;
 
-	stopwatch stopwatch;
+	stopwatch mod;
 
 	g_console->run( );
-	info( "console initialized in {}ms", stopwatch );
+	info( "console initialized in {:0.2f}s", mod );
 	g_config->run( );
-	info( "config initialized in {}ms", stopwatch );
+	info( "config initialized in {:0.2f}s", mod );
 	g_modules->run( );
-	info( "modules initialized in {}ms", stopwatch );
+	info( "modules initialized in {:0.2f}s", mod );
 	g_signatures.run( );
-	info( "signatures initialized in {}ms", stopwatch );
+	info( "signatures initialized in {:0.2f}s", mod );
 	g_interfaces->run( );
-	info( "interfaces initialized in {}ms", stopwatch );
+	info( "interfaces initialized in {:0.2f}s", mod );
 	g_hooks->run( );
-	info( "hooks initialized in {}ms", stopwatch );
+	info( "hooks initialized in {:0.2f}s", mod );
 
 	g_input->add_keybind( VK_DELETE, []( bool ) {
 		if ( auto handle = CreateThread( nullptr, 0, shutdown_routine, nullptr, 0, nullptr ) ) {

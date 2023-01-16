@@ -79,7 +79,7 @@ void menu::run( )
 			RenderFadedGradientLine( draw_list, ImVec2( position.x, position.y + size.y - background_height ), ImVec2( size.x, 1.f ),
 			                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ) );
 
-			std::vector< const char* > tab_names = { "aimbot", "visuals", "movement", "misc", "settings" };
+			std::vector< const char* > tab_names = { "aimbot", "visuals", "chams", "misc", "settings" };
 			for ( int iterator = { }; iterator < tab_names.size( ); iterator++ ) {
 				if ( !( iterator < tab_names.size( ) ) )
 					break;
@@ -295,6 +295,42 @@ void menu::run( )
 
 			break;
 		}
+		case 1: {
+			if ( ImGui::BeginChild(
+					 "player visuals",
+					 ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ( ImGui::GetContentRegionAvail( ).y / 2.f ) - background_height - 20.f ), true,
+					 0, true ) ) {
+				ImGui::EndChild( );
+			}
+
+			ImGui::SameLine( );
+			ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
+
+			if ( ImGui::BeginChild(
+					 "building visuals",
+					 ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y / 2.f ) - background_height - 20.f ), true, 0,
+					 true ) ) {
+				ImGui::EndChild( );
+			}
+
+			if ( ImGui::BeginChild(
+					 "projectile visuals",
+					 ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ), true, 0,
+					 true ) ) {
+				ImGui::EndChild( );
+			}
+
+			ImGui::SameLine( );
+			ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
+
+			if ( ImGui::BeginChild( "other visuals",
+			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ),
+			                        true, 0, true ) ) {
+				ImGui::EndChild( );
+			}
+
+			break;
+		}
 		case 4: {
 			if ( ImGui::BeginChild( "menu settings",
 			                        ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ImGui::GetContentRegionAvail( ).y - background_height - 20.f ),
@@ -323,6 +359,20 @@ void menu::run( )
 			if ( ImGui::BeginChild( "config settings",
 			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ImGui::GetContentRegionAvail( ).y - background_height - 20.f ), true,
 			                        0, true ) ) {
+				static auto config_name = std::string{ };
+
+				ImGui::InputText( "config name", config_name.data( ), config_name.capacity( ) );
+
+				if ( ImGui::Button( "load", ImVec2( 110.f, 0 ) ) ) {
+					g_config->load( fmt::format( "C:\\Hotwheels\\Configs\\{}.hw", config_name.data( ) ) );
+				}
+
+				ImGui::SameLine( );
+
+				if ( ImGui::Button( "save", ImVec2( 111.f, 0 ) ) ) {
+					g_config->save( fmt::format( "C:\\Hotwheels\\Configs\\{}.hw", config_name.data( ) ) );
+				}
+
 				ImGui::EndChild( );
 			}
 
