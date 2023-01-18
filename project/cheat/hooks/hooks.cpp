@@ -30,6 +30,7 @@ void hooks::run( )
 	g_item_post_frame->run( );
 	g_get_time->run( );
 
+	// ReSharper disable once CppZeroConstantCanBeReplacedWithNullptr
 	MH_EnableHook( MH_ALL_HOOKS );
 }
 

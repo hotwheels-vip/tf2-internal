@@ -4,21 +4,21 @@
 
 void interfaces::run( )
 {
-	engine_client   = reinterpret_cast< sdk::i_engine_client* >( get_interface( "engine.dll", HASH( "VEngineClient013" ) ) );
-	client          = reinterpret_cast< sdk::i_base_client_dll* >( get_interface( "client.dll", HASH( "VClient017" ) ) );
-	entity_list     = reinterpret_cast< sdk::i_client_entity_list* >( get_interface( "client.dll", HASH( "VClientEntityList003" ) ) );
-	debug_overlay   = reinterpret_cast< sdk::i_debug_overlay* >( get_interface( "engine.dll", HASH( "VDebugOverlay003" ) ) );
-	cvar            = reinterpret_cast< sdk::i_con_var* >( get_interface( "vstdlib.dll", HASH( "VEngineCvar004" ) ) );
-	model_info      = reinterpret_cast< sdk::i_model_info* >( get_interface( "engine.dll", HASH( "VModelInfoClient006" ) ) );
-	render_view     = reinterpret_cast< sdk::i_render_view* >( get_interface( "engine.dll", HASH( "VEngineRenderView014" ) ) );
-	prediction      = reinterpret_cast< sdk::c_prediction* >( get_interface( "client.dll", HASH( "VClientPrediction001" ) ) );
-	game_movement   = reinterpret_cast< sdk::i_game_movement* >( get_interface( "client.dll", HASH( "GameMovement001" ) ) );
-	panel           = reinterpret_cast< sdk::i_panel* >( get_interface( "vgui2.dll", HASH( "VGUI_Panel009" ) ) );
-	engine_trace    = reinterpret_cast< sdk::i_engine_trace* >( get_interface( "engine.dll", HASH( "EngineTraceClient003" ) ) );
-	leaf_system     = reinterpret_cast< sdk::i_client_leaf_system* >( get_interface( "client.dll", HASH( "ClientLeafSystem002" ) ) );
-	model_render    = reinterpret_cast< sdk::i_model_render* >( get_interface( "engine.dll", HASH( "VEngineModel016" ) ) );
-	material_system = reinterpret_cast< sdk::i_material_system* >( get_interface( "materialsystem.dll", HASH( "VMaterialSystem081" ) ) );
-	localize        = reinterpret_cast< sdk::i_localize* >( get_interface( "vgui2.dll", HASH( "VGUI_Localize005" ) ) );
+	engine_client   = static_cast< sdk::i_engine_client* >( get_interface( "engine.dll", HASH( "VEngineClient013" ) ) );
+	client          = static_cast< sdk::i_base_client_dll* >( get_interface( "client.dll", HASH( "VClient017" ) ) );
+	entity_list     = static_cast< sdk::i_client_entity_list* >( get_interface( "client.dll", HASH( "VClientEntityList003" ) ) );
+	debug_overlay   = static_cast< sdk::i_debug_overlay* >( get_interface( "engine.dll", HASH( "VDebugOverlay003" ) ) );
+	cvar            = static_cast< sdk::i_con_var* >( get_interface( "vstdlib.dll", HASH( "VEngineCvar004" ) ) );
+	model_info      = static_cast< sdk::i_model_info* >( get_interface( "engine.dll", HASH( "VModelInfoClient006" ) ) );
+	render_view     = static_cast< sdk::i_render_view* >( get_interface( "engine.dll", HASH( "VEngineRenderView014" ) ) );
+	prediction      = static_cast< sdk::c_prediction* >( get_interface( "client.dll", HASH( "VClientPrediction001" ) ) );
+	game_movement   = static_cast< sdk::i_game_movement* >( get_interface( "client.dll", HASH( "GameMovement001" ) ) );
+	panel           = static_cast< sdk::i_panel* >( get_interface( "vgui2.dll", HASH( "VGUI_Panel009" ) ) );
+	engine_trace    = static_cast< sdk::i_engine_trace* >( get_interface( "engine.dll", HASH( "EngineTraceClient003" ) ) );
+	leaf_system     = static_cast< sdk::i_client_leaf_system* >( get_interface( "client.dll", HASH( "ClientLeafSystem002" ) ) );
+	model_render    = static_cast< sdk::i_model_render* >( get_interface( "engine.dll", HASH( "VEngineModel016" ) ) );
+	material_system = static_cast< sdk::i_material_system* >( get_interface( "materialsystem.dll", HASH( "VMaterialSystem081" ) ) );
+	localize        = static_cast< sdk::i_localize* >( get_interface( "vgui2.dll", HASH( "VGUI_Localize005" ) ) );
 
 	input       = g_signatures[ HASH( "8B 0D ? ? ? ? FF 75 ? D9 45 ? 51 8B 01 D9 1C ? FF 75" ) ].add( 0x2 ).get( 2 ).as< sdk::i_input* >( );
 	move_helper = g_signatures[ HASH( "8B 0D ? ? ? ? 8B 46 08 68 ? ? ? ? 05 ? ? ? ? 8B 11 50" ) ].add( 0x2 ).get( 2 ).as< sdk::i_move_helper* >( );
@@ -39,20 +39,20 @@ void* interfaces::get_interface( const char* modules, std::uint32_t hash )
 	//		                                    "studiorender.dll",   "datacache.dll",     "steam_api.dll",       "matchmaking.dll",
 	//		                                    "server.dll",         "serverbrowser.dll", "filesystem_stdio.dll" };
 
-	auto create_interface = ( std::uintptr_t )GetProcAddress( GetModuleHandleA( modules ), "CreateInterface" );
+	auto create_interface = reinterpret_cast< std::uintptr_t >( GetProcAddress( GetModuleHandleA( modules ), "CreateInterface" ) );
 
 	if ( !create_interface )
 		return nullptr;
 
-	while ( *( std::uint8_t* )create_interface != 0xE9 )
+	while ( *reinterpret_cast< std::uint8_t* >( create_interface ) != 0xE9 )
 		create_interface++;
 
 	create_interface = jump_address( create_interface );
 
-	while ( *( std::uint16_t* )create_interface != 0x358B )
+	while ( *reinterpret_cast< std::uint16_t* >( create_interface ) != 0x358B )
 		create_interface++;
 
-	auto found_interface = **( interface_*** )( create_interface + 0x2 );
+	auto found_interface = **reinterpret_cast< interface_*** >( create_interface + 0x2 );
 
 	char buffer[ 128 ]{ };
 
@@ -81,10 +81,10 @@ void* interfaces::get_interface( const char* modules, std::uint32_t hash )
 
 std::uintptr_t interfaces::jump_address( std::uintptr_t pAddress )
 {
-	auto iJump = *( std::uintptr_t* )( pAddress + 0x1 );
+	const auto jump = *reinterpret_cast< std::uintptr_t* >( pAddress + 0x1 );
 
 	pAddress += 0x5;
-	pAddress += iJump;
+	pAddress += jump;
 
 	return pAddress;
 }

@@ -15,10 +15,10 @@ restore< float > fall_velocity{ };
 
 void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 {
-	auto last_command    = g_interfaces->client_state->last_command_ack( );
-	auto last_outgoing   = g_interfaces->client_state->last_outgoing_command( );
-	auto choked_commands = g_interfaces->client_state->choked_commands( );
-	auto delta_tick      = g_interfaces->client_state->delta_tick( );
+	const auto last_command    = g_interfaces->client_state->last_command_ack( );
+	const auto last_outgoing   = g_interfaces->client_state->last_outgoing_command( );
+	const auto choked_commands = g_interfaces->client_state->choked_commands( );
+	const auto delta_tick      = g_interfaces->client_state->delta_tick( );
 
 	if ( delta_tick > 0 )
 		g_interfaces->prediction->update( delta_tick, delta_tick > 0, last_command, last_outgoing + choked_commands );
@@ -35,7 +35,7 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 	set_prediction_player( player );
 
 	g_interfaces->globals->tick_count = player->tick_base( );
-	g_interfaces->globals->cur_time   = ( float )player->tick_base( ) * g_interfaces->globals->interval_per_tick;
+	g_interfaces->globals->cur_time   = static_cast< float >( player->tick_base( ) ) * g_interfaces->globals->interval_per_tick;
 	g_interfaces->globals->frame_time = g_interfaces->globals->interval_per_tick;
 
 	auto first_time_predicted = restore( &g_interfaces->prediction->first_time_predicted );

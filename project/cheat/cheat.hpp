@@ -10,8 +10,8 @@ class cheat
 public:
 	HINSTANCE instance{ };
 
-	void run( );
-	void end( );
+	static void run( );
+	static void end( );
 };
 
 inline cheat* g_cheat = new cheat( );

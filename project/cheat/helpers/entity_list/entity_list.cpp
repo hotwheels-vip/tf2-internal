@@ -9,22 +9,18 @@ void entity_list::run( sdk::c_user_cmd* _cmd )
 	if ( !g_interfaces->engine_client->is_connected( ) )
 		return;
 
-	auto local_index = g_interfaces->engine_client->get_local_player( );
+	if ( const auto local_index = g_interfaces->engine_client->get_local_player( ) ) {
+		local = reinterpret_cast< sdk::c_tf_player* >( g_interfaces->entity_list->get_client_entity( local_index ) );
 
-	if ( local_index ) {
-		local = ( sdk::c_tf_player* )g_interfaces->entity_list->get_client_entity( local_index );
-
-		auto weapon_index = local->active_weapon( );
-
-		if ( weapon_index.index ) {
-			weapon = ( sdk::c_tf_weapon_base* )g_interfaces->entity_list->get_client_entity_from_handle( weapon_index );
+		if ( const auto weapon_index = local->active_weapon( ); weapon_index.index ) {
+			weapon = reinterpret_cast< sdk::c_tf_weapon_base* >( g_interfaces->entity_list->get_client_entity_from_handle( weapon_index ) );
 		}
 	}
 
 	for ( int i = 0; i < 48; i++ ) {
 		enemy[ i ] = nullptr;
 
-		auto entity = reinterpret_cast< sdk::c_tf_player* >( g_interfaces->entity_list->get_client_entity( i ) );
+		const auto entity = reinterpret_cast< sdk::c_tf_player* >( g_interfaces->entity_list->get_client_entity( i ) );
 
 		if ( !entity )
 			continue;

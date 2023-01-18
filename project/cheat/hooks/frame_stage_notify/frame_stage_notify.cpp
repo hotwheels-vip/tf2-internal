@@ -10,7 +10,7 @@ void __fastcall frame_stage_notify::detour( void* ecx, void* edx, sdk::client_fr
 			if ( !player )
 				continue;
 
-			auto var_map = player->get_var_mapping( );
+			const auto var_map = player->get_var_mapping( );
 
 			if ( !var_map )
 				continue;
@@ -26,6 +26,9 @@ void __fastcall frame_stage_notify::detour( void* ecx, void* edx, sdk::client_fr
 			}
 		}
 
+		break;
+	}
+	default: {
 		break;
 	}
 	}

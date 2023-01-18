@@ -12,6 +12,6 @@ private:                                                                        
 #define NETVAR( function_name, type, table_name, netvar_name )                                                                                       \
 	inline type& function_name( )                                                                                                                    \
 	{                                                                                                                                                \
-		static std::uint32_t offset = g_netvars->get_table( table_name, netvar_name );                                                               \
+		static std::uint32_t offset = netvars::get_table( table_name, netvar_name );                                                                 \
 		return *( type* )( ( std::uint32_t )this + offset );                                                                                         \
 	}

@@ -9,18 +9,16 @@ template< class T, class R >
 class hook
 {
 private:
-	void* source;
-	void* original;
-	std::string_view hook_name;
+	void* source{ };
+	void* original{ };
+	std::string_view hook_name{ };
 
 public:
 	void create( auto source, auto destination, const char* name = "undefined" )
 	{
 		using namespace spdlog;
 
-		auto ret = MH_CreateHook( ( void* )source, ( void* )destination, &original );
-
-		if ( ret != MH_OK ) {
+		if ( const auto ret = MH_CreateHook( static_cast< void* >( source ), reinterpret_cast< void* >( destination ), &original ); ret != MH_OK ) {
 			error( "failed to create hook for {} (error code {})", name, ret );
 
 			return;
@@ -36,9 +34,7 @@ public:
 	{
 		using namespace spdlog;
 
-		auto ret = MH_DisableHook( source );
-
-		if ( ret != MH_OK ) {
+		if ( const auto ret = MH_DisableHook( source ); ret != MH_OK ) {
 			error( "failed to disable hook for {} (error code {})", hook_name, ret );
 
 			return;
@@ -51,9 +47,7 @@ public:
 	{
 		using namespace spdlog;
 
-		auto ret = MH_EnableHook( source );
-
-		if ( ret != MH_OK ) {
+		if ( const auto ret = MH_EnableHook( source ); ret != MH_OK ) {
 			error( "failed to enable hook for {} (error code {})", hook_name, ret );
 
 			return;
@@ -66,9 +60,7 @@ public:
 	{
 		using namespace spdlog;
 
-		auto ret = MH_RemoveHook( source );
-
-		if ( ret != MH_OK ) {
+		if ( const auto ret = MH_RemoveHook( source ); ret != MH_OK ) {
 			error( "failed to remove hook for {} (error code {})", hook_name, ret );
 
 			return;
@@ -80,7 +72,7 @@ public:
 	template< typename... ARGS >
 	R call( ARGS&&... Args )
 	{
-		return ( R )( reinterpret_cast< T* >( original )( Args... ) );
+		return static_cast< R >( static_cast< T* >( original )( Args... ) );
 	}
 };
 

@@ -17,7 +17,7 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 
 	std::uintptr_t* _ebp;
 	__asm mov _ebp, ebp;
-	bool& send_packet = *( bool* )( *_ebp - 0x1 );
+	bool& send_packet = *reinterpret_cast< bool* >( *_ebp - 0x1 );
 
 	g_entity_list->run( cmd );
 

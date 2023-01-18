@@ -41,9 +41,8 @@ public:
 
 	void run( );
 	void end( );
-
-	void* get_interface( const char* module, std::uint32_t hash );
-	std::uintptr_t jump_address( std::uintptr_t address );
+	static void* get_interface( const char* module, std::uint32_t hash );
+	static std::uintptr_t jump_address( std::uintptr_t address );
 };
 
 inline interfaces* g_interfaces = new interfaces( );

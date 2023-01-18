@@ -5,7 +5,7 @@
 
 DWORD WINAPI shutdown_routine( LPVOID )
 {
-	g_cheat->end( );
+	cheat::end( );
 
 	return 0;
 }
@@ -30,7 +30,7 @@ void cheat::run( )
 	info( "hooks initialized in {:0.2f}s", mod );
 
 	g_input->add_keybind( VK_DELETE, []( bool ) {
-		if ( auto handle = CreateThread( nullptr, 0, shutdown_routine, nullptr, 0, nullptr ) ) {
+		if ( const auto handle = CreateThread( nullptr, 0, shutdown_routine, nullptr, 0, nullptr ) ) {
 			CloseHandle( handle );
 		}
 	} );
@@ -54,5 +54,5 @@ void cheat::end( )
 	info( "config uninitialized in {}ms", stopwatch );
 	g_console->end( );
 
-	FreeLibraryAndExitThread( instance, 0 );
+	FreeLibraryAndExitThread( g_cheat->instance, 0 );
 }

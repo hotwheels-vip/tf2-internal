@@ -44,15 +44,15 @@ public:
 		ImGui_ImplDX9_Init( g_interfaces->device );
 		ImGui_ImplWin32_Init( FindWindowA( "Valve001", nullptr ) );
 
-		std::filesystem::create_directories( "C:\\Hotwheels\\" );
-		std::filesystem::create_directories( "C:\\Hotwheels\\Configs" );
-		std::filesystem::create_directories( "C:\\Hotwheels\\Menu" );
-		std::filesystem::create_directories( "C:\\Hotwheels\\Themes" );
+		std::filesystem::create_directories( R"(C:\Hotwheels\)" );
+		std::filesystem::create_directories( R"(C:\Hotwheels\Configs)" );
+		std::filesystem::create_directories( R"(C:\Hotwheels\Menu)" );
+		std::filesystem::create_directories( R"(C:\Hotwheels\Themes)" );
 
-		ImGui::GetIO( ).IniFilename = "C:\\Hotwheels\\Menu\\Config.ini";
+		ImGui::GetIO( ).IniFilename = R"(C:\Hotwheels\Menu\Config.ini)";
 
-		auto& style = ImGui::GetStyle( );
-		auto& io    = ImGui::GetIO( );
+		auto& style    = ImGui::GetStyle( );
+		const auto& io = ImGui::GetIO( );
 
 		/* setup styles */
 		[ & ]( ) {
@@ -98,17 +98,18 @@ public:
 		verdana_11    = io.Fonts->AddFontFromMemoryCompressedTTF( verdana_compressed_data, verdana_compressed_size, 11.f, &font_config );
 		verdana_bd_11 = io.Fonts->AddFontFromMemoryCompressedTTF( verdana_bold_compressed_data, verdana_bold_compressed_size, 11.f, &font_config );
 
-		static const ImWchar second_icon_font_ranges[] = { ICON_MIN_FK, ICON_MAX_FK, 0 };
+		constexpr ImWchar second_icon_font_ranges[] = { ICON_MIN_FK, ICON_MAX_FK, 0 };
 
-		second_icon_20 = io.Fonts->AddFontFromMemoryCompressedTTF( second_icon_font_compressed_data, second_icon_font_compressed_size, 20.f, 0,
+		second_icon_20 = io.Fonts->AddFontFromMemoryCompressedTTF( second_icon_font_compressed_data, second_icon_font_compressed_size, 20.f, nullptr,
 		                                                           second_icon_font_ranges );
 
-		static const ImWchar first_icon_font_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+		constexpr ImWchar first_icon_font_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
 
 		first_icon_14 =
-			io.Fonts->AddFontFromMemoryCompressedTTF( icon_font_compressed_data, icon_font_compressed_size, 14.f, 0, first_icon_font_ranges );
+			io.Fonts->AddFontFromMemoryCompressedTTF( icon_font_compressed_data, icon_font_compressed_size, 14.f, nullptr, first_icon_font_ranges );
 
-		icon_20 = io.Fonts->AddFontFromMemoryCompressedTTF( icon_font_compressed_data, icon_font_compressed_size, 20.f, 0, first_icon_font_ranges );
+		icon_20 =
+			io.Fonts->AddFontFromMemoryCompressedTTF( icon_font_compressed_data, icon_font_compressed_size, 20.f, nullptr, first_icon_font_ranges );
 
 		ImGuiFreeType::BuildFontAtlas( io.Fonts, 0x0 );
 

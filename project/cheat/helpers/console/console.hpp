@@ -7,7 +7,7 @@
 class console
 {
 private:
-	HANDLE console;
+	HANDLE console_handle;
 	FILE* file;
 
 public:

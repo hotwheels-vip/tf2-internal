@@ -106,17 +106,27 @@ void config::run( )
 	insert( "aimbot_mouse_enabled", false );
 	insert( "aimbot_mouse_fov", 0.f );
 	insert( "aimbot_mouse_smoothing", 1.f );
-	insert( "aimbot_mouse_hitboxes", 0 );
+	insert( "aimbot_mouse_hitboxes", 0b0 );
 	insert( "aimbot_mouse_curve_a", ImVec2{ 0.f, 0.f } );
 	insert( "aimbot_mouse_curve_b", ImVec2{ 1.f, 1.f } );
 	insert( "aimbot_silent_enabled", false );
 	insert( "aimbot_silent_fov", 0.f );
-	insert( "aimbot_silent_hitboxes", 0 );
+	insert( "aimbot_silent_hitboxes", 0b0 );
 	insert( "aimbot_projectile_enabled", false );
 	insert( "aimbot_projectile_invisible", false );
 	insert( "aimbot_projectile_feet", false );
 	insert( "aimbot_projectile_steps", 2 );
-	insert( "menu_disabled_inputs", 3 ); // 0b11
+
+	insert( "visuals_player_enabled", false );
+	insert( "visuals_player_teams", 0b0 );
+	insert( "visuals_player_box", false );
+	insert( "visuals_player_box_color", ImVec4{ 1.f, 1.f, 1.f, 1.f } );
+	insert( "visuals_player_box_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+	insert( "visuals_player_name", false );
+	insert( "visuals_player_name_color", ImVec4{ 1.f, 1.f, 1.f, 1.f } );
+	insert( "visuals_player_name_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+
+	insert( "menu_disabled_inputs", 0b11 );
 }
 
 void config::end( ) { }

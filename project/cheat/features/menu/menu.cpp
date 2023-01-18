@@ -8,15 +8,22 @@ void menu::run( )
 	CONFIG( aimbot_mouse_hitboxes, int );
 	CONFIG( aimbot_mouse_curve_a, ImVec2 );
 	CONFIG( aimbot_mouse_curve_b, ImVec2 );
-
 	CONFIG( aimbot_silent_enabled, bool );
 	CONFIG( aimbot_silent_fov, float );
 	CONFIG( aimbot_silent_hitboxes, int );
-
 	CONFIG( aimbot_projectile_enabled, bool );
 	CONFIG( aimbot_projectile_invisible, bool );
 	CONFIG( aimbot_projectile_feet, bool );
 	CONFIG( aimbot_projectile_steps, int );
+
+	CONFIG( visuals_player_enabled, bool );
+	CONFIG( visuals_player_teams, int );
+	CONFIG( visuals_player_box, bool );
+	CONFIG( visuals_player_box_color, ImVec4 );
+	CONFIG( visuals_player_box_outline_color, ImVec4 );
+	CONFIG( visuals_player_name, bool );
+	CONFIG( visuals_player_name_color, ImVec4 );
+	CONFIG( visuals_player_name_outline_color, ImVec4 );
 
 	CONFIG( menu_disabled_inputs, int );
 
@@ -300,6 +307,32 @@ void menu::run( )
 					 "player visuals",
 					 ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ( ImGui::GetContentRegionAvail( ).y / 2.f ) - background_height - 20.f ), true,
 					 0, true ) ) {
+				std::vector< bool > buffer_teams = { ( bool )( *visuals_player_teams & 1 << 0 ), ( bool )( *visuals_player_teams & 1 << 1 ) };
+
+				ImGui::Checkbox( "visuals enabled", visuals_player_enabled );
+				ImGui::MultiCombo( "visuals teams", buffer_teams, { "allies", "enemies" }, buffer_teams.size( ) );
+
+				if ( buffer_teams[ 0 ] ) {
+					*visuals_player_teams |= 1 << 0;
+				} else {
+					*visuals_player_teams &= ~( 1 << 0 );
+				}
+				if ( buffer_teams[ 1 ] ) {
+					*visuals_player_teams |= 1 << 1;
+				} else {
+					*visuals_player_teams &= ~( 1 << 1 );
+				}
+
+				ImGui::Checkbox( "player boxes", visuals_player_box );
+				ImGui::ColorEdit4( "##visuals_player_box_outline_color", ( float* )visuals_player_box_outline_color, color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_box_color", ( float* )visuals_player_box_color, color_picker_alpha_flags );
+
+				ImGui::Checkbox( "player names", visuals_player_name );
+				ImGui::ColorEdit4( "##visuals_player_name_outline_color", ( float* )visuals_player_name_outline_color, color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_name_color", ( float* )visuals_player_name_color, color_picker_alpha_flags );
+
 				ImGui::EndChild( );
 			}
 
@@ -332,30 +365,6 @@ void menu::run( )
 			break;
 		}
 		case 4: {
-			if ( ImGui::BeginChild( "menu settings",
-			                        ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ImGui::GetContentRegionAvail( ).y - background_height - 20.f ),
-			                        true, 0, true ) ) {
-				std::vector< bool > buffer_inputs = { ( bool )( *menu_disabled_inputs & 1 << 0 ), ( bool )( *menu_disabled_inputs & 1 << 1 ) };
-
-				ImGui::MultiCombo( "disabled inputs", buffer_inputs, { "mouse", "keyboard" }, buffer_inputs.size( ) );
-
-				if ( buffer_inputs[ 0 ] ) {
-					*menu_disabled_inputs |= 1 << 0;
-				} else {
-					*menu_disabled_inputs &= ~( 1 << 0 );
-				}
-				if ( buffer_inputs[ 1 ] ) {
-					*menu_disabled_inputs |= 1 << 1;
-				} else {
-					*menu_disabled_inputs &= ~( 1 << 1 );
-				}
-
-				ImGui::EndChild( );
-			}
-
-			ImGui::SameLine( );
-			ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
-
 			if ( ImGui::BeginChild( "config settings",
 			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ImGui::GetContentRegionAvail( ).y - background_height - 20.f ), true,
 			                        0, true ) ) {
