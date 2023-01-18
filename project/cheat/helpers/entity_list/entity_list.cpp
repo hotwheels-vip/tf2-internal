@@ -17,7 +17,7 @@ void entity_list::run( sdk::c_user_cmd* _cmd )
 		}
 	}
 
-	for ( int i = 0; i < 48; i++ ) {
+	for ( int i = 0; i < 65; i++ ) {
 		enemy[ i ] = nullptr;
 
 		const auto entity = reinterpret_cast< sdk::c_tf_player* >( g_interfaces->entity_list->get_client_entity( i ) );
