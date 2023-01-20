@@ -2,7 +2,7 @@
 
 void __cdecl cl_move::detour( float accumulated_extra_samples, bool final_tick )
 {
-	if ( g_input->key_state< input::KEY_DOWN >( 'R' ) ) {
+	if ( g_cl_move->force_charge ) {
 		if ( g_cl_move->stored < 22 ) {
 			g_cl_move->stored++;
 			g_cl_move->charging = true;
@@ -37,7 +37,7 @@ void __cdecl cl_move::detour( float accumulated_extra_samples, bool final_tick )
 	// if ( ( ( sdk::i_net_channel* )g_interfaces->engine_client )->get_choked_packets( ) > 1 )
 	// return;
 
-	if ( g_input->key_state< input::KEY_DOWN >( 'E' ) || ( g_entity_list->cmd->buttons & sdk::in_attack && final_tick ) ) {
+	if ( g_cl_move->force_shift || ( g_entity_list->cmd->buttons & sdk::in_attack && final_tick ) ) {
 		g_cl_move->max_shifted = g_cl_move->stored;
 
 		for ( int i = 1; i <= g_cl_move->stored; i++ ) {

@@ -107,14 +107,11 @@ void signatures::run( )
 		{ "55 8B EC 81 EC ? ? ? ? 8B 0D ? ? ? ? 33 D2 89 55 ? 89 55 ? 89 55 ? 8B 41", g_engine },
 		{ "55 8B EC 83 EC 34 53 8B 5D 08 57 8B F9 89 7D FC 85 DB", g_engine },
 		{ "0F B7 81 ? ? ? ? 50 E8 ? ? ? ? 83 C4 ? C3", g_client },
-		{ "A1 ? ? ? ? 03 05", g_engine },
-		{ "03 05 ? ? ? ? 8B 15", g_engine },
-		{ "8B 15 ? ? ? ? 85 D2 8B 35", g_engine },
-		{ "FF 35 ? ? ? ? 8B 3E", g_engine },
 		{ "55 8B EC 53 56 8B 75 ? 8B CE 57 FF 75 ? E8", g_client },
 		{ "55 8B EC B8 88 20 00 00", g_engine },
 		{ "55 8B EC 8B 45 ? 56 57 8B F9 83 EC", g_engine },
 		{ "55 8B EC 53 56 8B 75 ? 57 8B F9 89 77", g_engine },
+		{ "B9 ? ? ? ? E8 ? ? ? ? 83 3D ? ? ? ? ? 75 59", g_engine },
 		//{ "83 B9 ? ? ? ? ? 7E ? 69 91 ? ? ? ? ? ? ? ? 8B 81 ? ? ? ? 83 C0", g_engine },
 	};
 

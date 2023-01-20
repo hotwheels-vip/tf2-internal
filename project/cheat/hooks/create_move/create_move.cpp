@@ -24,12 +24,40 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 	if ( !g_entity_list->local )
 		return;
 
-	if ( g_cl_move->max_shifted ) {
-		cmd->forward_move = -cmd->forward_move;
-		cmd->side_move    = -cmd->side_move;
+	if ( g_cl_move->shifting && !g_cl_move->force_shift ) {
+		const auto velocity = g_entity_list->local->velocity( ) * sdk::vector{ 1.f, 1.f, 0.f };
+		const auto speed    = velocity.length_2d( );
+
+		static auto accelerate_cvar = g_interfaces->cvar->find_var( "sv_accelerate" );
+		static auto friction_cvar   = g_interfaces->cvar->find_var( "sv_friction" );
+
+		const auto max_speed      = g_entity_list->local->maxspeed( );
+		const auto accelerate     = accelerate_cvar->get_float( );
+		const auto friction       = friction_cvar->get_float( );
+		const auto max_accelerate = accelerate * g_interfaces->globals->interval_per_tick * max_speed * friction;
+
+		if ( speed > 1.f ) {
+			float wish_speed{ };
+
+			if ( speed - max_accelerate <= -1.f ) {
+				wish_speed = speed / ( accelerate * g_interfaces->globals->interval_per_tick );
+			} else {
+				wish_speed = max_accelerate;
+			}
+
+			sdk::qangle speed_direction = math::vector_to_angle( velocity * -1.f );
+			speed_direction.yaw         = cmd->view_angles.yaw - speed_direction.yaw;
+			sdk::vector speed_vector    = math::angle_to_vector( speed_direction );
+
+			cmd->forward_move = speed_vector.x * wish_speed;
+			cmd->side_move    = speed_vector.y * wish_speed;
+		} else {
+			cmd->forward_move = 0.f;
+			cmd->side_move    = 0.f;
+		}
 	}
 
-	auto backup_viewangles = cmd->view_angles;
+	auto backup_view = cmd->view_angles;
 
 	g_prediction->run( cmd, g_entity_list->local );
 	{
@@ -37,7 +65,7 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 	}
 	g_prediction->end( cmd, g_entity_list->local );
 
-	g_movement->move_fix( cmd, backup_viewangles );
+	g_movement->move_fix( cmd, backup_view );
 
 	send_packet = g_cl_move->choke;
 

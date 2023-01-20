@@ -11,6 +11,7 @@ class entity_list
 {
 public:
 	void run( sdk::c_user_cmd* _cmd );
+	void clear( );
 
 	sdk::c_tf_player* local{ };
 	sdk::c_user_cmd* cmd{ };

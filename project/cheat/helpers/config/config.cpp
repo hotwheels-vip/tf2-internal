@@ -125,6 +125,9 @@ void config::run( )
 	insert( "visuals_player_name", false );
 	insert( "visuals_player_name_color", ImVec4{ 1.f, 1.f, 1.f, 1.f } );
 	insert( "visuals_player_name_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+	insert( "visuals_player_health_bar", false );
+	insert( "visuals_player_health_bar_color", ImVec4{ 0.f, 1.f, 0.f, 1.f } );
+	insert( "visuals_player_health_bar_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
 
 	insert( "menu_disabled_inputs", 0b11 );
 }

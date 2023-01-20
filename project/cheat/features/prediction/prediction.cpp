@@ -4,6 +4,7 @@
 
 #include "prediction.hpp"
 #include "../../helpers/config/config.hpp"
+#include "../../hooks/cl_move/cl_move.hpp"
 #include <chrono>
 #include <deque>
 
@@ -15,12 +16,12 @@ restore< float > fall_velocity{ };
 
 void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 {
-	const auto last_command    = g_interfaces->client_state->last_command_ack( );
-	const auto last_outgoing   = g_interfaces->client_state->last_outgoing_command( );
-	const auto choked_commands = g_interfaces->client_state->choked_commands( );
-	const auto delta_tick      = g_interfaces->client_state->delta_tick( );
+	const auto last_command    = g_interfaces->client_state->last_command_ack;
+	const auto last_outgoing   = g_interfaces->client_state->last_out_going_command;
+	const auto choked_commands = g_interfaces->client_state->choked_commands;
+	const auto delta_tick      = g_interfaces->client_state->delta_tick;
 
-	if ( delta_tick > 0 )
+	if ( delta_tick > 0 || g_cl_move->force_update )
 		g_interfaces->prediction->update( delta_tick, delta_tick > 0, last_command, last_outgoing + choked_commands );
 
 	cur_time   = restore( &g_interfaces->globals->cur_time );

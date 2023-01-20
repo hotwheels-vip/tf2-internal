@@ -46,3 +46,13 @@ void entity_list::run( sdk::c_user_cmd* _cmd )
 			enemy[ i ] = entity;
 	}
 }
+
+void entity_list::clear( )
+{
+	local  = nullptr;
+	weapon = nullptr;
+	cmd    = nullptr;
+
+	for ( int i = 0; i < 65; i++ )
+		enemy[ i ] = nullptr;
+}

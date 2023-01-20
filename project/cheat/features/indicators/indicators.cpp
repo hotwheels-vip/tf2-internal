@@ -9,7 +9,7 @@ void indicators::run( )
 	ImGui::Begin( "Double Tap", nullptr,
 	              ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize );
 	{
-		auto net_channel = ( sdk::i_net_channel* )g_interfaces->engine_client->get_net_channel_info( );
+		auto net_channel = reinterpret_cast< sdk::i_net_channel* >( g_interfaces->engine_client->get_net_channel_info( ) );
 
 		if ( g_cl_move->stored == 0 )
 			ImGui::TextDisabled( "No Stored Ticks" );

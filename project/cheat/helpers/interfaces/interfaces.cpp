@@ -20,11 +20,12 @@ void interfaces::run( )
 	material_system = static_cast< sdk::i_material_system* >( get_interface( "materialsystem.dll", HASH( "VMaterialSystem081" ) ) );
 	localize        = static_cast< sdk::i_localize* >( get_interface( "vgui2.dll", HASH( "VGUI_Localize005" ) ) );
 
-	input       = g_signatures[ HASH( "8B 0D ? ? ? ? FF 75 ? D9 45 ? 51 8B 01 D9 1C ? FF 75" ) ].add( 0x2 ).get( 2 ).as< sdk::i_input* >( );
-	move_helper = g_signatures[ HASH( "8B 0D ? ? ? ? 8B 46 08 68 ? ? ? ? 05 ? ? ? ? 8B 11 50" ) ].add( 0x2 ).get( 2 ).as< sdk::i_move_helper* >( );
-	client_mode = g_signatures[ HASH( "8B 0D ? ? ? ? 8B 02 D9 05" ) ].add( 0x2 ).get( 2 ).as< sdk::i_client_mode* >( );
-	device      = g_signatures[ HASH( "A1 ? ? ? ? 50 8B 08 FF 51 0C" ) ].add( 0x1 ).get( 2 ).as< IDirect3DDevice9* >( );
-	globals     = g_signatures[ HASH( "68 ? ? ? ? 50 50 FF 12" ) ].add( 0x1 ).get( 1 ).as< sdk::i_global_vars_base* >( );
+	input        = g_signatures[ HASH( "8B 0D ? ? ? ? FF 75 ? D9 45 ? 51 8B 01 D9 1C ? FF 75" ) ].add( 0x2 ).get( 2 ).as< sdk::i_input* >( );
+	move_helper  = g_signatures[ HASH( "8B 0D ? ? ? ? 8B 46 08 68 ? ? ? ? 05 ? ? ? ? 8B 11 50" ) ].add( 0x2 ).get( 2 ).as< sdk::i_move_helper* >( );
+	client_mode  = g_signatures[ HASH( "8B 0D ? ? ? ? 8B 02 D9 05" ) ].add( 0x2 ).get( 2 ).as< sdk::i_client_mode* >( );
+	device       = g_signatures[ HASH( "A1 ? ? ? ? 50 8B 08 FF 51 0C" ) ].add( 0x1 ).get( 2 ).as< IDirect3DDevice9* >( );
+	globals      = g_signatures[ HASH( "68 ? ? ? ? 50 50 FF 12" ) ].add( 0x1 ).get( 1 ).as< sdk::i_global_vars_base* >( );
+	client_state = g_signatures[ HASH( "B9 ? ? ? ? E8 ? ? ? ? 83 3D ? ? ? ? ? 75 59" ) ].add( 0x1 ).get( 1 ).as< sdk::i_base_client_state* >( );
 }
 
 void interfaces::end( ) { }

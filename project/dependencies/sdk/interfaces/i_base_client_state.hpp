@@ -5,26 +5,20 @@
 
 namespace sdk
 {
+	struct c_clock_drift_mgr {
+	};
+
 	struct i_base_client_state {
-		static int delta_tick( )
-		{
-			return g_signatures[ HASH( "8B 15 ? ? ? ? 85 D2 8B 35" ) ].add( 0x2 ).get( 2 ).as< int >( );
-		}
-		static int last_command_ack( )
-		{
-			return g_signatures[ HASH( "FF 35 ? ? ? ? 8B 3E" ) ].add( 0x2 ).get( 2 ).as< int >( );
-		}
-		static int last_outgoing_command( )
-		{
-			return g_signatures[ HASH( "A1 ? ? ? ? 03 05" ) ].add( 0x2 ).get( 2 ).as< int >( );
-		}
-		static int choked_commands( )
-		{
-			return g_signatures[ HASH( "03 05 ? ? ? ? 8B 15" ) ].add( 0x2 ).get( 2 ).as< int >( );
-		}
-		static int relative_choked_commands( )
-		{
-			return choked_commands( ) - last_command_ack( );
-		}
+		PAD( 0x10 );
+		i_net_channel* net_channel; // 0x10
+		PAD( 0x140 );
+		c_clock_drift_mgr clock_drift_mgr; // 0x154
+		int delta_tick;                    // 0x1A0
+		PAD( 0x110 );
+		int max_clients; // 0x2B4
+		PAD( 0x486C );
+		int last_out_going_command; // 0x4B24
+		int choked_commands;        // 0x4B28
+		int last_command_ack;       // 0x4B2C
 	};
 } // namespace sdk

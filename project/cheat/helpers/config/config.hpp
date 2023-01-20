@@ -5,6 +5,7 @@
 #include <imgui/imgui.h>
 #include <iostream>
 #include <json/json.hpp>
+#include <spdlog/spdlog.h>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -84,7 +85,14 @@ public:
 	template< typename T >
 	T* find( std::string name )
 	{
+		using namespace spdlog;
+
 		auto it = settings.find( name );
+
+		if ( it == settings.end( ) ) {
+			critical( "failed to find config value {}", name );
+			return { };
+		}
 
 		switch ( it->second.type ) {
 		case variable::VARIABLE_BOOL:

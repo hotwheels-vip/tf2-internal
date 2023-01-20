@@ -1,4 +1,5 @@
 #include "end_scene.hpp"
+#include "../../helpers/entity_list/entity_list.hpp"
 
 LONG end_scene::detour( IDirect3DDevice9* device )
 {
@@ -6,6 +7,9 @@ LONG end_scene::detour( IDirect3DDevice9* device )
 
 	if ( multicore_rendering != _ReturnAddress( ) )
 		return g_end_scene->_hook.call( device );
+
+	if ( !g_interfaces->engine_client->is_in_game( ) || !g_interfaces->engine_client->is_connected( ) )
+		g_entity_list->clear( );
 
 	DWORD color_write{ }, srgb_write{ };
 

@@ -24,6 +24,9 @@ void menu::run( )
 	CONFIG( visuals_player_name, bool );
 	CONFIG( visuals_player_name_color, ImVec4 );
 	CONFIG( visuals_player_name_outline_color, ImVec4 );
+	CONFIG( visuals_player_health_bar, bool );
+	CONFIG( visuals_player_health_bar_color, ImVec4 );
+	CONFIG( visuals_player_health_bar_outline_color, ImVec4 );
 
 	CONFIG( menu_disabled_inputs, int );
 
@@ -307,7 +310,8 @@ void menu::run( )
 					 "player visuals",
 					 ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ( ImGui::GetContentRegionAvail( ).y / 2.f ) - background_height - 20.f ), true,
 					 0, true ) ) {
-				std::vector< bool > buffer_teams = { ( bool )( *visuals_player_teams & 1 << 0 ), ( bool )( *visuals_player_teams & 1 << 1 ) };
+				std::vector< bool > buffer_teams = { static_cast< bool >( *visuals_player_teams & 1 << 0 ),
+					                                 static_cast< bool >( *visuals_player_teams & 1 << 1 ) };
 
 				ImGui::Checkbox( "visuals enabled", visuals_player_enabled );
 				ImGui::MultiCombo( "visuals teams", buffer_teams, { "allies", "enemies" }, buffer_teams.size( ) );
@@ -324,14 +328,23 @@ void menu::run( )
 				}
 
 				ImGui::Checkbox( "player boxes", visuals_player_box );
-				ImGui::ColorEdit4( "##visuals_player_box_outline_color", ( float* )visuals_player_box_outline_color, color_picker_alpha_flags );
+				ImGui::ColorEdit4( "##visuals_player_box_outline_color", reinterpret_cast< float* >( visuals_player_box_outline_color ),
+				                   color_picker_alpha_flags );
 				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
-				ImGui::ColorEdit4( "##visuals_player_box_color", ( float* )visuals_player_box_color, color_picker_alpha_flags );
+				ImGui::ColorEdit4( "##visuals_player_box_color", reinterpret_cast< float* >( visuals_player_box_color ), color_picker_alpha_flags );
 
 				ImGui::Checkbox( "player names", visuals_player_name );
-				ImGui::ColorEdit4( "##visuals_player_name_outline_color", ( float* )visuals_player_name_outline_color, color_picker_alpha_flags );
+				ImGui::ColorEdit4( "##visuals_player_name_outline_color", reinterpret_cast< float* >( visuals_player_name_outline_color ),
+				                   color_picker_alpha_flags );
 				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
-				ImGui::ColorEdit4( "##visuals_player_name_color", ( float* )visuals_player_name_color, color_picker_alpha_flags );
+				ImGui::ColorEdit4( "##visuals_player_name_color", reinterpret_cast< float* >( visuals_player_name_color ), color_picker_alpha_flags );
+
+				ImGui::Checkbox( "player health bars", visuals_player_health_bar );
+				ImGui::ColorEdit4( "##visuals_player_health_bar_outline_color", reinterpret_cast< float* >( visuals_player_health_bar_outline_color ),
+				                   color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_health_bar_color", reinterpret_cast< float* >( visuals_player_health_bar_color ),
+				                   color_picker_alpha_flags );
 
 				ImGui::EndChild( );
 			}
