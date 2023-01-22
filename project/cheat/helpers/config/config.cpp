@@ -116,6 +116,8 @@ void config::run( )
 	insert( "aimbot_projectile_invisible", false );
 	insert( "aimbot_projectile_feet", false );
 	insert( "aimbot_projectile_steps", 2 );
+	insert( "aimbot_lagcomp_enabled", false );
+	insert( "aimbot_lagcomp_time", 200 );
 
 	insert( "visuals_player_enabled", false );
 	insert( "visuals_player_teams", 0b0 );
@@ -128,6 +130,11 @@ void config::run( )
 	insert( "visuals_player_health_bar", false );
 	insert( "visuals_player_health_bar_color", ImVec4{ 0.f, 1.f, 0.f, 1.f } );
 	insert( "visuals_player_health_bar_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+	insert( "visuals_player_health_bar_thickness", 2 );
+	insert( "visuals_player_health_text", false );
+	insert( "visuals_player_health_text_color", ImVec4{ 0.f, 1.f, 0.f, 1.f } );
+	insert( "visuals_player_health_text_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+	insert( "visuals_player_health_text_minimum", -10 );
 
 	insert( "menu_disabled_inputs", 0b11 );
 }

@@ -1,6 +1,7 @@
 #include "aimbot.hpp"
 
 #include "../../hooks/cl_move/cl_move.hpp"
+#include "../lagcomp/lagcomp.hpp"
 
 // #include <imgui/imgui.h>
 
@@ -8,6 +9,7 @@ bool should_run_aimbot( )
 {
 	return g_entity_list->weapon->can_attack_primary( g_entity_list->local ) || g_cl_move->shifted;
 }
+
 weapon_info aimbot::get_weapon_info( )
 {
 	switch ( g_entity_list->weapon->get_client_class( )->class_id ) {
@@ -54,6 +56,7 @@ weapon_info aimbot::get_weapon_info( )
 
 	return { };
 }
+
 sdk::c_tf_player* closest_player( float max_fov )
 {
 	float fov                 = max_fov;
@@ -74,29 +77,46 @@ sdk::c_tf_player* closest_player( float max_fov )
 
 	return closest;
 }
-sdk::hitboxes closest_hitbox( sdk::c_tf_player* player, int hitboxes )
+
+sdk::vector closest_hitbox( sdk::c_tf_player* player, int hitboxes )
 {
-	float current_fov            = 360.f;
-	sdk::hitboxes current_hitbox = sdk::hitbox_max;
+	float current_fov = 360.f;
+	sdk::vector current{ };
 
-	for ( int i = 0; i < sdk::hitbox_max; i++ ) {
-		if ( !( hitboxes & 1 << i ) )
-			continue;
+	const auto max_allocation = static_cast< int >( 1.f / g_interfaces->globals->interval_per_tick );
 
-		if ( !g_entity_list->local->can_hit( player->get_hitbox_position( i ), player ) )
-			continue;
+	if ( const auto record_list = g_lagcomp->records[ player->entindex( ) ] ) {
+		for ( int i = 0; i < max_allocation; i++ ) {
+			auto record = record_list[ i ];
 
-		auto view_angles = math::vector_to_angle( player->get_hitbox_position( i ) - g_entity_list->local->eye_position( ) );
-		const auto fov   = math::calculate_angle_fov( g_entity_list->cmd->view_angles, view_angles );
+			if ( !record.valid )
+				continue;
 
-		if ( fov <= current_fov ) {
-			current_fov    = fov;
-			current_hitbox = static_cast< sdk::hitboxes >( i );
+			for ( int i = 0; i < sdk::hitbox_max; i++ ) {
+				if ( !( hitboxes & 1 << i ) )
+					continue;
+
+				const auto position = player->get_hitbox_position( i, record.matrix );
+
+				if ( !g_entity_list->local->could_hit( position ) )
+					continue;
+
+				auto view_angles = math::vector_to_angle( position - g_entity_list->local->eye_position( ) );
+				const auto fov   = math::calculate_angle_fov( g_entity_list->cmd->view_angles, view_angles );
+
+				if ( fov <= current_fov ) {
+					current_fov = fov;
+					current     = position;
+
+					g_lagcomp->run( record );
+				}
+			}
 		}
 	}
 
-	return current_hitbox;
+	return current;
 }
+
 sdk::vector best_projectile_position( sdk::c_tf_player* target, bool can_headshot = false )
 {
 	CONFIG( aimbot_projectile_feet, bool );
@@ -123,8 +143,6 @@ void aimbot::run( )
 	CONFIG( aimbot_mouse_fov, float );
 	CONFIG( aimbot_mouse_smoothing, float );
 	CONFIG( aimbot_mouse_hitboxes, int );
-	CONFIG( aimbot_mouse_curve_a, ImVec2 );
-	CONFIG( aimbot_mouse_curve_b, ImVec2 );
 
 	CONFIG( aimbot_silent_enabled, bool );
 	CONFIG( aimbot_silent_fov, float );
@@ -132,7 +150,6 @@ void aimbot::run( )
 
 	CONFIG( aimbot_projectile_enabled, bool );
 	CONFIG( aimbot_projectile_invisible, bool );
-	CONFIG( aimbot_projectile_feet, bool );
 
 	if ( *aimbot_mouse_enabled ) {
 		const auto target = closest_player( *aimbot_mouse_fov );
@@ -142,20 +159,14 @@ void aimbot::run( )
 
 		const auto target_hitbox = closest_hitbox( target, *aimbot_mouse_hitboxes );
 
-		if ( target_hitbox == sdk::hitbox_max )
+		if ( target_hitbox.length( ) == 0 )
 			return;
 
 		sdk::qangle local_angles{ };
 
 		g_interfaces->engine_client->get_view_angles( local_angles );
 
-		sdk::vector position{ };
-
-		auto weapon_info = get_weapon_info( );
-
-		position = target->get_hitbox_position( target_hitbox );
-
-		const auto view_angles       = math::vector_to_angle( position - g_entity_list->local->eye_position( ) );
+		const auto view_angles       = math::vector_to_angle( target_hitbox - g_entity_list->local->eye_position( ) );
 		auto fov_distance            = view_angles - local_angles;
 		const auto distance          = fov_distance.normalize( ).length( );
 		const int curve_index        = 49 * ( -( std::clamp( distance / *aimbot_mouse_fov, 0.f, 1.f ) ) + 1.f );
@@ -220,11 +231,10 @@ void aimbot::run( )
 			if ( g_entity_list->cmd->buttons & sdk::in_attack && should_run_aimbot( ) ) {
 				const auto target_hitbox = closest_hitbox( target, *aimbot_silent_hitboxes );
 
-				if ( target_hitbox == sdk::hitbox_max )
+				if ( target_hitbox.length( ) == 0 )
 					return;
 
-				const auto view_angles =
-					math::vector_to_angle( target->get_hitbox_position( target_hitbox ) - g_entity_list->local->eye_position( ) );
+				const auto view_angles = math::vector_to_angle( target_hitbox - g_entity_list->local->eye_position( ) );
 
 				g_entity_list->cmd->view_angles = view_angles;
 			}

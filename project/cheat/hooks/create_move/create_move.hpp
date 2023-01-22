@@ -1,8 +1,9 @@
 #pragma once
 
+#include "../../helpers/include.hpp"
 #include "../hooks.hpp"
 
-#include "../../helpers/include.hpp"
+#include <deque>
 
 class create_move
 {
@@ -11,6 +12,8 @@ private:
 
 public:
 	static void __fastcall detour( void* ecx, void* edx, int sequence_number, float input_sample_time, bool active );
+
+	std::deque< int > outgoing_commands{ };
 
 	void run( )
 	{

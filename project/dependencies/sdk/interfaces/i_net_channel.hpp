@@ -14,22 +14,48 @@ namespace sdk
 
 		// use these to setup who can hear whose voice.
 		// pass in client indices (which are their ent indices - 1).
+		virtual void set_net_channel( i_net_channel* netchan ){ }; // netchannel this message is from/for
+		virtual void set_reliable( bool state ){ };                // set to true if it's a reliable message
 
-		virtual void set_net_channel( i_net_channel* netchan ) = 0; // netchannel this message is from/for
-		virtual void set_reliable( bool state )                = 0; // set to true if it's a reliable message
+		virtual bool process( void )
+		{
+			return true;
+		} // calles the recently set handler to process this message
 
-		virtual bool process( void ) = 0; // calles the recently set handler to process this message
+		virtual bool read_from_buffer( void* buffer )
+		{
+			return true;
+		}; // returns true if parsing was ok
+		virtual bool write_to_buffer( void* buffer )
+		{
+			return true;
+		}; // returns true if writing was ok
 
-		virtual bool read_from_buffer( void* buffer ) = 0; // returns true if parsing was ok
-		virtual bool write_to_buffer( void* buffer )  = 0; // returns true if writing was ok
+		virtual bool is_reliable( void ) const
+		{
+			return true;
+		}; // true, if message needs reliable handling
 
-		virtual bool is_reliable( void ) const = 0; // true, if message needs reliable handling
-
-		virtual int get_type( void ) const                   = 0; // returns module specific header tag eg svc_serverinfo
-		virtual int get_group( void ) const                  = 0; // returns net message group of this message
-		virtual const char* get_name( void ) const           = 0; // returns network message name, eg "svc_serverinfo"
-		virtual i_net_channel* get_net_channel( void ) const = 0;
-		virtual const char* to_string( void ) const          = 0; // returns a human readable string about message content
+		virtual int get_type( void ) const
+		{
+			return 1;
+		}; // returns module specific header tag eg svc_serverinfo
+		virtual int get_group( void ) const
+		{
+			return 1;
+		}; // returns net message group of this message
+		virtual const char* get_name( void ) const
+		{
+			return "";
+		}; // returns network message name, eg "svc_serverinfo"
+		virtual i_net_channel* get_net_channel( void ) const
+		{
+			return { };
+		};
+		virtual const char* to_string( void ) const
+		{
+			return { };
+		}; // returns a human readable string about message content
 	};
 
 	struct c_net_message : public i_net_message {
@@ -133,15 +159,15 @@ namespace sdk
 		virtual bool process_stream( void )                                          = 0;
 		virtual void process_packet( struct netpacket_s* packet, bool b_has_header ) = 0;
 
-		virtual bool send_net_msg( i_net_message& msg, bool b_force_reliable = false, bool b_voice = false ) = 0;
+		// virtual bool send_net_msg( i_net_message& msg, bool b_force_reliable = false, bool b_voice = false ) = 0;
 
 		virtual bool send_data( void* msg, bool b_reliable = true )                     = 0;
 		virtual bool send_file( const char* filename, unsigned int transfer_id )        = 0;
 		virtual void deny_file( const char* filename, unsigned int transfer_id )        = 0;
 		virtual void request_file_old( const char* filename, unsigned int transfer_id ) = 0; // get rid of this function when we version the
 		virtual void set_choked( void )                                                 = 0;
-		virtual int send_datagram( void* data )                                         = 0;
-		virtual bool transmit( bool only_reliable = false )                             = 0;
+		// virtual int send_datagram( void* data )                                         = 0;
+		virtual bool transmit( bool only_reliable = false ) = 0;
 
 		virtual const netadr_t& get_remote_address( void ) const = 0;
 		virtual void* get_msg_handler( void ) const              = 0;
@@ -175,6 +201,21 @@ namespace sdk
 
 		virtual int get_protocol_version( ) = 0;
 
+		bool send_net_msg( i_net_message& msg, bool b_force_reliable = false, bool b_voice = false )
+		{
+			using send_net_msg_fn = bool( __thiscall* )( void*, i_net_message&, bool, bool );
+
+			return g_signatures[ HASH( "55 8B EC 57 8B F9 8D 8F ? ? ? ? E8 ? ? ? ? 85 C0 75 ? B0 ? 5F 5D C2 ? ? 53" ) ].as< send_net_msg_fn >( )(
+				this, msg, b_force_reliable, b_voice );
+		}
+
+		int send_datagram( bf_write* data )
+		{
+			using send_datagram_fn = int( __thiscall* )( void*, bf_write* );
+
+			return g_signatures[ HASH( "55 8B EC B8 ? ? ? ? E8 ? ? ? ? A1 ? ? ? ? 53 56 8B D9" ) ].as< send_datagram_fn >( )( this, data );
+		}
+
 		int& get_drop_number( )
 		{
 			return *reinterpret_cast< int* >( reinterpret_cast< std::uint32_t >( this ) + 0x22B8 );
@@ -186,12 +227,34 @@ namespace sdk
 		}
 	};
 
-	struct clc_move {
+	struct clc_move : public c_net_message {
 	public:
-		PAD( 0x14 );
+		int read_from_buffer( bf_read* buffer )
+		{
+			return 0;
+		};
+		int write_to_buffer( bf_write* buffer )
+		{
+			return 0;
+		};
+		void clear( ){ };
+		const char* to_string( )
+		{
+			return "clc_move";
+		};
+		static int get_type( )
+		{
+			return 9;
+		}
+		static const char* get_name( )
+		{
+			return "clc_move";
+		}
+
 		int backup_commands;
 		int new_commands;
 		int length;
+		bf_write data;
 	};
 
 } // namespace sdk

@@ -1,4 +1,5 @@
 #include "cl_move.hpp"
+#include <random>
 
 void __cdecl cl_move::detour( float accumulated_extra_samples, bool final_tick )
 {

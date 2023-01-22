@@ -21,7 +21,7 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 	const auto choked_commands = g_interfaces->client_state->choked_commands;
 	const auto delta_tick      = g_interfaces->client_state->delta_tick;
 
-	if ( delta_tick > 0 || g_cl_move->force_update )
+	if ( delta_tick > 0 )
 		g_interfaces->prediction->update( delta_tick, delta_tick > 0, last_command, last_outgoing + choked_commands );
 
 	cur_time   = restore( &g_interfaces->globals->cur_time );

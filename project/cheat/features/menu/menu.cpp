@@ -15,6 +15,8 @@ void menu::run( )
 	CONFIG( aimbot_projectile_invisible, bool );
 	CONFIG( aimbot_projectile_feet, bool );
 	CONFIG( aimbot_projectile_steps, int );
+	CONFIG( aimbot_lagcomp_enabled, bool );
+	CONFIG( aimbot_lagcomp_time, int );
 
 	CONFIG( visuals_player_enabled, bool );
 	CONFIG( visuals_player_teams, int );
@@ -27,6 +29,11 @@ void menu::run( )
 	CONFIG( visuals_player_health_bar, bool );
 	CONFIG( visuals_player_health_bar_color, ImVec4 );
 	CONFIG( visuals_player_health_bar_outline_color, ImVec4 );
+	CONFIG( visuals_player_health_bar_thickness, int );
+	CONFIG( visuals_player_health_text, bool );
+	CONFIG( visuals_player_health_text_color, ImVec4 );
+	CONFIG( visuals_player_health_text_outline_color, ImVec4 );
+	CONFIG( visuals_player_health_text_minimum, int );
 
 	CONFIG( menu_disabled_inputs, int );
 
@@ -297,9 +304,12 @@ void menu::run( )
 			ImGui::SameLine( );
 			ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
 
-			if ( ImGui::BeginChild( "other aimbot",
+			if ( ImGui::BeginChild( "lagcomp aimbot",
 			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ),
 			                        true, 0, true ) ) {
+				ImGui::Checkbox( "lagcomp enabled", aimbot_lagcomp_enabled );
+				ImGui::SliderInt( "lagcomp time", aimbot_lagcomp_time, 0, 200, "%dms" );
+
 				ImGui::EndChild( );
 			}
 
@@ -346,6 +356,13 @@ void menu::run( )
 				ImGui::ColorEdit4( "##visuals_player_health_bar_color", reinterpret_cast< float* >( visuals_player_health_bar_color ),
 				                   color_picker_alpha_flags );
 
+				ImGui::Checkbox( "player health text", visuals_player_health_text );
+				ImGui::ColorEdit4( "##visuals_player_health_bar_outline_color",
+				                   reinterpret_cast< float* >( visuals_player_health_text_outline_color ), color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_health_bar_color", reinterpret_cast< float* >( visuals_player_health_text_color ),
+				                   color_picker_alpha_flags );
+
 				ImGui::EndChild( );
 			}
 
@@ -372,6 +389,9 @@ void menu::run( )
 			if ( ImGui::BeginChild( "other visuals",
 			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ),
 			                        true, 0, true ) ) {
+				ImGui::SliderInt( "health bar thickness", visuals_player_health_bar_thickness, 1, 3, "%dpx" );
+				ImGui::SliderInt( "health text minimum", visuals_player_health_text_minimum, -20, 0, "%dhp" );
+
 				ImGui::EndChild( );
 			}
 

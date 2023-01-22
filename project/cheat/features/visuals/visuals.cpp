@@ -67,6 +67,11 @@ void render_visuals( sdk::c_tf_player* entity )
 	CONFIG( visuals_player_health_bar, bool );
 	CONFIG( visuals_player_health_bar_color, ImVec4 );
 	CONFIG( visuals_player_health_bar_outline_color, ImVec4 );
+	CONFIG( visuals_player_health_bar_thickness, int );
+	CONFIG( visuals_player_health_text, bool );
+	CONFIG( visuals_player_health_text_color, ImVec4 );
+	CONFIG( visuals_player_health_text_outline_color, ImVec4 );
+	CONFIG( visuals_player_health_text_minimum, int );
 
 	const auto [ bb, on_screen ] = bounding_box( entity );
 
@@ -104,8 +109,57 @@ void render_visuals( sdk::c_tf_player* entity )
 
 		ImGui::ColorConvertHSVtoRGB( h, s, v, r, g, b );
 
-		draw->AddRectFilled( ImVec2( bb.x - 6, bb.y - 1 ), ImVec2( bb.x - 2, bb.w + 1 ), ImColor( *visuals_player_health_bar_outline_color ) );
-		draw->AddRectFilled( ImVec2( bb.x - 5, bb.w - health_size ), ImVec2( bb.x - 3, bb.w ), ImColor( r, g, b ) );
+		draw->AddRectFilled( ImVec2( bb.x - ( 4 + *visuals_player_health_bar_thickness ), bb.y - 1 ), ImVec2( bb.x - 2, bb.w + 1 ),
+		                     ImColor( *visuals_player_health_bar_outline_color ) );
+		draw->AddRectFilled( ImVec2( bb.x - ( 3 + *visuals_player_health_bar_thickness ), bb.w - health_size ), ImVec2( bb.x - 3, bb.w ),
+		                     ImColor( r, g, b ) );
+	}
+
+	if ( *visuals_player_health_text ) {
+		const float health     = entity->health( );
+		const float max_health = entity->max_health( );
+
+		if ( *visuals_player_health_text_minimum >= health - max_health ) {
+			const auto health_size  = ( bb.w - bb.y ) * ( health / max_health );
+			const auto health_color = ImColor( *visuals_player_health_text_color );
+			float h{ }, s{ }, v{ };
+			float r{ }, g{ }, b{ };
+
+			ImGui::ColorConvertRGBtoHSV( health_color.Value.x, health_color.Value.y, health_color.Value.z, h, s, v );
+
+			h -= 0.3f * ( -( health / max_health ) + 1.f );
+
+			ImGui::ColorConvertHSVtoRGB( h, s, v, r, g, b );
+
+			const auto text_size = verdana_bd_11->CalcTextSizeA( 11.f, FLT_MAX, -1.f, std::to_string( static_cast< int >( health ) ).c_str( ) );
+
+			if ( *visuals_player_health_bar ) {
+				draw->AddText(
+					verdana_bd_11, 11.f,
+					ImVec2( bb.x - ( 3 + *visuals_player_health_bar_thickness ) - text_size.x / 2.f + 1, bb.w - health_size - text_size.y / 2.f + 1 ),
+					ImColor( *visuals_player_health_text_outline_color ), std::to_string( static_cast< int >( health ) ).c_str( ) );
+
+				draw->AddText(
+					verdana_bd_11, 11.f,
+					ImVec2( bb.x - ( 3 + *visuals_player_health_bar_thickness ) - text_size.x / 2.f - 1, bb.w - health_size - text_size.y / 2.f + 1 ),
+					ImColor( *visuals_player_health_text_outline_color ), std::to_string( static_cast< int >( health ) ).c_str( ) );
+
+				draw->AddText(
+					verdana_bd_11, 11.f,
+					ImVec2( bb.x - ( 3 + *visuals_player_health_bar_thickness ) - text_size.x / 2.f + 1, bb.w - health_size - text_size.y / 2.f - 1 ),
+					ImColor( *visuals_player_health_text_outline_color ), std::to_string( static_cast< int >( health ) ).c_str( ) );
+
+				draw->AddText(
+					verdana_bd_11, 11.f,
+					ImVec2( bb.x - ( 3 + *visuals_player_health_bar_thickness ) - text_size.x / 2.f - 1, bb.w - health_size - text_size.y / 2.f - 1 ),
+					ImColor( *visuals_player_health_text_outline_color ), std::to_string( static_cast< int >( health ) ).c_str( ) );
+
+				draw->AddText(
+					verdana_bd_11, 11.f,
+					ImVec2( bb.x - ( 3 + *visuals_player_health_bar_thickness ) - text_size.x / 2.f, bb.w - health_size - text_size.y / 2.f ),
+					ImColor( r, g, b ), std::to_string( static_cast< int >( health ) ).c_str( ) );
+			}
+		}
 	}
 }
 

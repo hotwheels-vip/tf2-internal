@@ -18,7 +18,13 @@ void entity_list::run( sdk::c_user_cmd* _cmd )
 	}
 
 	for ( int i = 0; i < 65; i++ ) {
+		// dormant_info backup{ };
+
+		// memcpy( &backup, &dormant[ i ], sizeof( dormant_info ) );
+		// memset( &backup, 0, sizeof( dormant_info ) );
+
 		enemy[ i ] = nullptr;
+		team[ i ]  = nullptr;
 
 		const auto entity = reinterpret_cast< sdk::c_tf_player* >( g_interfaces->entity_list->get_client_entity( i ) );
 
@@ -26,6 +32,9 @@ void entity_list::run( sdk::c_user_cmd* _cmd )
 			continue;
 
 		if ( !entity->get_ref_e_handle( ).index || !entity->get_think_handle( ) || !entity->render_handle( ) )
+			continue;
+
+		if ( !entity->get_var_mapping( ) )
 			continue;
 
 		if ( !entity->is_player( ) )
@@ -37,6 +46,9 @@ void entity_list::run( sdk::c_user_cmd* _cmd )
 		if ( !entity->is_alive( ) )
 			continue;
 
+		if ( entity->is_dormant( ) )
+			continue;
+
 		if ( entity == local )
 			continue;
 
@@ -44,6 +56,15 @@ void entity_list::run( sdk::c_user_cmd* _cmd )
 			team[ i ] = entity;
 		else
 			enemy[ i ] = entity;
+
+		// dormant[ i ] = backup;
+
+		// if ( entity->is_dormant( ) ) {
+		//	dormant[ i ].last_seen = g_interfaces->globals->tick_count;
+		//	dormant[ i ].valid     = true;
+		// } else if ( g_interfaces->globals->tick_count - dormant[ i ].last_seen > 5.f / g_interfaces->globals->interval_per_tick ) {
+		//	dormant[ i ].valid = false;
+		// }
 	}
 }
 
@@ -53,6 +74,8 @@ void entity_list::clear( )
 	weapon = nullptr;
 	cmd    = nullptr;
 
-	for ( int i = 0; i < 65; i++ )
+	for ( int i = 0; i < 65; i++ ) {
 		enemy[ i ] = nullptr;
+		team[ i ]  = nullptr;
+	}
 }

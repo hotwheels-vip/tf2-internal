@@ -2,7 +2,12 @@
 
 int sdk::c_base_entity::max_health( )
 {
-	return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 107 ) )( this );
+	auto addr = g_virtuals->get_virtual_function( this, 107 );
+
+	if ( !addr || reinterpret_cast< int >( addr ) == 0xFFFFFFFF )
+		return 0;
+
+	return reinterpret_cast< int( __thiscall* )( void* ) >( addr )( this );
 }
 
 sdk::matrix_3x4& sdk::c_base_entity::rgfl_coordinate_frame( )

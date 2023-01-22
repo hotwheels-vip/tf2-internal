@@ -1,6 +1,7 @@
 #include "create_move.hpp"
 
 #include "../../features/aimbot/aimbot.hpp"
+#include "../../features/lagcomp/lagcomp.hpp"
 #include "../../features/movement/movement.hpp"
 #include "../../features/prediction/prediction.hpp"
 #include "../cl_move/cl_move.hpp"
@@ -23,6 +24,23 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 
 	if ( !g_entity_list->local )
 		return;
+
+	auto backup_view = cmd->view_angles;
+
+	g_prediction->run( cmd, g_entity_list->local );
+	{
+		g_aimbot->run( );
+	}
+	g_prediction->end( cmd, g_entity_list->local );
+
+	g_movement->move_fix( cmd, backup_view );
+
+	send_packet = g_cl_move->choke;
+
+	if ( g_aimbot->projectile_choke ) {
+		send_packet                = false;
+		g_aimbot->projectile_choke = false;
+	}
 
 	if ( g_cl_move->shifting && !g_cl_move->force_shift ) {
 		const auto velocity = g_entity_list->local->velocity( ) * sdk::vector{ 1.f, 1.f, 0.f };
@@ -57,23 +75,25 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 		}
 	}
 
-	auto backup_view = cmd->view_angles;
-
-	g_prediction->run( cmd, g_entity_list->local );
-	{
-		g_aimbot->run( );
-	}
-	g_prediction->end( cmd, g_entity_list->local );
-
-	g_movement->move_fix( cmd, backup_view );
-
-	send_packet = g_cl_move->choke;
-
-	if ( g_aimbot->projectile_choke ) {
-		send_packet                = false;
-		g_aimbot->projectile_choke = false;
-	}
+	// if ( const auto net_channel = reinterpret_cast< sdk::i_net_channel* >( g_interfaces->engine_client->get_net_channel_info( ) ) ) {
+	//	send_packet = net_channel->get_choked_packets( ) < 19 ? false : true;
+	// }
 
 	verified_cmd->cmd = *cmd;
 	verified_cmd->crc = cmd->get_checksum( );
+
+	// if ( send_packet ) {
+	//	g_create_move->outgoing_commands.emplace_front( cmd->command_number );
+	// } else {
+	//	if ( const auto net_channel = reinterpret_cast< sdk::i_net_channel* >( g_interfaces->engine_client->get_net_channel_info( ) ) ) {
+	//		const int backup_choked = net_channel->get_choked_packets( );
+
+	//		net_channel->get_choked_packets( ) = 0;
+	//		net_channel->send_datagram( nullptr );
+
+	//		*reinterpret_cast< int* >( reinterpret_cast< std::uintptr_t >( net_channel ) + 0x8 ) -= 1;
+
+	//		net_channel->get_choked_packets( ) = backup_choked;
+	//	}
+	//}
 }

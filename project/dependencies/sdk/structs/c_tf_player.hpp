@@ -179,6 +179,7 @@ namespace sdk
 		void draw_client_hitbox( const float& duration = 0.f );
 
 		bool can_hit( const vector pos, c_base_entity* ent = nullptr );
+		bool could_hit( vector pos );
 		void post_think( );
 		void pre_think( );
 	};

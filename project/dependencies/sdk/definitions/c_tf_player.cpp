@@ -35,6 +35,24 @@ bool sdk::c_tf_player::can_hit( const vector pos, sdk::c_base_entity* ent )
 	return ( ent && trace.entity == ent ) || trace.fraction > 0.99f;
 }
 
+bool sdk::c_tf_player::could_hit( vector pos )
+{
+	sdk::c_game_trace trace;
+	sdk::c_trace_filter_hitscan filter;
+	sdk::ray_t ray;
+
+	if ( g_entity_list->weapon && g_aimbot->get_weapon_info( ).speed != 0 )
+		ray.init( this->eye_position( ), pos, { -2, -2, -2 }, { 2, 2, 2 } );
+	else
+		ray.init( this->eye_position( ), pos );
+
+	filter.skip = this;
+
+	g_interfaces->engine_trace->trace_ray( ray, ( MASK_SHOT | CONTENTS_GRATE ), &filter, &trace );
+
+	return trace.fraction > 0.99f;
+}
+
 void sdk::c_tf_player::draw_client_hitbox( const float& duration )
 {
 	auto hdr = g_interfaces->model_info->get_studio_model( get_model( ) );
