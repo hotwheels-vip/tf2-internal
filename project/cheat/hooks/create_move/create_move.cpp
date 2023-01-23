@@ -22,16 +22,19 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 
 	g_entity_list->run( cmd );
 
-	if ( !g_entity_list->local )
+	if ( !g_cl_move->shifting )
+		g_lagcomp->update( );
+
+	if ( !g_local )
 		return;
 
 	auto backup_view = cmd->view_angles;
 
-	g_prediction->run( cmd, g_entity_list->local );
+	g_prediction->run( cmd, g_local );
 	{
 		g_aimbot->run( );
 	}
-	g_prediction->end( cmd, g_entity_list->local );
+	g_prediction->end( cmd, g_local );
 
 	g_movement->move_fix( cmd, backup_view );
 
@@ -43,13 +46,13 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 	}
 
 	if ( g_cl_move->shifting && !g_cl_move->force_shift ) {
-		const auto velocity = g_entity_list->local->velocity( ) * sdk::vector{ 1.f, 1.f, 0.f };
+		const auto velocity = g_local->velocity( ) * sdk::vector{ 1.f, 1.f, 0.f };
 		const auto speed    = velocity.length_2d( );
 
 		static auto accelerate_cvar = g_interfaces->cvar->find_var( "sv_accelerate" );
 		static auto friction_cvar   = g_interfaces->cvar->find_var( "sv_friction" );
 
-		const auto max_speed      = g_entity_list->local->maxspeed( );
+		const auto max_speed      = g_local->maxspeed( );
 		const auto accelerate     = accelerate_cvar->get_float( );
 		const auto friction       = friction_cvar->get_float( );
 		const auto max_accelerate = accelerate * g_interfaces->globals->interval_per_tick * max_speed * friction;

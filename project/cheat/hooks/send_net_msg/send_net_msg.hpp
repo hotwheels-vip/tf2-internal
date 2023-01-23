@@ -15,7 +15,7 @@ public:
 
 	void run( )
 	{
-		_hook.create( g_signatures[ HASH( "55 8B EC 57 8B F9 8D 8F ? ? ? ? E8 ? ? ? ? 85 C0 75 ? B0 ? 5F 5D C2 ? ? 53" ) ], detour, "send_net_msg" );
+		_hook.create( g_database[ HASH( "55 8B EC 57 8B F9 8D 8F ? ? ? ? E8 ? ? ? ? 85 C0 75 ? B0 ? 5F 5D C2 ? ? 53" ) ], detour, "send_net_msg" );
 	}
 
 	void end( )

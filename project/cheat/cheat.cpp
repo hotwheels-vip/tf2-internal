@@ -5,7 +5,7 @@
 
 DWORD WINAPI shutdown_routine( LPVOID )
 {
-	cheat::end( );
+	g_cheat->end( );
 
 	return 0;
 }
@@ -14,20 +14,14 @@ void cheat::run( )
 {
 	using namespace spdlog;
 
-	stopwatch mod;
+	stopwatch watch;
 
-	g_console->run( );
-	info( "console initialized in {:0.2f}s", mod );
-	g_config->run( );
-	info( "config initialized in {:0.2f}s", mod );
-	g_modules->run( );
-	info( "modules initialized in {:0.2f}s", mod );
-	g_signatures.run( );
-	info( "signatures initialized in {:0.2f}s", mod );
-	g_interfaces->run( );
-	info( "interfaces initialized in {:0.2f}s", mod );
-	g_hooks->run( );
-	info( "hooks initialized in {:0.2f}s", mod );
+	RUN( g_console )
+	RUN( g_config )
+	RUN( g_modules )
+	RUN( g_signatures )
+	RUN( g_interfaces )
+	RUN( g_hooks )
 
 	g_input->add_keybind( VK_DELETE, []( bool ) {
 		if ( const auto handle = CreateThread( nullptr, 0, shutdown_routine, nullptr, 0, nullptr ) ) {
@@ -40,19 +34,14 @@ void cheat::end( )
 {
 	using namespace spdlog;
 
-	stopwatch stopwatch;
+	stopwatch watch;
 
-	g_hooks->end( );
-	info( "hooks uninitialized in {}ms", stopwatch );
-	g_interfaces->end( );
-	info( "interfaces uninitialized in {}ms", stopwatch );
-	g_signatures.end( );
-	info( "signatures uninitialized in {}ms", stopwatch );
-	g_modules->end( );
-	info( "modules uninitialized in {}ms", stopwatch );
-	g_config->end( );
-	info( "config uninitialized in {}ms", stopwatch );
-	g_console->end( );
+	END( g_hooks )
+	END( g_interfaces )
+	END( g_signatures )
+	END( g_modules )
+	END( g_config )
+	END( g_console )
 
 	FreeLibraryAndExitThread( g_cheat->instance, 0 );
 }

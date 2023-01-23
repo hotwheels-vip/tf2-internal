@@ -17,7 +17,7 @@
 #include "send_net_msg/send_net_msg.hpp"
 #include "wndproc/wndproc.hpp"
 
-void hooks::run( )
+bool hooks::run( )
 {
 	MH_Initialize( );
 
@@ -40,9 +40,11 @@ void hooks::run( )
 
 	// ReSharper disable once CppZeroConstantCanBeReplacedWithNullptr
 	MH_EnableHook( MH_ALL_HOOKS );
+
+	return true;
 }
 
-void hooks::end( )
+bool hooks::end( )
 {
 	g_wndproc->end( );
 	g_end_scene->end( );
@@ -62,4 +64,6 @@ void hooks::end( )
 	g_draw_model_execute->end( );
 
 	MH_Uninitialize( );
+
+	return true;
 }

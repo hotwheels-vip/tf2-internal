@@ -74,8 +74,8 @@ public:
 
 	std::unordered_map< std::string, option > settings{ };
 
-	void run( );
-	void end( );
+	bool run( );
+	bool end( );
 
 	void save( std::string name );
 	void load( std::string name );

@@ -92,19 +92,19 @@ void prediction::end( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 
 void prediction::set_prediction_random_seed( sdk::c_user_cmd* cmd )
 {
-	static auto set_prediction_random_seed = g_signatures[ HASH( "55 8B EC 8B 45 ? 85 C0 75 ? C7 05" ) ].as< void ( * )( sdk::c_user_cmd* ) >( );
+	static auto set_prediction_random_seed = g_database[ HASH( "55 8B EC 8B 45 ? 85 C0 75 ? C7 05" ) ].as< void ( * )( sdk::c_user_cmd* ) >( );
 	set_prediction_random_seed( cmd );
 }
 
 void prediction::set_prediction_player( sdk::c_tf_player* player )
 {
-	static auto predicted_player = g_signatures[ HASH( "83 3D ? ? ? ? ? 74 ? 6A ? 50" ) ].get( 1 ).as< sdk::c_tf_player* >( );
+	static auto predicted_player = g_database[ HASH( "83 3D ? ? ? ? ? 74 ? 6A ? 50" ) ].get( 1 ).as< sdk::c_tf_player* >( );
 	predicted_player             = player;
 }
 
 void prediction::reset( )
 {
-	static auto reset = g_signatures[ HASH( "68 ? ? ? ? 6A ? 68 ? ? ? ? C7 05 ? ? ? ? ? ? ? ? E8 ? ? ? ? 83 C4 ? C3" ) ].as< void ( * )( ) >( );
+	static auto reset = g_database[ HASH( "68 ? ? ? ? 6A ? 68 ? ? ? ? C7 05 ? ? ? ? ? ? ? ? E8 ? ? ? ? 83 C4 ? C3" ) ].as< void ( * )( ) >( );
 	reset( );
 }
 

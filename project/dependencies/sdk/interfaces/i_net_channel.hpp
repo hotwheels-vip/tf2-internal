@@ -205,7 +205,7 @@ namespace sdk
 		{
 			using send_net_msg_fn = bool( __thiscall* )( void*, i_net_message&, bool, bool );
 
-			return g_signatures[ HASH( "55 8B EC 57 8B F9 8D 8F ? ? ? ? E8 ? ? ? ? 85 C0 75 ? B0 ? 5F 5D C2 ? ? 53" ) ].as< send_net_msg_fn >( )(
+			return g_database[ HASH( "55 8B EC 57 8B F9 8D 8F ? ? ? ? E8 ? ? ? ? 85 C0 75 ? B0 ? 5F 5D C2 ? ? 53" ) ].as< send_net_msg_fn >( )(
 				this, msg, b_force_reliable, b_voice );
 		}
 
@@ -213,7 +213,7 @@ namespace sdk
 		{
 			using send_datagram_fn = int( __thiscall* )( void*, bf_write* );
 
-			return g_signatures[ HASH( "55 8B EC B8 ? ? ? ? E8 ? ? ? ? A1 ? ? ? ? 53 56 8B D9" ) ].as< send_datagram_fn >( )( this, data );
+			return g_database[ HASH( "55 8B EC B8 ? ? ? ? E8 ? ? ? ? A1 ? ? ? ? 53 56 8B D9" ) ].as< send_datagram_fn >( )( this, data );
 		}
 
 		int& get_drop_number( )

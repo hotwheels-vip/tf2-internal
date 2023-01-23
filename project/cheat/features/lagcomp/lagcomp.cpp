@@ -43,9 +43,7 @@ bool is_valid( lagcomp::record rec )
 
 void lagcomp::update( )
 {
-	// BONEZ 0x0007FF00
-
-	// CONFIG( aimbot_lagcomp_enabled, bool );
+	CONFIG( aimbot_lagcomp_enabled, bool );
 
 	const auto max_allocation = static_cast< int >( 1.f / g_interfaces->globals->interval_per_tick );
 
@@ -71,7 +69,7 @@ void lagcomp::update( )
 				break;
 			}
 
-			record.valid = is_valid( record );
+			record.valid = *aimbot_lagcomp_enabled ? is_valid( record ) : false;
 		}
 	}
 
@@ -104,13 +102,17 @@ void lagcomp::update( )
 		if ( location >= max_allocation )
 			location = 0;
 
-		auto& new_record = record[ location ];
+		// auto& new_record = record[ location ];
+
+		lagcomp::record new_record{ };
 
 		new_record.player   = index;
 		new_record.sim_time = entity->simulation_time( );
-		new_record.valid    = is_valid( new_record );
+		new_record.valid    = *aimbot_lagcomp_enabled ? is_valid( new_record ) : false;
 
-		entity->setup_bones( new_record.matrix, 128, 0x0007FF00, g_interfaces->globals->cur_time );
+		entity->setup_bones( new_record.matrix, 128, 0x0007FF00, 0.f );
+
+		memcpy( &record[ location ], &new_record, sizeof( lagcomp::record ) );
 
 		location++;
 	}
@@ -118,5 +120,5 @@ void lagcomp::update( )
 
 void lagcomp::run( record rec )
 {
-	g_entity_list->cmd->tick_count = static_cast< int >( ( rec.sim_time + lerp_time( ) ) / g_interfaces->globals->interval_per_tick );
+	g_cmd->tick_count = static_cast< int >( ( rec.sim_time + lerp_time( ) ) / g_interfaces->globals->interval_per_tick );
 }

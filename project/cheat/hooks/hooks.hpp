@@ -19,7 +19,7 @@ public:
 		using namespace spdlog;
 
 		if ( const auto ret = MH_CreateHook( static_cast< void* >( source ), reinterpret_cast< void* >( destination ), &original ); ret != MH_OK ) {
-			error( "failed to create hook for {} (error code {})", name, ret );
+			error( "failed hook {} (error code {})", name, ret );
 
 			return;
 		}
@@ -27,7 +27,7 @@ public:
 		this->source = source;
 		hook_name    = name;
 
-		info( "created hook for {}", name );
+		info( "hooked {} {}->{}", name, static_cast< void* >( source ), reinterpret_cast< void* >( destination ) );
 	}
 
 	void disable( )
@@ -35,12 +35,12 @@ public:
 		using namespace spdlog;
 
 		if ( const auto ret = MH_DisableHook( source ); ret != MH_OK ) {
-			error( "failed to disable hook for {} (error code {})", hook_name, ret );
+			error( "failed hook {} (error code {})", hook_name, ret );
 
 			return;
 		}
 
-		info( "disabled hook for {}", hook_name );
+		info( "disabled hook {}", hook_name );
 	}
 
 	void enable( )
@@ -48,12 +48,12 @@ public:
 		using namespace spdlog;
 
 		if ( const auto ret = MH_EnableHook( source ); ret != MH_OK ) {
-			error( "failed to enable hook for {} (error code {})", hook_name, ret );
+			error( "failed hook {} (error code {})", hook_name, ret );
 
 			return;
 		}
 
-		info( "enabled hook for {}", hook_name );
+		info( "enabled hook {}", hook_name );
 	}
 
 	void remove( )
@@ -61,12 +61,12 @@ public:
 		using namespace spdlog;
 
 		if ( const auto ret = MH_RemoveHook( source ); ret != MH_OK ) {
-			error( "failed to remove hook for {} (error code {})", hook_name, ret );
+			error( "failed hook {} (error code {})", hook_name, ret );
 
 			return;
 		}
 
-		info( "removed hook for {}", hook_name );
+		info( "removed hook {}", hook_name );
 	}
 
 	template< typename... ARGS >
@@ -79,8 +79,8 @@ public:
 class hooks
 {
 public:
-	void run( );
-	void end( );
+	bool run( );
+	bool end( );
 };
 
 inline hooks* g_hooks = new hooks( );

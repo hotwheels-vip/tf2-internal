@@ -1,5 +1,4 @@
 #include "frame_stage_notify.hpp"
-#include "../../features/lagcomp/lagcomp.hpp"
 
 void __fastcall frame_stage_notify::detour( void* ecx, void* edx, sdk::client_frame_stage stage )
 {
@@ -11,8 +10,6 @@ void __fastcall frame_stage_notify::detour( void* ecx, void* edx, sdk::client_fr
 	case sdk::frame_net_update_end: {
 		g_interfaces->engine_client->fire_events( );
 
-		g_lagcomp->update( );
-
 		for ( auto player : g_entity_list->enemy ) {
 			if ( *aimbot_lagcomp_enabled ) {
 				if ( !player )
@@ -23,7 +20,7 @@ void __fastcall frame_stage_notify::detour( void* ecx, void* edx, sdk::client_fr
 				if ( !var_map )
 					continue;
 
-				if ( !g_entity_list->local || !g_entity_list->cmd )
+				if ( !g_local || !g_cmd )
 					continue;
 
 				if ( var_map->interpolated_entries > 20108 )

@@ -14,7 +14,7 @@ public:
 
 	void run( )
 	{
-		_hook.create( g_signatures[ HASH( "55 8B EC 51 80 B9 14 4B 00 00" ) ], detour, "get_time" );
+		_hook.create( g_database[ HASH( "55 8B EC 51 80 B9 14 4B 00 00" ) ], detour, "get_time" );
 	}
 
 	void end( )

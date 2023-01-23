@@ -14,7 +14,7 @@ public:
 
 	void run( )
 	{
-		_hook.create( g_signatures[ HASH( "55 8B EC 81 EC ? ? ? ? A1 ? ? ? ? 8D 4D" ) ], detour, "cl_send_move" );
+		_hook.create( g_database[ HASH( "55 8B EC 81 EC ? ? ? ? A1 ? ? ? ? 8D 4D" ) ], detour, "cl_send_move" );
 	}
 
 	void end( )

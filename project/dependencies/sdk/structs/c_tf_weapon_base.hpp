@@ -37,7 +37,7 @@ namespace sdk
 
 		c_tf_weapon_info& get_weapon_info( )
 		{
-			auto get_tf_weapon_data_address = g_signatures[ HASH( "0F B7 81 ? ? ? ? 50 E8 ? ? ? ? 83 C4 ? C3" ) ];
+			auto get_tf_weapon_data_address = g_database[ HASH( "0F B7 81 ? ? ? ? 50 E8 ? ? ? ? 83 C4 ? C3" ) ];
 			using get_tf_weapon_data_type   = c_tf_weapon_info&( __thiscall* )( void* );
 
 			return get_tf_weapon_data_address.as< get_tf_weapon_data_type >( )( this );

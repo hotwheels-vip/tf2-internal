@@ -17,7 +17,7 @@ std::uintptr_t memory::find_pattern( std::uint8_t* region_start, std::uintptr_t 
 		}
 
 		if ( found )
-			return ( std::uintptr_t )( &region_start[ i ] );
+			return reinterpret_cast< std::uintptr_t >( &region_start[ i ] );
 	}
 
 	return 0;
@@ -27,50 +27,55 @@ std::vector< int > memory::pattern_to_bytes( const char* pattern )
 {
 	std::vector< int > bytes;
 
-	char* start = ( char* )pattern;
-	char* end   = ( char* )( start + strlen( pattern ) );
+	char* start = const_cast< char* >( pattern );
+	char* end   = start + strlen( pattern );
 
-	for ( char* szCurrent = start; szCurrent < end; ++szCurrent ) {
-		if ( *szCurrent == '?' ) {
-			++szCurrent;
+	for ( char* current = start; current < end; ++current ) {
+		if ( *current == '?' ) {
+			++current;
 
-			if ( *szCurrent == '?' )
-				++szCurrent;
+			if ( *current == '?' )
+				++current;
 
 			bytes.push_back( -1 );
 		} else {
-			bytes.push_back( strtoul( szCurrent, &szCurrent, 16 ) );
+			bytes.push_back( strtoul( current, &current, 16 ) );
 		}
 	}
 
 	return bytes;
 }
 
-void modules::run( )
+bool modules::run( )
 {
-	g_client       = new modules::module( "client.dll" );
-	g_engine       = new modules::module( "engine.dll" );
-	g_shaderapidx9 = new modules::module( "shaderapidx9.dll" );
-	g_server       = new modules::module( "server.dll" );
+	g_client       = new module( "client.dll" );
+	g_engine       = new module( "engine.dll" );
+	g_shaderapidx9 = new module( "shaderapidx9.dll" );
+	g_server       = new module( "server.dll" );
+
+	return true;
 }
 
-void modules::end( ) { }
-
-std::uintptr_t* virtuals::get_virtual_table( void* pAddress )
+bool modules::end( )
 {
-	return *( std::uintptr_t** )pAddress;
+	return true;
 }
 
-std::uintptr_t* virtuals::get_virtual_function( void* pAddress, std::size_t iIndex )
+std::uintptr_t* virtuals::get_virtual_table( void* address )
 {
-	return ( std::uintptr_t* )get_virtual_table( pAddress )[ iIndex ];
+	return *static_cast< std::uintptr_t** >( address );
 }
 
-void signatures::run( )
+std::uintptr_t* virtuals::get_virtual_function( void* address, std::size_t index )
+{
+	return reinterpret_cast< std::uintptr_t* >( get_virtual_table( address )[ index ] );
+}
+
+bool signatures::run( )
 {
 	using namespace spdlog;
 
-	std::vector< signature > signatures{
+	std::vector< database::signature > signatures{
 		{ "8B 0D ? ? ? ? FF 75 ? D9 45 ? 51 8B 01 D9 1C ? FF 75", g_client },
 		{ "55 8B EC 56 8B 75 ? 85 F6 74 ? 8B 16 8B CE", g_client },
 		{ "8B 0D ? ? ? ? 8B 02 D9 05", g_client },
@@ -120,16 +125,21 @@ void signatures::run( )
 	};
 
 	for ( auto& i : signatures ) {
-		auto pattern = i.module->Scan( i.pattern );
+		auto pattern = i.module->scan( i.pattern );
 
 		if ( !pattern.address_ ) {
-			error( "failed to find signature for pattern {}", i.pattern );
+			error( "failed signature {}", i.pattern );
 		}
 
-		info( "found signature for pattern hash {} at {}", RT_HASH( i.pattern ), ( void* )pattern.address_ );
+		info( "signature {} at {}", reinterpret_cast< void* >( RT_HASH( i.pattern ) ), reinterpret_cast< void* >( pattern.address_ ) );
 
-		database.insert( std::make_pair( RT_HASH( i.pattern ), pattern ) );
+		g_database.database_.insert( std::make_pair( RT_HASH( i.pattern ), pattern ) );
 	}
+
+	return true;
 }
 
-void signatures::end( ) { }
+bool signatures::end( )
+{
+	return true;
+}

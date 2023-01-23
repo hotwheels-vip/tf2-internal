@@ -35,7 +35,7 @@ void cl_send_move::detour( )
 	// static bool ran = false;
 
 	// if ( !ran ) {
-	//	static auto location = g_signatures[ HASH( "C7 45 ? ? ? ? ? 79" ) ].add( 14 ).as< void* >( );
+	//	static auto location = g_database[ HASH( "C7 45 ? ? ? ? ? 79" ) ].add( 14 ).as< void* >( );
 	//	DWORD old{ };
 
 	//	VirtualProtect( location, sizeof( char ), PAGE_EXECUTE_READWRITE, &old );
@@ -47,7 +47,7 @@ void cl_send_move::detour( )
 	//	ran = true;
 	//}
 
-	// if ( const auto extra_commands = g_signatures[ HASH( "C7 05 ? ? ? ? ? ? ? ? C7 05 ? ? ? ? ? ? ? ? DD 1D" ) ].add( 0x2 ).get( 2 ).as< int >( );
+	// if ( const auto extra_commands = g_database[ HASH( "C7 05 ? ? ? ? ? ? ? ? C7 05 ? ? ? ? ? ? ? ? DD 1D" ) ].add( 0x2 ).get( 2 ).as< int >( );
 	//      extra_commands - std::clamp( extra_commands, 0, 16 ) > 0 )
 	//	reinterpret_cast< sdk::i_net_channel* >( g_interfaces->engine_client->get_net_channel_info( ) )->get_choked_packets( ) -=
 	//		extra_commands - std::clamp( extra_commands, 0, 16 );

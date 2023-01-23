@@ -101,7 +101,7 @@ void config::insert( std::string name, config::option value )
 	settings.insert( std::make_pair( name, value ) );
 }
 
-void config::run( )
+bool config::run( )
 {
 	insert( "aimbot_mouse_enabled", false );
 	insert( "aimbot_mouse_fov", 0.f );
@@ -137,6 +137,11 @@ void config::run( )
 	insert( "visuals_player_health_text_minimum", -10 );
 
 	insert( "menu_disabled_inputs", 0b11 );
+
+	return true;
 }
 
-void config::end( ) { }
+bool config::end( )
+{
+	return true;
+}

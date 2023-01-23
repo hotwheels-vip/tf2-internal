@@ -22,8 +22,10 @@ namespace hash
 {
 	namespace holder
 	{
-		constexpr static UINT32 seed  = 0x45C3370D;
-		constexpr static UINT32 prime = 0x1000193;
+		constexpr static UINT32 seed =
+			static_cast< UINT32 >( __TIME__[ 0 ] * __TIME__[ 1 ] + __TIME__[ 2 ] * __TIME__[ 3 ] + __TIME__[ 4 ] * __TIME__[ 5 ] );
+		constexpr static UINT32 prime =
+			static_cast< UINT32 >( __TIME__[ 0 ] + __TIME__[ 1 ] + __TIME__[ 2 ] * __TIME__[ 3 ] + __TIME__[ 4 ] + __TIME__[ 5 ] );
 	} // namespace holder
 
 	inline UINT32 fnv1a_rt( const char* key, const UINT32 val = hash::holder::seed )

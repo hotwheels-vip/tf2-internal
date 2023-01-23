@@ -168,7 +168,7 @@ void visuals::run( )
 	CONFIG( visuals_player_enabled, bool );
 	CONFIG( visuals_player_teams, int );
 
-	if ( !g_entity_list->local )
+	if ( !g_local )
 		return;
 
 	if ( *visuals_player_enabled ) {

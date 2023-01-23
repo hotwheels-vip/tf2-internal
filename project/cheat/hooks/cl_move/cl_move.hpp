@@ -43,7 +43,7 @@ public:
 				force_shift = false;
 		} );
 
-		_hook.create( g_signatures[ HASH( "55 8B EC 83 EC 38 83 3D ? ? ? ? ?" ) ], detour, "cl_move" );
+		_hook.create( g_database[ HASH( "55 8B EC 83 EC 38 83 3D ? ? ? ? ?" ) ], detour, "cl_move" );
 	}
 
 	void end( )

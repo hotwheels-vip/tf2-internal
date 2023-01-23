@@ -1,4 +1,5 @@
 #include "cl_move.hpp"
+#include "../../features/lagcomp/lagcomp.hpp"
 #include <random>
 
 void __cdecl cl_move::detour( float accumulated_extra_samples, bool final_tick )
@@ -16,7 +17,7 @@ void __cdecl cl_move::detour( float accumulated_extra_samples, bool final_tick )
 
 	g_cl_move->_hook.call( accumulated_extra_samples, final_tick );
 
-	if ( !g_entity_list->local || !g_entity_list->cmd || !g_interfaces->engine_client->get_local_player( ) ) {
+	if ( !g_local || !g_cmd || !g_interfaces->engine_client->get_local_player( ) ) {
 		g_cl_move->max_shifted = g_cl_move->stored;
 
 		for ( int i = 1; i <= g_cl_move->stored; i++ ) {
@@ -38,7 +39,7 @@ void __cdecl cl_move::detour( float accumulated_extra_samples, bool final_tick )
 	// if ( ( ( sdk::i_net_channel* )g_interfaces->engine_client )->get_choked_packets( ) > 1 )
 	// return;
 
-	if ( g_cl_move->force_shift || ( g_entity_list->cmd->buttons & sdk::in_attack && final_tick ) ) {
+	if ( g_cl_move->force_shift || ( g_cmd->buttons & sdk::in_attack && final_tick ) ) {
 		g_cl_move->max_shifted = g_cl_move->stored;
 
 		for ( int i = 1; i <= g_cl_move->stored; i++ ) {
