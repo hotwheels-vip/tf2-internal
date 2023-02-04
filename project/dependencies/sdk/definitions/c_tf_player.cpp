@@ -82,6 +82,32 @@ void sdk::c_tf_player::draw_client_hitbox( const float& duration )
 	}
 }
 
+const char* sdk::c_tf_player::class_name( )
+{
+	switch ( this->class_id( ) ) {
+	case 1:
+		return "scou";
+	case 2:
+		return "snip";
+	case 3:
+		return "sold";
+	case 4:
+		return "demo";
+	case 5:
+		return "medi";
+	case 6:
+		return "heav";
+	case 7:
+		return "pyro";
+	case 8:
+		return "spy";
+	case 9:
+		return "engi";
+	default:
+		return "unkn";
+	}
+}
+
 sdk::c_base_animating* sdk::c_tf_player::get_server_base_animating( )
 {
 	static auto server_base_animating = g_database[ HASH( "55 8B EC 8B 55 ? 85 D2 7E ? A1" ) ].as< sdk::c_base_animating*( __cdecl* )( int ) >( );

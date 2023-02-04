@@ -1,6 +1,51 @@
 #include "visuals.hpp"
 #include <imgui/imgui.h>
 
+void draw_image( const int index, const unsigned char* data, const int data_size, const ImVec2 pos, const ImVec2 size, const ImColor color )
+{
+	static std::map< unsigned int, PDIRECT3DTEXTURE9 > texture_cache{ };
+
+	if ( !texture_cache[ index ] ) {
+		PDIRECT3DTEXTURE9 buffer{ };
+
+		if ( D3DXCreateTextureFromFileInMemory( g_interfaces->device, data, data_size, &buffer ) != S_OK )
+			return;
+
+		texture_cache[ index ] = buffer;
+	}
+
+	const auto draw_list = ImGui::GetBackgroundDrawList( );
+
+	draw_list->AddImage( texture_cache[ index ], pos, { pos.x + size.x, pos.y + size.y }, { 0.f, 0.f }, { 1.f, 1.f }, color );
+}
+
+void draw_weapon_icon( sdk::c_tf_player* player, ImVec2 position, ImVec2 size )
+{
+	if ( !player )
+		return;
+
+	auto weapon_handle = player->active_weapon( );
+
+	if ( !weapon_handle.index )
+		return;
+
+	auto weapon = reinterpret_cast< sdk::c_tf_weapon_base* >( g_interfaces->entity_list->get_client_entity_from_handle( weapon_handle ) );
+
+	if ( !weapon )
+		return;
+
+	auto type = weapon->get_weapon_id( );
+
+	switch ( type ) {
+	case sdk::tf_weapon_scattergun:
+		return draw_image( HASH( "scattergun" ), icon_scattergun.data( ), icon_scattergun.size( ), position, size, ImColor( 255, 255, 255 ) );
+	default:
+		return;
+		// return draw_image( HASH( "default" ), icon_.data( ), Killicon_golden_frying_pan.size( ), position, size,
+		//                    ImColor( 255, 255, 255 ) );
+	}
+}
+
 std::pair< ImVec4, bool > bounding_box( sdk::c_tf_player* player )
 {
 	auto on_screen         = false;
@@ -72,6 +117,9 @@ void render_visuals( sdk::c_tf_player* entity )
 	CONFIG( visuals_player_health_text_color, ImVec4 );
 	CONFIG( visuals_player_health_text_outline_color, ImVec4 );
 	CONFIG( visuals_player_health_text_minimum, int );
+	CONFIG( visuals_player_class, bool );
+	CONFIG( visuals_player_class_color, ImVec4 );
+	CONFIG( visuals_player_class_outline_color, ImVec4 );
 
 	const auto [ bb, on_screen ] = bounding_box( entity );
 
@@ -79,6 +127,8 @@ void render_visuals( sdk::c_tf_player* entity )
 		return;
 
 	const auto draw = ImGui::GetBackgroundDrawList( );
+
+	std::vector< std::pair< std::string, std::pair< ImColor, ImColor > > > text;
 
 	if ( *visuals_player_box ) {
 		draw->AddRect( ImVec2( bb.x - 1, bb.y - 1 ), ImVec2( bb.z + 1, bb.w + 1 ), ImColor( *visuals_player_box_outline_color ) );
@@ -96,10 +146,12 @@ void render_visuals( sdk::c_tf_player* entity )
 	}
 
 	if ( *visuals_player_health_bar ) {
-		const float health      = entity->health( );
-		const float max_health  = entity->max_health( );
+		const auto health     = static_cast< float >( entity->health( ) );
+		const auto max_health = static_cast< float >( entity->max_health( ) );
+
 		const auto health_size  = ( bb.w - bb.y ) * ( health / max_health );
 		const auto health_color = ImColor( *visuals_player_health_bar_color );
+
 		float h{ }, s{ }, v{ };
 		float r{ }, g{ }, b{ };
 
@@ -116,8 +168,8 @@ void render_visuals( sdk::c_tf_player* entity )
 	}
 
 	if ( *visuals_player_health_text ) {
-		const float health     = entity->health( );
-		const float max_health = entity->max_health( );
+		const auto health     = static_cast< float >( entity->health( ) );
+		const auto max_health = static_cast< float >( entity->max_health( ) );
 
 		if ( *visuals_player_health_text_minimum >= health - max_health ) {
 			const auto health_size  = ( bb.w - bb.y ) * ( health / max_health );
@@ -160,6 +212,28 @@ void render_visuals( sdk::c_tf_player* entity )
 					ImColor( r, g, b ), std::to_string( static_cast< int >( health ) ).c_str( ) );
 			}
 		}
+	}
+
+	if ( *visuals_player_class ) {
+		const auto class_name = entity->class_name( );
+
+		text.push_back(
+			std::make_pair( class_name, std::make_pair( ImColor( *visuals_player_class_outline_color ), ImColor( *visuals_player_class_color ) ) ) );
+	}
+
+	if ( true ) {
+		draw_weapon_icon( entity, { bb.x, bb.w }, { 60, 20 } );
+	}
+
+	auto offset = 0.f;
+
+	for ( const auto& indicator : text ) {
+		const auto text_size = verdana_bd_11->CalcTextSizeA( 11.f, FLT_MAX, -1.f, indicator.first.c_str( ) );
+
+		draw->AddText( verdana_bd_11, 11.f, ImVec2( bb.z + 2, bb.y + offset + 1 ), indicator.second.first, indicator.first.c_str( ) );
+		draw->AddText( verdana_bd_11, 11.f, ImVec2( bb.z + 2, bb.y + offset ), indicator.second.second, indicator.first.c_str( ) );
+
+		offset += text_size.y + 1;
 	}
 }
 

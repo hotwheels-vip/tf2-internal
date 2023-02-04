@@ -14,7 +14,7 @@ restore< int > tick_count{ };
 restore< int > tick_base{ };
 restore< float > fall_velocity{ };
 
-void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
+void prediction::run( )
 {
 	const auto last_command    = g_interfaces->client_state->last_command_ack;
 	const auto last_outgoing   = g_interfaces->client_state->last_out_going_command;
@@ -27,16 +27,16 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 	cur_time   = restore( &g_interfaces->globals->cur_time );
 	frame_time = restore( &g_interfaces->globals->frame_time );
 	tick_count = restore( &g_interfaces->globals->tick_count );
-	tick_base  = restore( &player->tick_base( ) );
+	tick_base  = restore( &g_local->tick_base( ) );
 
 	reset( );
 
-	player->current_command( ) = cmd;
-	set_prediction_random_seed( cmd );
-	set_prediction_player( player );
+	g_local->current_command( ) = g_cmd;
+	set_prediction_random_seed( g_cmd );
+	set_prediction_player( g_local );
 
-	g_interfaces->globals->tick_count = player->tick_base( );
-	g_interfaces->globals->cur_time   = static_cast< float >( player->tick_base( ) ) * g_interfaces->globals->interval_per_tick;
+	g_interfaces->globals->tick_count = g_local->tick_base( );
+	g_interfaces->globals->cur_time   = static_cast< float >( g_local->tick_base( ) ) * g_interfaces->globals->interval_per_tick;
 	g_interfaces->globals->frame_time = g_interfaces->globals->interval_per_tick;
 
 	auto first_time_predicted = restore( &g_interfaces->prediction->first_time_predicted );
@@ -47,22 +47,22 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 
 	sdk::move_data_t move_data{ };
 
-	g_interfaces->game_movement->start_track_prediction_errors( player );
-	g_interfaces->prediction->set_local_view_angles( cmd->view_angles );
+	g_interfaces->game_movement->start_track_prediction_errors( g_local );
+	g_interfaces->prediction->set_local_view_angles( g_cmd->view_angles );
 
-	player->pre_think( );
+	g_local->pre_think( );
 
-	g_interfaces->prediction->setup_move( player, cmd, g_interfaces->move_helper, &move_data );
-	g_interfaces->game_movement->process_movement( player, &move_data );
-	g_interfaces->prediction->finish_move( player, cmd, &move_data );
+	g_interfaces->prediction->setup_move( g_local, g_cmd, g_interfaces->move_helper, &move_data );
+	g_interfaces->game_movement->process_movement( g_local, &move_data );
+	g_interfaces->prediction->finish_move( g_local, g_cmd, &move_data );
 
 	g_interfaces->move_helper->process_impacts( );
 
-	fall_velocity = restore( &player->fall_velocity( ) );
+	fall_velocity = restore( &g_local->fall_velocity( ) );
 
 	running_post_think = true;
 
-	player->post_think( );
+	g_local->post_think( );
 
 	running_post_think = false;
 
@@ -72,14 +72,14 @@ void prediction::run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
 	in_prediction.run( );
 }
 
-void prediction::end( sdk::c_user_cmd* cmd, sdk::c_tf_player* player )
+void prediction::end( )
 {
-	player->current_command( ) = nullptr;
+	g_local->current_command( ) = nullptr;
 
 	if ( g_interfaces->globals->frame_time > 0.f )
-		player->tick_base( )++;
+		g_local->tick_base( )++;
 
-	g_interfaces->game_movement->finish_track_prediction_errors( player );
+	g_interfaces->game_movement->finish_track_prediction_errors( g_local );
 	g_interfaces->move_helper->set_host( nullptr );
 
 	set_prediction_random_seed( nullptr );

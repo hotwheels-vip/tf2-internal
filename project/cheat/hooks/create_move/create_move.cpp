@@ -22,21 +22,21 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 
 	g_entity_list->run( cmd );
 
-	if ( !g_cl_move->shifting )
-		g_lagcomp->update( );
-
 	if ( !g_local )
 		return;
 
+	if ( !g_cl_move->shifting )
+		g_lagcomp->update( );
+
 	auto backup_view = cmd->view_angles;
 
-	g_prediction->run( cmd, g_local );
+	g_prediction->run( );
 	{
 		g_aimbot->run( );
 	}
-	g_prediction->end( cmd, g_local );
+	g_prediction->end( );
 
-	g_movement->move_fix( cmd, backup_view );
+	g_movement->move_fix( backup_view );
 
 	send_packet = g_cl_move->choke;
 
@@ -45,38 +45,8 @@ void create_move::detour( void* ecx, void* edx, int sequence_number, float input
 		g_aimbot->projectile_choke = false;
 	}
 
-	if ( g_cl_move->shifting && !g_cl_move->force_shift ) {
-		const auto velocity = g_local->velocity( ) * sdk::vector{ 1.f, 1.f, 0.f };
-		const auto speed    = velocity.length_2d( );
-
-		static auto accelerate_cvar = g_interfaces->cvar->find_var( "sv_accelerate" );
-		static auto friction_cvar   = g_interfaces->cvar->find_var( "sv_friction" );
-
-		const auto max_speed      = g_local->maxspeed( );
-		const auto accelerate     = accelerate_cvar->get_float( );
-		const auto friction       = friction_cvar->get_float( );
-		const auto max_accelerate = accelerate * g_interfaces->globals->interval_per_tick * max_speed * friction;
-
-		if ( speed > 1.f ) {
-			float wish_speed{ };
-
-			if ( speed - max_accelerate <= -1.f ) {
-				wish_speed = speed / ( accelerate * g_interfaces->globals->interval_per_tick );
-			} else {
-				wish_speed = max_accelerate;
-			}
-
-			sdk::qangle speed_direction = math::vector_to_angle( velocity * -1.f );
-			speed_direction.yaw         = cmd->view_angles.yaw - speed_direction.yaw;
-			sdk::vector speed_vector    = math::angle_to_vector( speed_direction );
-
-			cmd->forward_move = speed_vector.x * wish_speed;
-			cmd->side_move    = speed_vector.y * wish_speed;
-		} else {
-			cmd->forward_move = 0.f;
-			cmd->side_move    = 0.f;
-		}
-	}
+	if ( g_cl_move->shifting && !g_cl_move->force_shift )
+		g_movement->auto_stop( );
 
 	// if ( const auto net_channel = reinterpret_cast< sdk::i_net_channel* >( g_interfaces->engine_client->get_net_channel_info( ) ) ) {
 	//	send_packet = net_channel->get_choked_packets( ) < 19 ? false : true;

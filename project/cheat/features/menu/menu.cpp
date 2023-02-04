@@ -34,6 +34,9 @@ void menu::run( )
 	CONFIG( visuals_player_health_text_color, ImVec4 );
 	CONFIG( visuals_player_health_text_outline_color, ImVec4 );
 	CONFIG( visuals_player_health_text_minimum, int );
+	CONFIG( visuals_player_class, bool );
+	CONFIG( visuals_player_class_color, ImVec4 );
+	CONFIG( visuals_player_class_outline_color, ImVec4 );
 
 	CONFIG( menu_disabled_inputs, int );
 
@@ -361,6 +364,13 @@ void menu::run( )
 				                   reinterpret_cast< float* >( visuals_player_health_text_outline_color ), color_picker_alpha_flags );
 				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
 				ImGui::ColorEdit4( "##visuals_player_health_bar_color", reinterpret_cast< float* >( visuals_player_health_text_color ),
+				                   color_picker_alpha_flags );
+
+				ImGui::Checkbox( "player class names", visuals_player_class );
+				ImGui::ColorEdit4( "##visuals_player_class_outline_color", reinterpret_cast< float* >( visuals_player_class_outline_color ),
+				                   color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_class_color", reinterpret_cast< float* >( visuals_player_class_color ),
 				                   color_picker_alpha_flags );
 
 				ImGui::EndChild( );

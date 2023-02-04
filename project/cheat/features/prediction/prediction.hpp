@@ -43,8 +43,8 @@ public:
 
 	bool running_post_think{ };
 
-	void run( sdk::c_user_cmd* cmd, sdk::c_tf_player* player );
-	void end( sdk::c_user_cmd* cmd, sdk::c_tf_player* player );
+	void run( );
+	void end( );
 
 	void set_prediction_random_seed( sdk::c_user_cmd* cmd );
 	void set_prediction_player( sdk::c_tf_player* player );

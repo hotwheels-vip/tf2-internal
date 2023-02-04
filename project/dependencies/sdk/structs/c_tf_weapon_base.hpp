@@ -50,18 +50,18 @@ namespace sdk
 
 		int get_slot( )
 		{
-			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 329 ) )( this );
+			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 330 ) )( this );
 		}
 
 		int get_weapon_id( )
 		{
-			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 379 ) )( this );
+			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 381 ) )( this );
 		}
 
-		//char* get_name( )
+		// char* get_name( )
 		//{
 		//	return reinterpret_cast< char*( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 331 ) )( this );
-		//}
+		// }
 
 		bool can_attack_primary( sdk::c_tf_player* owner );
 		bool can_attack_secondary( sdk::c_tf_player* owner );

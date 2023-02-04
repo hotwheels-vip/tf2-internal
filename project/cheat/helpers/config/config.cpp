@@ -135,6 +135,9 @@ bool config::run( )
 	insert( "visuals_player_health_text_color", ImVec4{ 0.f, 1.f, 0.f, 1.f } );
 	insert( "visuals_player_health_text_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
 	insert( "visuals_player_health_text_minimum", -10 );
+	insert( "visuals_player_class", false );
+	insert( "visuals_player_class_color", ImVec4{ 1.f, 1.f, 1.f, 1.f } );
+	insert( "visuals_player_class_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
 
 	insert( "menu_disabled_inputs", 0b11 );
 

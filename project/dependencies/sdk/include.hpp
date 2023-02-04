@@ -49,3 +49,4 @@
 #include "enums/hitboxes.hpp"
 #include "enums/tf_cond.hpp"
 #include "enums/trace_defs.hpp"
+#include "enums/weapon_type.hpp"
