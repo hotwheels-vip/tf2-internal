@@ -1,5 +1,7 @@
 #include "menu.hpp"
 
+#include "../../hooks/end_scene/end_scene.hpp"
+
 void menu::run( )
 {
 	CONFIG( aimbot_mouse_enabled, bool );
@@ -39,18 +41,20 @@ void menu::run( )
 	CONFIG( visuals_player_class_outline_color, ImVec4 );
 
 	CONFIG( menu_disabled_inputs, int );
+	CONFIG( menu_accent_color, ImVec4 );
 
 	//	ImGui::ShowDemoWindow( );
+
+	ImGui::GetStyle( ).Colors[ ImGuiCol_Accent ] = *menu_accent_color;
 
 	ImGuiStyle& style = ImGui::GetStyle( );
 
 	constexpr auto background_height = 25.f;
 
-	ImGui::SetNextWindowSize( ImVec2( 588.f, 559.f ), ImGuiCond_::ImGuiCond_Always );
+	ImGui::SetNextWindowSize( ImVec2( 588.f, 559.f ), ImGuiCond_Always );
 
 	if ( ImGui::Begin( "hotwheels-ui", 0,
-	                   ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse |
-	                       ImGuiWindowFlags_::ImGuiWindowFlags_NoResize ) ) {
+	                   ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize ) ) {
 		const auto window = ImGui::GetCurrentWindow( );
 
 		const auto draw_list = window->DrawList;
@@ -60,55 +64,65 @@ void menu::run( )
 
 		static int tab_number = 0;
 
-		// title
-		{
+		[ & ]( ) {
+			/* render background */
 			ImGui::PushClipRect( ImVec2( position.x, position.y ), ImVec2( position.x + size.x, position.y + background_height ), false );
 			draw_list->AddRectFilled( ImVec2( position.x, position.y ), ImVec2( position.x + size.x, position.y + background_height ),
-			                          ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, style.Alpha ), style.WindowRounding, ImDrawFlags_RoundCornersTop );
+			                          ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, 1.f ), ImGui::GetStyle( ).WindowRounding,
+			                          ImDrawFlags_RoundCornersTop );
 			ImGui::PopClipRect( );
 
+			ImGui::PushClipRect( ImVec2( position.x, position.y ), ImVec2( position.x + size.x, position.y + size.y ), false );
+			draw_list->AddRect( ImVec2( position.x, position.y ), ImVec2( position.x + size.x, position.y + size.y ), ImColor( 50, 50, 50, 255 ),
+			                    ImGui::GetStyle( ).WindowRounding );
+			ImGui::PopClipRect( );
+
+			/* render gradient */
 			RenderFadedGradientLine( draw_list, ImVec2( position.x, position.y + background_height - 1.f ), ImVec2( size.x, 1.f ),
-			                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ) );
+			                         ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent ) );
 
-			constexpr const char* title_text = "hotwheels";
-			const auto title_text_size       = verdana_bd_11->CalcTextSizeA( verdana_bd_11->FontSize, FLT_MAX, 0.f, title_text );
+			const auto title_text      = ( "hotwheels" );
+			const auto title_text_size = g_verdana_bd_11->CalcTextSizeA( g_verdana_bd_11->FontSize, FLT_MAX, 0.f, title_text );
 
-			constexpr const char* vip_title_text = ".vip";
-			const auto vip_title_text_size       = verdana_bd_11->CalcTextSizeA( verdana_bd_11->FontSize, FLT_MAX, 0.f, vip_title_text );
+			const auto vip_title_text      = ( ".vip" );
+			const auto vip_title_text_size = g_verdana_bd_11->CalcTextSizeA( g_verdana_bd_11->FontSize, FLT_MAX, 0.f, vip_title_text );
 
-			draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize,
+			draw_list->AddText( g_verdana_bd_11, g_verdana_bd_11->FontSize,
 			                    ImVec2( position.x + ( ( size.x - title_text_size.x - vip_title_text_size.x ) / 2.f ),
 			                            position.y + ( ( background_height - title_text_size.y ) / 2.f ) ),
-			                    ImColor( 1.f, 1.f, 1.f, style.Alpha ), title_text );
+			                    ImColor( 1.f, 1.f, 1.f ), title_text );
 
-			draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize,
+			draw_list->AddText( g_verdana_bd_11, g_verdana_bd_11->FontSize,
 			                    ImVec2( position.x + ( ( size.x + title_text_size.x - vip_title_text_size.x ) / 2.f ),
 			                            position.y + ( ( background_height - title_text_size.y ) / 2.f ) ),
-			                    ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ), vip_title_text );
-		}
+			                    ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent ), vip_title_text );
+		}( );
 
-		// tabs
-		{
+		[ & ]( ) {
+			/* render background */
 			ImGui::PushClipRect( ImVec2( position.x, position.y + size.y - background_height ), ImVec2( position.x + size.x, position.y + size.y ),
 			                     false );
 			draw_list->AddRectFilled( ImVec2( position.x, position.y + size.y - background_height ),
-			                          ImVec2( position.x + size.x, position.y + size.y ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, style.Alpha ),
-			                          style.WindowRounding, ImDrawFlags_RoundCornersBottom );
+			                          ImVec2( position.x + size.x, position.y + size.y ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ),
+			                          ImGui::GetStyle( ).WindowRounding, ImDrawFlags_RoundCornersBottom );
 			ImGui::PopClipRect( );
 
+			/* render gradient */
 			RenderFadedGradientLine( draw_list, ImVec2( position.x, position.y + size.y - background_height ), ImVec2( size.x, 1.f ),
-			                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ) );
+			                         ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent ) );
 
-			std::vector< const char* > tab_names = { "aimbot", "visuals", "chams", "misc", "settings" };
-			for ( int iterator = { }; iterator < tab_names.size( ); iterator++ ) {
-				if ( !( iterator < tab_names.size( ) ) )
+			std::vector< const char* > tab_names = { ( "aimbot" ), ( "visuals" ), ( "misc" ), ( "settings" ) };
+
+			/* tab logic */
+			for ( int iterator = { }; iterator < static_cast< int >( tab_names.size( ) ); iterator++ ) {
+				if ( !( iterator < static_cast< int >( tab_names.size( ) ) ) )
 					break;
 
 				const char* const tab_name = tab_names[ iterator ];
 
 				const auto hashed_tab_name = ImHashStr( tab_name );
 
-				const auto text_size = verdana_bd_11->CalcTextSizeA( verdana_bd_11->FontSize, FLT_MAX, 0.f, tab_name );
+				const auto text_size = g_verdana_bd_11->CalcTextSizeA( g_verdana_bd_11->FontSize, FLT_MAX, 0.f, tab_name );
 
 				const int tab_width    = ( size.x / static_cast< int >( tab_names.size( ) ) );
 				const int tab_center_x = ( tab_width * iterator ) + ( tab_width / 2 );
@@ -127,16 +141,15 @@ void menu::run( )
 				auto selected_animation = ImAnimationHelper( hashed_tab_name + ImHashStr( "selected-animation" ), ImGui::GetIO( ).DeltaTime );
 				selected_animation.Update( 2.f, selected ? 2.f : -2.f );
 
-				draw_list->AddText( verdana_bd_11, verdana_bd_11->FontSize, ImVec2( position.x + text_position.x, position.y + text_position.y ),
+				draw_list->AddText( g_verdana_bd_11, g_verdana_bd_11->FontSize, ImVec2( position.x + text_position.x, position.y + text_position.y ),
 				                    ImColor::Blend( ImColor( 1.f, 1.f, 1.f, hovered_text_animation.AnimationData->second ),
-				                                    ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ),
-				                                    selected_animation.AnimationData->second ),
+				                                    ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent ), selected_animation.AnimationData->second ),
 				                    tab_name );
 
 				if ( hovered && ImGui::IsMouseClicked( ImGuiMouseButton_Left ) )
 					tab_number = iterator;
 			}
-		}
+		}( );
 
 		ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) + 25.f );
 
@@ -407,7 +420,7 @@ void menu::run( )
 
 			break;
 		}
-		case 4: {
+		case 3: {
 			if ( ImGui::BeginChild( "config settings",
 			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ImGui::GetContentRegionAvail( ).y - background_height - 20.f ), true,
 			                        0, true ) ) {

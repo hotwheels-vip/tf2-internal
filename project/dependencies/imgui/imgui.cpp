@@ -1,3 +1,5 @@
+#include "../../cheat/hooks/end_scene/end_scene.hpp"
+
 // dear imgui, v1.89 WIP
 // (main code and documentation)
 
@@ -3395,6 +3397,8 @@ const char* ImGui::GetStyleColorName( ImGuiCol idx )
 		return "NavWindowingDimBg";
 	case ImGuiCol_ModalWindowDimBg:
 		return "ModalWindowDimBg";
+	case ImGuiCol_Accent:
+		return "Accent";
 	}
 	IM_ASSERT( 0 );
 	return "Unknown";
@@ -5795,13 +5799,15 @@ bool ImGui::BeginChildEx( const char* name, ImGuiID id, const ImVec2& size_arg, 
 
 	const auto draw_position = child_window->Pos - ImVec2( 0.f, 20.f );
 
-	if ( show_text && name ) {
+	const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
+
+	if ( show_text ) {
 		parent_window->DrawList->AddRectFilled(
-			draw_position, draw_position + ImVec2( child_window->Size.x, 20.f ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ),
+			draw_position, draw_position + ImVec2( child_window->Size.x, 20.f ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ),
 			g.Style.WindowRounding - 2.f /* NOTE ~ float ~ liga, if u see this baby , ,, . . . Am very Sorry X D */,
 			ImDrawFlags_::ImDrawFlags_RoundCornersTop );
 
-		const auto text_size = verdana_bd_11->CalcTextSizeA( verdana_bd_11->FontSize, FLT_MAX, 0.f, name );
+		const auto text_size = g_verdana_bd_11->CalcTextSizeA( g_verdana_bd_11->FontSize, FLT_MAX, 0.f, name );
 
 		auto text_animation = ImAnimationHelper( id, ImGui::GetIO( ).DeltaTime );
 
@@ -5817,19 +5823,20 @@ bool ImGui::BeginChildEx( const char* name, ImGuiID id, const ImVec2& size_arg, 
 		const ImColor text_color = GetColorU32( ImGuiCol_Text );
 
 		parent_window->DrawList->AddText(
-			verdana_bd_11, verdana_bd_11->FontSize,
+			g_verdana_bd_11, g_verdana_bd_11->FontSize,
 			draw_position + ImVec2( ( child_window->Size.x - text_size.x ) / 2.f, ( 20.f - text_size.y ) / 2.f ),
 			ImColor( text_color.Value.x, text_color.Value.y, text_color.Value.z, text_color.Value.w * text_animation.AnimationData->second ), name );
 
 		RenderFadedGradientLine( parent_window->DrawList, draw_position + ImVec2( 0.f, 20.f ), ImVec2( child_window->Size.x, 1.f ),
-		                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ) );
+		                         ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.z ) );
 	}
 
 	if ( border ) {
 		parent_window->DrawList->AddRect(
-			child_window->Pos - ImVec2( 0.f, 20.f ), child_window->Pos - ImVec2( 0.f, 20.f ) + child_window->Size + ImVec2( 0.f, 20.f ),
-			ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ),
-			g.Style.WindowRounding - 2.f /* NOTE ~ float ~ liga, if u see this baby , ,, . . . Am very Sorry X D */, ImDrawCornerFlags_Top );
+			child_window->Pos - ImVec2( 0.f, show_text ? 20.f : 0.f ),
+			child_window->Pos - ImVec2( 0.f, show_text ? 20.f : 0.f ) + child_window->Size + ImVec2( 0.f, show_text ? 20.f : 0.f ),
+			ImColor( 50, 50, 50, 100 ), g.Style.WindowRounding - 2.f /* NOTE ~ float ~ liga, if u see this baby , ,, . . . Am very Sorry X D */,
+			ImDrawCornerFlags_Top );
 	}
 
 	return ret;
@@ -5839,6 +5846,12 @@ bool ImGui::BeginChild( const char* str_id, const ImVec2& size_arg, bool border,
 {
 	ImGuiWindow* window = GetCurrentWindow( );
 	return BeginChildEx( str_id, window->GetID( str_id ), size_arg, border, extra_flags, show_text );
+}
+
+bool ImGui::BeginChild( ImGuiID id, const ImVec2& size_arg, bool border, ImGuiWindowFlags extra_flags, bool show_text )
+{
+	ImGuiWindow* window = GetCurrentWindow( );
+	return BeginChildEx( NULL, id, size_arg, border, extra_flags, show_text );
 }
 
 bool ImGui::BeginChild( ImGuiID id, const ImVec2& size_arg, bool border, ImGuiWindowFlags extra_flags )
@@ -5881,25 +5894,25 @@ void ImGui::EndChild( )
 				top_shadow_animation.Update( 2.f, window->Scroll.y != 0.f ? 2.f : -4.f );
 
 				/* top shadow */
-				window->DrawList->AddRectFilledMultiColor(
-					window->Pos + ImVec2( 0.f, 1.f ), window->Pos + ImVec2( 0.f, 1.f ) + ImVec2( window->Size.x, shadow_height ),
-					ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * shadow_opacity * g.Style.Alpha ),
-					ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * shadow_opacity * g.Style.Alpha ),
-					ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * 0.f * g.Style.Alpha ),
-					ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * 0.f * g.Style.Alpha ) );
+				window->DrawList->AddRectFilledMultiColor( window->Pos + ImVec2( 0.f, 1.f ),
+				                                           window->Pos + ImVec2( 0.f, 1.f ) + ImVec2( window->Size.x, shadow_height ),
+				                                           ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * shadow_opacity ),
+				                                           ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * shadow_opacity ),
+				                                           ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * 0.f ),
+				                                           ImColor( 0.f, 0.f, 0.f, top_shadow_animation.AnimationData->second * 0.f ) );
 
 				auto bottom_shadow_animation =
 					ImAnimationHelper( hashed_window_name + +ImHashStr( "bottom-shadow-animation" ), ImGui::GetIO( ).DeltaTime );
 				bottom_shadow_animation.Update( 2.f, window->Scroll.y != window->ScrollMax.y != 0.f ? 2.f : -2.f );
 
 				/* bottom shadow */
-				window->DrawList->AddRectFilledMultiColor(
-					window->Pos + ImVec2( 0.f, window->Size.y - shadow_height ),
-					window->Pos + ImVec2( 0.f, window->Size.y - shadow_height ) + ImVec2( window->Size.x, shadow_height ),
-					ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * 0.f * g.Style.Alpha ),
-					ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * 0.f * g.Style.Alpha ),
-					ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * shadow_opacity * g.Style.Alpha ),
-					ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * shadow_opacity * g.Style.Alpha ) );
+				window->DrawList->AddRectFilledMultiColor( window->Pos + ImVec2( 0.f, window->Size.y - shadow_height ),
+				                                           window->Pos + ImVec2( 0.f, window->Size.y - shadow_height ) +
+				                                               ImVec2( window->Size.x, shadow_height ),
+				                                           ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * 0.f ),
+				                                           ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * 0.f ),
+				                                           ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * shadow_opacity ),
+				                                           ImColor( 0.f, 0.f, 0.f, bottom_shadow_animation.AnimationData->second * shadow_opacity ) );
 			}
 
 			ItemAdd( bb, window->ChildId );
@@ -5929,7 +5942,7 @@ bool ImGui::BeginChildFrame( ImGuiID id, const ImVec2& size, ImGuiWindowFlags ex
 	PushStyleVar( ImGuiStyleVar_ChildRounding, style.FrameRounding );
 	PushStyleVar( ImGuiStyleVar_ChildBorderSize, style.FrameBorderSize );
 	PushStyleVar( ImGuiStyleVar_WindowPadding, style.FramePadding );
-	bool ret = BeginChild( id, size, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysUseWindowPadding | extra_flags );
+	bool ret = BeginChild( id, size, true, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysUseWindowPadding | extra_flags, false );
 	PopStyleVar( 3 );
 	PopStyleColor( );
 	return ret;
@@ -7318,8 +7331,8 @@ void ImGui::End( )
 	IM_ASSERT( g.CurrentWindowStack.Size > 0 );
 
 	// Error checking: verify that user doesn't directly call End() on a child window.
-	if ( window->Flags & ImGuiWindowFlags_ChildWindow )
-		IM_ASSERT_USER_ERROR( g.WithinEndChild, "Must call EndChild() and not End()!" );
+	/*if ( window->Flags & ImGuiWindowFlags_ChildWindow )
+	    IM_ASSERT_USER_ERROR( g.WithinEndChild, "Must call EndChild() and not End()!" );*/
 
 	// Close anything that is open
 	if ( window->DC.CurrentColumns )
@@ -14046,7 +14059,7 @@ void ImGui::DebugNodeDrawCmdShowMeshAndBoundingBox( ImDrawList* out_draw_list, c
 
 	// Draw wire-frame version of all triangles
 	ImRect clip_rect = draw_cmd->ClipRect;
-	ImRect vtxs_rect( FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX );
+	ImRect vt_rect( FLT_MAX, FLT_MAX, -FLT_MAX, -FLT_MAX );
 	ImDrawListFlags backup_flags = out_draw_list->Flags;
 	out_draw_list->Flags &= ~ImDrawListFlags_AntiAliasedLines; // Disable AA on triangle outlines is more readable for very large and thin triangles.
 	for ( unsigned int idx_n = draw_cmd->IdxOffset, idx_end = draw_cmd->IdxOffset + draw_cmd->ElemCount; idx_n < idx_end; ) {
@@ -14058,7 +14071,7 @@ void ImGui::DebugNodeDrawCmdShowMeshAndBoundingBox( ImDrawList* out_draw_list, c
 
 		ImVec2 triangle[ 3 ];
 		for ( int n = 0; n < 3; n++, idx_n++ )
-			vtxs_rect.Add( ( triangle[ n ] = vtx_buffer[ idx_buffer ? idx_buffer[ idx_n ] : idx_n ].pos ) );
+			vt_rect.Add( ( triangle[ n ] = vtx_buffer[ idx_buffer ? idx_buffer[ idx_n ] : idx_n ].pos ) );
 		if ( show_mesh )
 			out_draw_list->AddPolyline( triangle, 3, IM_COL32( 255, 255, 0, 255 ), ImDrawFlags_Closed, 1.0f ); // In yellow: mesh triangles
 	}
@@ -14066,8 +14079,7 @@ void ImGui::DebugNodeDrawCmdShowMeshAndBoundingBox( ImDrawList* out_draw_list, c
 	if ( show_aabb ) {
 		out_draw_list->AddRect( ImFloor( clip_rect.Min ), ImFloor( clip_rect.Max ),
 		                        IM_COL32( 255, 0, 255, 255 ) ); // In pink: clipping rectangle submitted to GPU
-		out_draw_list->AddRect( ImFloor( vtxs_rect.Min ), ImFloor( vtxs_rect.Max ),
-		                        IM_COL32( 0, 255, 255, 255 ) ); // In cyan: bounding box of triangles
+		out_draw_list->AddRect( ImFloor( vt_rect.Min ), ImFloor( vt_rect.Max ), IM_COL32( 0, 255, 255, 255 ) ); // In cyan: bounding box of triangles
 	}
 	out_draw_list->Flags = backup_flags;
 }

@@ -140,6 +140,7 @@ bool config::run( )
 	insert( "visuals_player_class_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
 
 	insert( "menu_disabled_inputs", 0b11 );
+	insert( "menu_accent_color", ImVec4{ 129.f / 255.f, 99.f / 255.f, 251.f / 255.f, 1.f } );
 
 	return true;
 }

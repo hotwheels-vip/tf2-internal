@@ -2,7 +2,6 @@
 
 #include "../../helpers/include.hpp"
 
-#include <easing/easing.h>
 #include <filesystem>
 #include <imgui/imgui.h>
 #include <imgui/imgui_internal.h>
