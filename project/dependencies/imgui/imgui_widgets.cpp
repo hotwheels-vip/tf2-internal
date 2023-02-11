@@ -47,7 +47,7 @@ Index of this file:
 #		include <stdint.h> // intptr_t
 #	endif
 
-#	include "fonts.h"
+#	include "helpers/fonts.h"
 
 //-------------------------------------------------------------------------
 // Warnings
@@ -173,9 +173,6 @@ void ImGui::TextEx( const char* text, const char* text_end, ImGuiTextFlags flags
 		return;
 	ImGuiContext& g = *GImGui;
 
-	auto style = g.Style;
-	auto h     = GetFrameHeight( ) - 2.f;
-
 	// Accept null ranges
 	if ( text == text_end )
 		text = text_end = "";
@@ -185,7 +182,7 @@ void ImGui::TextEx( const char* text, const char* text_end, ImGuiTextFlags flags
 	if ( text_end == NULL )
 		text_end = text + strlen( text ); // FIXME-OPT
 
-	const ImVec2 text_pos( window->DC.CursorPos.x + 3.f + style.ItemInnerSpacing.x + h, window->DC.CursorPos.y + window->DC.CurrLineTextBaseOffset );
+	const ImVec2 text_pos( window->DC.CursorPos.x, window->DC.CursorPos.y + window->DC.CurrLineTextBaseOffset );
 	const float wrap_pos_x  = window->DC.TextWrapPos;
 	const bool wrap_enabled = ( wrap_pos_x >= 0.0f );
 	if ( text_end - text <= 2000 || wrap_enabled ) {
@@ -731,10 +728,13 @@ bool ImGui::ButtonEx( const char* label, const ImVec2& size_arg, ImGuiButtonFlag
 	auto frame_animation = ImAnimationHelper( id + ImHashStr( "frame-animation" ), ImGui::GetIO( ).DeltaTime );
 	frame_animation.Update( pressed || held ? 4.f : -4.f, 1.f, 0.f, 1.f );
 
+	const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
+
 	RenderFrame( bb.Min - ImVec2( 2.f, 2.f ), bb.Max + ImVec2( 2.f, 2.f ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ), true,
 	             g.Style.FrameRounding );
 	RenderFrame( bb.Min - ImVec2( 2.f, 2.f ), bb.Max + ImVec2( 2.f, 2.f ),
-	             ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], 1.f * frame_animation.AnimationData->second ), true, g.Style.FrameRounding );
+	             ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.w, 1.f * frame_animation.AnimationData->second ), true,
+	             g.Style.FrameRounding );
 	window->DrawList->AddRect( bb.Min - ImVec2( 2.f, 2.f ), bb.Max + ImVec2( 2.f, 2.f ), ImColor( 50, 50, 50, 100 ), g.Style.FrameRounding );
 
 	if ( g.LogEnabled )
@@ -1045,6 +1045,8 @@ bool ImGui::ScrollbarEx( const ImRect& bb_frame, ImGuiID id, ImGuiAxis axis, ImS
 	ImAnimationHelper scrollbar_animation = ImAnimationHelper( ImHashStr( window->Name ), ImGui::GetIO( ).DeltaTime );
 	scrollbar_animation.Update( 3.5f, held ? 3.f : -3.f );
 
+	const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
+
 	ImRect grab_rect;
 	if ( axis == ImGuiAxis_X )
 		grab_rect =
@@ -1053,8 +1055,8 @@ bool ImGui::ScrollbarEx( const ImRect& bb_frame, ImGuiID id, ImGuiAxis axis, ImS
 		grab_rect =
 			ImRect( bb.Min.x, ImLerp( bb.Min.y, bb.Max.y, grab_v_norm ), bb.Max.x, ImLerp( bb.Min.y, bb.Max.y, grab_v_norm ) + grab_h_pixels );
 	window->DrawList->AddRectFilled( grab_rect.Min, grab_rect.Max,
-	                                 ImColor::Blend( ImColor( 51 / 255.f, 51 / 255.f, 51 / 255.f, g.Style.Alpha ),
-	                                                 ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ),
+	                                 ImColor::Blend( ImColor( 51 / 255.f, 51 / 255.f, 51 / 255.f, 1.f ),
+	                                                 ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.z ),
 	                                                 scrollbar_animation.AnimationData->second ),
 	                                 style.ScrollbarRounding );
 
@@ -1077,10 +1079,10 @@ void ImGui::Image( ImTextureID user_texture_id, const ImVec2& size, const ImVec2
 
 	if ( border_col.w > 0.0f ) {
 		window->DrawList->AddRect( bb.Min, bb.Max, GetColorU32( border_col ), 0.0f );
-		window->DrawList->AddImage( user_texture_id, bb.Min + ImVec2( 1, 1 ), bb.Max - ImVec2( 1, 1 ), uv0, uv1, GetColorU32( tint_col ) );
-	} else {
-		window->DrawList->AddImage( user_texture_id, bb.Min, bb.Max, uv0, uv1, GetColorU32( tint_col ) );
-	}
+		window->DrawList->AddImageRounded( user_texture_id, bb.Min + ImVec2( 1, 1 ), bb.Max - ImVec2( 1, 1 ), uv0, uv1, GetColorU32( tint_col ),
+		                                   6.f );
+	} else
+		window->DrawList->AddImageRounded( user_texture_id, bb.Min, bb.Max, uv0, uv1, GetColorU32( tint_col ), 6.f );
 }
 
 // ImageButton() is flawed as 'id' is always derived from 'texture_id' (see #2464 #1390)
@@ -1122,88 +1124,6 @@ bool ImGui::ImageButton( const char* str_id, ImTextureID user_texture_id, const 
 		return false;
 
 	return ImageButtonEx( window->GetID( str_id ), user_texture_id, size, uv0, uv1, bg_col, tint_col );
-}
-
-void ImGui::RenderSettingsPopup( const char* str_id, const std::function< void( ) >& function )
-{
-	const auto hashed_id = ImHashStr( str_id );
-
-	SameLine( GetContentRegionAvail( ).x - 10.f - first_icon_14->CalcTextSizeA( first_icon_14->FontSize, 0.f, FLT_MAX, ICON_FA_COG ).x / 2.f );
-
-	auto text_animation = ImAnimationHelper( hashed_id, GetIO( ).DeltaTime );
-
-	const ImColor text_color = GetColorU32( ImGuiCol_Text );
-
-	PushFont( first_icon_14 );
-	TextColored( ImColor::Blend( ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z, text_color.Value.w * 0.5f ),
-	                             ImColor( 200 / 255.f, 255 / 255.f, 80 / 255.f, 1.f ), text_animation.AnimationData->second ),
-	             ICON_FA_COG );
-	PopFont( );
-
-	const bool hovered = IsItemHovered( );
-
-	if ( hovered && IsMouseClicked( ImGuiMouseButton_::ImGuiMouseButton_Right ) )
-		OpenPopup( str_id );
-
-	const bool popup_open = IsPopupOpen( str_id );
-
-	text_animation.Update( popup_open || hovered ? 4.f : -4.f );
-
-	auto popup_animation = ImAnimationHelper( hashed_id + 1u, GetIO( ).DeltaTime );
-	popup_animation.Update( popup_open ? 10.f : -10.f );
-
-	[ & ]( ) {
-		PushStyleColor( ImGuiCol_::ImGuiCol_PopupBg, GetColorU32( ImGuiCol_::ImGuiCol_ChildBg ) );
-		PushStyleColor( ImGuiCol_::ImGuiCol_Border, GetColorU32( ImGuiCol_::ImGuiCol_WindowBg ) );
-		PushStyleVar( ImGuiStyleVar_::ImGuiStyleVar_PopupBorderSize, 1.f );
-
-		SetNextWindowSize( ImVec2( 150.f, -1 ) * ImVec2( popup_animation.AnimationData->second, popup_animation.AnimationData->second ) );
-		if ( BeginPopup( str_id ) ) {
-			function( );
-			EndPopup( );
-		}
-
-		PopStyleVar( );
-		PopStyleColor( 2 );
-	}( );
-}
-
-void ImGui::ImageWithText( const char* label, int* selected_module, int wanted_module, ImTextureID user_texture_id, const ImVec2& size,
-                           const ImVec2& uv0, const ImVec2& uv1, const ImVec4& tint_col, const ImVec4& border_col )
-{
-	ImGuiWindow* window = GetCurrentWindow( );
-	if ( window->SkipItems )
-		return;
-
-	const auto cursor_pos = window->DC.CursorPos;
-
-	ImRect bb( cursor_pos, cursor_pos + size );
-	if ( border_col.w > 0.0f )
-		bb.Max += ImVec2( 2, 2 );
-	ItemSize( bb );
-	if ( !ItemAdd( bb, 0 ) )
-		return;
-
-	const auto draw_pos = ImGui::GetCursorScreenPos( );
-
-	window->DrawList->AddImageRounded( user_texture_id, bb.Min, bb.Max, uv0, uv1, GetColorU32( tint_col ), 25.f,
-	                                   ImDrawFlags_::ImDrawFlags_RoundCornersTop );
-
-	const bool hovered = ImGui::IsItemHovered( );
-
-	if ( hovered && ImGui::IsMouseClicked( ImGuiMouseButton_::ImGuiMouseButton_Left ) )
-		*selected_module = wanted_module;
-
-	auto animation = ImAnimationHelper( ImHashStr( label ), ImGui::GetIO( ).DeltaTime );
-	animation.Update( 1.f, hovered ? 4.f : -4.f );
-
-	window->DrawList->AddRectFilledMultiColor( bb.Min, bb.Max, ImColor( 0.f, 0.f, 0.f, animation.AnimationData->second * 0.f ),
-	                                           ImColor( 0.f, 0.f, 0.f, animation.AnimationData->second * 0.f ),
-	                                           ImColor( 0.f, 0.f, 0.f, animation.AnimationData->second * 0.90f ),
-	                                           ImColor( 0.f, 0.f, 0.f, animation.AnimationData->second * 0.90f ) );
-
-	// window->DrawList->AddText(gilroy_14, gilroy_14->FontSize, ImVec2(bb.Min.x + 5.f, draw_pos.y - gilroy_14->CalcTextSizeA(gilroy_14->FontSize,
-	// FLT_MAX, 0.f, label).y - 10.f), ImColor(1.f, 1.f, 1.f, animation.AnimationData->second), label);
 }
 
 #	ifndef IMGUI_DISABLE_OBSOLETE_FUNCTIONS
@@ -1273,13 +1193,15 @@ bool ImGui::Checkbox( const char* label, bool* v )
 	const bool render_decorations = frame_animation.AnimationData->second != 1.f;
 
 	if ( render_decorations )
-		RenderFrame( check_bb.Min, check_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ), true, style.FrameRounding );
+		RenderFrame( check_bb.Min, check_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ), true, style.FrameRounding );
+
+	const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
 
 	RenderFrame( check_bb.Min, check_bb.Max,
-	             ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], 1.f * frame_animation.AnimationData->second * g.Style.Alpha ), true,
+	             ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.z, 1.f * frame_animation.AnimationData->second ), true,
 	             style.FrameRounding );
 
-	window->DrawList->AddRect( check_bb.Min, check_bb.Max, ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ), style.FrameRounding );
+	window->DrawList->AddRect( check_bb.Min, check_bb.Max, ImColor( 50, 50, 50, 100 ), style.FrameRounding );
 
 	auto text_animation = ImAnimationHelper( id + 1u, ImGui::GetIO( ).DeltaTime );
 	text_animation.Update( hovered || *v ? 4.f : -4.f, 1.f, 0.5f, 1.f );
@@ -1775,10 +1697,9 @@ bool ImGui::BeginCombo( const char* label, const char* preview_value, ImGuiCombo
 	const float value_x2 = ImMax( frame_bb.Min.x, frame_bb.Max.x );
 	RenderNavHighlight( frame_bb, id );
 	if ( !( flags & ImGuiComboFlags_NoPreview ) ) {
-		window->DrawList->AddRectFilled( frame_bb.Min, ImVec2( value_x2, frame_bb.Max.y ),
-		                                 ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ), style.PopupRounding );
-		window->DrawList->AddRect( frame_bb.Min, ImVec2( value_x2, frame_bb.Max.y ), ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ),
-		                           style.FrameRounding );
+		window->DrawList->AddRectFilled( frame_bb.Min, ImVec2( value_x2, frame_bb.Max.y ), ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ),
+		                                 style.PopupRounding );
+		window->DrawList->AddRect( frame_bb.Min, ImVec2( value_x2, frame_bb.Max.y ), ImColor( 50, 50, 50, 100 ), style.FrameRounding );
 	}
 
 	if ( !( flags & ImGuiComboFlags_NoArrowButton ) ) {
@@ -1803,7 +1724,9 @@ bool ImGui::BeginCombo( const char* label, const char* preview_value, ImGuiCombo
 
 		const ImVec2 arrow_draw_position = ImVec2( value_x2 + style.FramePadding.y - 20.f, frame_bb.Min.y + style.FramePadding.y );
 
-		RenderArrow( arrow_draw_position, ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ) );
+		const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
+
+		RenderArrow( arrow_draw_position, ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.z ) );
 	}
 
 	auto text_animation = ImAnimationHelper( id + ImHashStr( "text-animation" ), ImGui::GetIO( ).DeltaTime );
@@ -1811,8 +1734,8 @@ bool ImGui::BeginCombo( const char* label, const char* preview_value, ImGuiCombo
 
 	const ImColor text_color = GetColorU32( ImGuiCol_Text );
 
-	PushStyleColor( ImGuiCol_Text, ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z,
-	                                       text_color.Value.w * text_animation.AnimationData->second * g.Style.Alpha ) );
+	PushStyleColor( ImGuiCol_Text,
+	                ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z, text_color.Value.w * text_animation.AnimationData->second ) );
 
 	// Render preview and label
 	if ( preview_value != NULL && !( flags & ImGuiComboFlags_NoPreview ) ) {
@@ -1878,12 +1801,12 @@ bool ImGui::BeginCombo( const char* label, const char* preview_value, ImGuiCombo
 	// Horizontally align ourselves with the framed text
 	PushStyleVar( ImGuiStyleVar_::ImGuiStyleVar_WindowPadding, ImVec2( style.FramePadding.x, style.WindowPadding.y - 4.f ) );
 	PushStyleVar( ImGuiStyleVar_::ImGuiStyleVar_ScrollbarSize, 0.f );
-	PushStyleColor( ImGuiCol_::ImGuiCol_PopupBg, ImVec4( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ) );
+	PushStyleColor( ImGuiCol_::ImGuiCol_PopupBg, ImVec4( 25 / 255.f, 25 / 255.f, 25 / 255.f, 1.f ) );
 	bool ret = Begin( name, NULL, window_flags );
 
 	PushClipRect( ImGui::GetWindowPos( ), ImGui::GetWindowSize( ) + ImGui::GetWindowPos( ), false );
-	ImGui::GetWindowDrawList( )->AddRect( ImGui::GetWindowPos( ), ImGui::GetWindowSize( ) + ImGui::GetWindowPos( ),
-	                                      ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ), style.FrameRounding );
+	ImGui::GetWindowDrawList( )->AddRect( ImGui::GetWindowPos( ), ImGui::GetWindowSize( ) + ImGui::GetWindowPos( ), ImColor( 50, 50, 50, 100 ),
+	                                      style.FrameRounding );
 	PopClipRect( );
 
 	PopStyleColor( );
@@ -1966,7 +1889,7 @@ inline const char* key_names[] = {
 	"[shi]", "[shi]", "[ctr]", "[ctr]", "[alt]", "[alt]"
 };
 
-bool ImGui::Keybind( const char* label, KeyBind_t* key_data, bool has_style )
+bool ImGui::Keybind( const char* label, key_bind_t* key_data, bool has_style )
 {
 	ImGuiWindow* window = ImGui::GetCurrentWindow( );
 	if ( window->SkipItems )
@@ -1980,14 +1903,14 @@ bool ImGui::Keybind( const char* label, KeyBind_t* key_data, bool has_style )
 
 	char buf_display[ 64 ] = ( "[none]" );
 
-	if ( key_data->iKey != 0 && g.ActiveId != id )
-		strcpy_s( buf_display, key_names[ key_data->iKey ] );
+	if ( key_data->m_key != 0 && g.ActiveId != id )
+		strcpy_s( buf_display, key_names[ key_data->m_key ] );
 	else if ( g.ActiveId == id )
 		strcpy_s( buf_display, ( "[...]" ) );
 
 	ImGui::SameLine( window->Size.x - 18.f - CalcTextSize( buf_display ).x );
 
-	const ImVec2 label_size = CalcTextSize( key_names[ key_data->iKey ] );
+	const ImVec2 label_size = CalcTextSize( key_names[ key_data->m_key ] );
 	const ImRect frame_bb( ImVec2( window->DC.CursorPos.x, window->DC.CursorPos.y ),
 	                       ImVec2( window->DC.CursorPos.x, window->DC.CursorPos.y ) - label_size );
 
@@ -2000,7 +1923,7 @@ bool ImGui::Keybind( const char* label, KeyBind_t* key_data, bool has_style )
 		return false;
 
 	bool value_changed = false;
-	int k              = key_data->iKey;
+	int k              = key_data->m_key;
 
 	const bool hovered = IsItemHovered( );
 
@@ -2008,7 +1931,7 @@ bool ImGui::Keybind( const char* label, KeyBind_t* key_data, bool has_style )
 		if ( g.ActiveId != id ) {
 			memset( io.MouseDown, 0, sizeof( io.MouseDown ) );
 			memset( io.KeysDown, 0, sizeof( io.KeysDown ) );
-			key_data->iKey = 0;
+			key_data->m_key = 0;
 		}
 		SetActiveID( id, window );
 		FocusWindow( window );
@@ -2055,10 +1978,10 @@ bool ImGui::Keybind( const char* label, KeyBind_t* key_data, bool has_style )
 		}
 
 		if ( IsKeyPressedMap( ImGuiKey_Escape ) ) {
-			key_data->iKey = 0;
+			key_data->m_key = 0;
 			ImGui::ClearActiveID( );
 		} else
-			key_data->iKey = k;
+			key_data->m_key = k;
 	}
 
 	PushStyleVar( ImGuiStyleVar_::ImGuiStyleVar_WindowPadding, ImVec2( 0.f, 8.f ) );
@@ -2073,16 +1996,16 @@ bool ImGui::Keybind( const char* label, KeyBind_t* key_data, bool has_style )
 
 		popup_window->DrawList->AddRect( position, position + ImGui::GetWindowSize( ), ImColor( 50, 50, 50, 100 ), style.WindowRounding );
 
-		if ( Selectable( "always on", key_data->iKeyStyle == EKeyStyles::KEY_STYLE_ALWAYS_ON,
+		if ( Selectable( "always on", key_data->m_key_style == EKeyStyles::KEY_STYLE_ALWAYS_ON,
 		                 ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups ) )
-			key_data->iKeyStyle = EKeyStyles::KEY_STYLE_ALWAYS_ON;
+			key_data->m_key_style = EKeyStyles::KEY_STYLE_ALWAYS_ON;
 
-		if ( Selectable( "hold", key_data->iKeyStyle == EKeyStyles::KEY_STYLE_HOLD, ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups ) )
-			key_data->iKeyStyle = EKeyStyles::KEY_STYLE_HOLD;
+		if ( Selectable( "hold", key_data->m_key_style == EKeyStyles::KEY_STYLE_HOLD, ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups ) )
+			key_data->m_key_style = EKeyStyles::KEY_STYLE_HOLD;
 
-		if ( Selectable( "toggle", key_data->iKeyStyle == EKeyStyles::KEY_STYLE_TOGGLE,
+		if ( Selectable( "toggle", key_data->m_key_style == EKeyStyles::KEY_STYLE_TOGGLE,
 		                 ImGuiSelectableFlags_::ImGuiSelectableFlags_DontClosePopups ) )
-			key_data->iKeyStyle = EKeyStyles::KEY_STYLE_TOGGLE;
+			key_data->m_key_style = EKeyStyles::KEY_STYLE_TOGGLE;
 
 		EndPopup( );
 	}
@@ -2094,9 +2017,12 @@ bool ImGui::Keybind( const char* label, KeyBind_t* key_data, bool has_style )
 	auto text_animation = ImAnimationHelper( id + ImHashStr( "text-animation" ), ImGui::GetIO( ).DeltaTime );
 	text_animation.Update( 2.f, g.ActiveId == id ? 2.f : -2.f );
 
+	const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
+
 	window->DrawList->AddText( frame_bb.Min,
 	                           ImColor::Blend( ImColor( text_color.Value.x, text_color.Value.y, text_color.Value.z, text_color.Value.w * 0.5f ),
-	                                           ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ), text_animation.AnimationData->second ),
+	                                           ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.z ),
+	                                           text_animation.AnimationData->second ),
 	                           buf_display );
 
 	return value_changed;
@@ -2118,11 +2044,11 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 	const ImGuiIO& io       = ImGui::GetIO( );
 	const ImGuiContext& g   = *GImGui;
 
-	ImRect frame_bb( window->DC.CursorPos + ImVec2( 18.f, 0.f ),
-	                 window->DC.CursorPos + ImVec2( 18.f, 0.f ) + ImVec2( ImGui::GetContentRegionAvail( ).x - 29.f, 100.f ) );
-	ImRect total_bb( window->DC.CursorPos + ImVec2( 18.f, 0.f ), window->DC.CursorPos + ImVec2( 18.f, 0.f ) +
-	                                                                 ImVec2( ImGui::GetContentRegionAvail( ).x - 29.f, 100.f ) + label_size +
-	                                                                 ImVec2( 0.f, 5.f ) );
+	const ImRect frame_bb( window->DC.CursorPos + ImVec2( 18.f, 0.f ),
+	                       window->DC.CursorPos + ImVec2( 18.f, 0.f ) + ImVec2( ImGui::GetContentRegionAvail( ).x - 29.f, 100.f ) );
+	const ImRect total_bb( window->DC.CursorPos + ImVec2( 18.f, 0.f ), window->DC.CursorPos + ImVec2( 18.f, 0.f ) +
+	                                                                       ImVec2( ImGui::GetContentRegionAvail( ).x - 29.f, 100.f ) + label_size +
+	                                                                       ImVec2( 0.f, 5.f ) );
 
 	ItemSize( total_bb, style.FramePadding.y );
 	if ( !ItemAdd( total_bb, id, &frame_bb ) )
@@ -2131,13 +2057,10 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 	const bool hovered = IsItemHovered( );
 
 	// Draw the label
-	RenderText( ImVec2( frame_bb.Min.x, frame_bb.Min.y ), label );
-
-	// Push the frame_bb down from the text size
-	frame_bb = ImRect( frame_bb.Min + ImVec2( 0.f, label_size.y + 5.f ), frame_bb.Max );
+	RenderText( ImVec2( frame_bb.Min.x, frame_bb.Max.y + 5.f ), label );
 
 	// Draw the curve editor
-	RenderFrame( frame_bb.Min, frame_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ), true, g.Style.FrameRounding );
+	RenderFrame( frame_bb.Min, frame_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f ), true, g.Style.FrameRounding );
 
 	window->DrawList->AddRect( frame_bb.Min, frame_bb.Max, ImColor( 50, 50, 50, 100 ), g.Style.FrameRounding );
 
@@ -2156,13 +2079,11 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 	                                              ImClamp( point_position_b.y, frame_bb.Min.y + point_size, frame_bb.Max.y - point_size ) );
 	ImAnimationHelper point_a_animation = ImAnimationHelper( id + ImHashStr( "active-animation-point-a" ), ImGui::GetIO( ).DeltaTime );
 
-	window->DrawList->AddCircleFilled( point_position_a_clamped, point_size / 2,
-	                                   ImColor( 1.f, 1.f, 1.f, point_a_animation.AnimationData->second * g.Style.Alpha ) );
+	window->DrawList->AddCircleFilled( point_position_a_clamped, point_size / 2, ImColor( 1.f, 1.f, 1.f, point_a_animation.AnimationData->second ) );
 
 	ImAnimationHelper point_b_animation = ImAnimationHelper( id + ImHashStr( "active-animation-point-b" ), ImGui::GetIO( ).DeltaTime );
 
-	window->DrawList->AddCircleFilled( point_position_b_clamped, point_size / 2,
-	                                   ImColor( 1.f, 1.f, 1.f, point_b_animation.AnimationData->second * g.Style.Alpha ) );
+	window->DrawList->AddCircleFilled( point_position_b_clamped, point_size / 2, ImColor( 1.f, 1.f, 1.f, point_b_animation.AnimationData->second ) );
 
 	// Calculate button bb for each point
 	const auto point_a_bb =
@@ -2208,6 +2129,8 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 	points->PointB.x = ImClamp( points->PointB.x, 0.0f, 1.0f );
 	points->PointB.y = ImClamp( points->PointB.y, 0.0f, 1.0f );
 
+	const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
+
 	// Draw the curve
 	for ( int i = 0; i < members; i++ ) {
 		const auto time = i / ( float )( members - 1 );
@@ -2226,7 +2149,8 @@ bool ImGui::CurveEditor( const char* label, Points_t* points, ImVec2 data[], int
 			const auto prev_point_position = ImVec2( frame_bb.Min.x + ( frame_bb.Max.x - frame_bb.Min.x ) * prev_pos.x,
 			                                         frame_bb.Min.y + ( frame_bb.Max.y - frame_bb.Min.y ) * ( 1.f + -prev_pos.y ) );
 
-			window->DrawList->AddLine( prev_point_position, point_position, ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ), 2.f );
+			window->DrawList->AddLine( prev_point_position, point_position,
+			                           ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.z ), 2.f );
 		}
 	}
 
@@ -3624,9 +3548,9 @@ bool ImGui::SliderScalar( const char* label, ImGuiDataType data_type, void* p_da
 		}
 	}
 
-	RenderFrame( frame_bb.Min, frame_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, g.Style.Alpha ), true, g.Style.FrameRounding );
+	RenderFrame( frame_bb.Min, frame_bb.Max, ImColor( 25 / 255.f, 25 / 255.f, 25 / 255.f, 1.f ), true, g.Style.FrameRounding );
 
-	window->DrawList->AddRect( frame_bb.Min, frame_bb.Max, ImColor( 50, 50, 50, ( int )( 100 * g.Style.Alpha ) ), g.Style.FrameRounding );
+	window->DrawList->AddRect( frame_bb.Min, frame_bb.Max, ImColor( 50, 50, 50, 100 ), g.Style.FrameRounding );
 
 	// Slider behavior
 	int percent              = 0;
@@ -3634,6 +3558,8 @@ bool ImGui::SliderScalar( const char* label, ImGuiDataType data_type, void* p_da
 	const bool value_changed = SliderBehavior( frame_bb, id, data_type, p_data, p_min, p_max, format, flags, &grab_bb, &percent );
 	if ( value_changed )
 		MarkItemEdited( id );
+
+	const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
 
 	static std::map< ImGuiID, float > old_value    = { };
 	static std::map< ImGuiID, float > active_value = { };
@@ -3665,7 +3591,7 @@ bool ImGui::SliderScalar( const char* label, ImGuiDataType data_type, void* p_da
 	// Render grab
 	if ( grab_bb.Max.x > grab_bb.Min.x )
 		window->DrawList->AddRectFilled( frame_bb.Min, ImVec2( frame_bb.Min.x + old_value_data->second, frame_bb.Max.y ),
-		                                 ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], g.Style.Alpha ),
+		                                 ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.z, 1.f ),
 		                                 old_value_data->second > 1.f ? g.Style.FrameRounding : 0.f );
 
 	char value_buf[ 64 ]      = { };
@@ -3678,8 +3604,8 @@ bool ImGui::SliderScalar( const char* label, ImGuiDataType data_type, void* p_da
 
 	const ImColor text_color = GetColorU32( ImGuiCol_Text );
 
-	PushStyleColor( ImGuiCol_Text, ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z,
-	                                       text_color.Value.w * text_animation.AnimationData->second * g.Style.Alpha ) );
+	PushStyleColor( ImGuiCol_Text,
+	                ImVec4( text_color.Value.x, text_color.Value.y, text_color.Value.z, text_color.Value.w * text_animation.AnimationData->second ) );
 	RenderText( ImVec2( frame_bb.Max.x - CalcTextSize( value_buf ).x + 1.f, total_bb.Min.y + style.FramePadding.y - 3 ), value_buf, value_buf_end );
 
 	if ( label_size.x > 0.0f )
@@ -5882,6 +5808,140 @@ bool ImGui::ColorEdit4( const char* label, float col[ 4 ], ImGuiColorEditFlags f
 	return value_changed;
 }
 
+#	include <array>
+
+enum e_color_type {
+	color_type_r = 0,
+	color_type_g = 1,
+	color_type_b = 2,
+	color_type_a = 3
+};
+
+class c_color
+{
+public:
+	c_color( ) = default;
+
+	constexpr c_color( std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a = 255 ) : m_colors( { r, g, b, a } ) { }
+
+	constexpr c_color( int r, int g, int b, int a = 255 )
+		: m_colors( { static_cast< std::uint8_t >( r ), static_cast< std::uint8_t >( g ), static_cast< std::uint8_t >( b ),
+	                  static_cast< std::uint8_t >( a ) } )
+	{
+	}
+
+	constexpr c_color( float r, float g, float b, float a = 1.0f )
+		: m_colors( { static_cast< std::uint8_t >( r * 255.f ), static_cast< std::uint8_t >( g * 255.f ), static_cast< std::uint8_t >( b * 255.f ),
+	                  static_cast< std::uint8_t >( a * 255.f ) } )
+	{
+	}
+
+	template< std::size_t N >
+	[[nodiscard]] std::uint8_t get( ) const
+	{
+		static_assert( N >= e_color_type::color_type_r && N <= e_color_type::color_type_a, "given index is out of range" );
+		return this->m_colors[ N ];
+	}
+
+	[[nodiscard]] ImU32 get_u32( const float alpha_multiplier = 1.0f ) const
+	{
+		return ImGui::GetColorU32( this->get_vec4( alpha_multiplier ) );
+	}
+
+	[[nodiscard]] ImVec4 get_vec4( const float alpha_multiplier = 1.0f ) const
+	{
+		return ImVec4( this->base< e_color_type::color_type_r >( ), this->base< e_color_type::color_type_g >( ),
+		               this->base< e_color_type::color_type_b >( ), this->base< e_color_type::color_type_a >( ) * alpha_multiplier );
+	}
+
+	static c_color from_hsb( float hue, float saturation, float brightness, float alpha = 1.0f )
+	{
+		const float h = std::fmodf( hue, 1.0f ) / ( 60.0f / 360.0f );
+		const int i   = static_cast< int >( h );
+		const float f = h - static_cast< float >( i );
+		const float p = brightness * ( 1.0f - saturation );
+		const float q = brightness * ( 1.0f - saturation * f );
+		const float t = brightness * ( 1.0f - saturation * ( 1.0f - f ) );
+
+		float r = 0.0f, g = 0.0f, b = 0.0f;
+
+		switch ( i ) {
+		case 0:
+			r = brightness, g = t, b = p;
+			break;
+		case 1:
+			r = q, g = brightness, b = p;
+			break;
+		case 2:
+			r = p, g = brightness, b = t;
+			break;
+		case 3:
+			r = p, g = q, b = brightness;
+			break;
+		case 4:
+			r = t, g = p, b = brightness;
+			break;
+		case 5:
+		default:
+			r = brightness, g = p, b = q;
+			break;
+		}
+
+		return c_color( r, g, b, alpha );
+	}
+
+	std::uint8_t& operator[]( const std::size_t i )
+	{
+		return this->m_colors[ i ];
+	}
+
+	const std::uint8_t& operator[]( const std::size_t i ) const
+	{
+		return this->m_colors[ i ];
+	}
+
+	bool operator==( const c_color& second_color ) const
+	{
+		return this->m_colors == second_color.m_colors;
+	}
+
+	bool operator!=( const c_color& second_color ) const
+	{
+		return !( operator==( second_color ) );
+	}
+
+	c_color& operator=( const c_color& new_color )
+	{
+		this->m_colors[ e_color_type::color_type_r ] = new_color.m_colors[ e_color_type::color_type_r ];
+		this->m_colors[ e_color_type::color_type_g ] = new_color.m_colors[ e_color_type::color_type_g ];
+		this->m_colors[ e_color_type::color_type_b ] = new_color.m_colors[ e_color_type::color_type_b ];
+		this->m_colors[ e_color_type::color_type_a ] = new_color.m_colors[ e_color_type::color_type_a ];
+		return *this;
+	}
+
+	template< std::size_t N >
+	[[nodiscard]] float base( ) const
+	{
+		static_assert( N >= e_color_type::color_type_r && N <= e_color_type::color_type_a, "given index is out of range" );
+		return this->m_colors[ N ] / 255.f;
+	}
+
+private:
+	std::array< std::uint8_t, 4U > m_colors = { };
+};
+
+bool ImGui::ColorEdit4( const char* label, c_color* color, ImGuiColorEditFlags flags )
+{
+	ImVec4 converted_color = color->get_vec4( );
+
+	if ( ColorEdit4( label, &converted_color.x, flags ) ) {
+		*color = c_color( converted_color.x, converted_color.y, converted_color.z, converted_color.w );
+		return true;
+	}
+
+	return false;
+}
+
 bool ImGui::ColorPicker3( const char* label, float col[ 3 ], ImGuiColorEditFlags flags )
 {
 	float col4[ 4 ] = { col[ 0 ], col[ 1 ], col[ 2 ], 1.0f };
@@ -6174,7 +6234,7 @@ bool ImGui::ColorPicker4( const char* label, float col[ 4 ], ImGuiColorEditFlags
 		draw_list->AddRectFilledMultiColor( ImVec2( bar0_pos_x, bar0_line_y + 10 ), ImVec2( bar0_pos_x + bars_width, bar0_line_y ),
 		                                    ImColor( 0.f, 0.f, 0.f, 0.f ), ImColor( 0.f, 0.f, 0.f, 0.f ), ImColor( 0.f, 0.f, 0.f, 0.6f ),
 		                                    ImColor( 0.f, 0.f, 0.f, 0.6f ) );
-		draw_list->AddLine( ImVec2( bar0_pos_x, bar0_line_y ), ImVec2( bar0_pos_x + bars_width, bar0_line_y ), ImColor( 1.f, 1.f, 1.f, 1.f ) );
+		draw_list->AddLine( ImVec2( bar0_pos_x, bar0_line_y ), ImVec2( bar0_pos_x + bars_width - 1.f, bar0_line_y ), ImColor( 1.f, 1.f, 1.f, 1.f ) );
 
 		// RenderArrowsForVerticalBar(draw_list, ImVec2(bar0_pos_x - 1, bar0_line_y), ImVec2(bars_triangles_half_sz + 1, bars_triangles_half_sz),
 		// bars_width + 2.0f, style.Alpha);
@@ -6221,7 +6281,7 @@ bool ImGui::ColorPicker4( const char* label, float col[ 4 ], ImGuiColorEditFlags
 		draw_list->AddRectFilledMultiColor( ImVec2( bar1_pos_x, bar1_line_y + 10 ), ImVec2( bar1_pos_x + bars_width, bar1_line_y ),
 		                                    ImColor( 0.f, 0.f, 0.f, 0.f ), ImColor( 0.f, 0.f, 0.f, 0.f ), ImColor( 0.f, 0.f, 0.f, 0.6f ),
 		                                    ImColor( 0.f, 0.f, 0.f, 0.6f ) );
-		draw_list->AddLine( ImVec2( bar1_pos_x, bar1_line_y ), ImVec2( bar1_pos_x + bars_width, bar1_line_y ), ImColor( 1.f, 1.f, 1.f, 1.f ) );
+		draw_list->AddLine( ImVec2( bar1_pos_x, bar1_line_y ), ImVec2( bar1_pos_x + bars_width - 1.f, bar1_line_y ), ImColor( 1.f, 1.f, 1.f, 1.f ) );
 
 		// RenderArrowsForVerticalBar(draw_list, ImVec2(bar1_pos_x - 1, bar1_line_y), ImVec2(bars_triangles_half_sz + 1, bars_triangles_half_sz),
 		// bars_width + 2.0f, style.Alpha);
@@ -7067,9 +7127,11 @@ bool ImGui::Selectable( const char* label, bool selected, ImGuiSelectableFlags f
 
 	const ImColor text_color = GetColorU32( ImGuiCol_Text );
 
+	const ImColor accent_color = ImGui::GetColorU32( ImGuiCol_::ImGuiCol_Accent );
+
 	const ImVec4 blended_color = ImColor::Blend(
 		ImColor( text_color.Value.x, text_color.Value.y, text_color.Value.z, text_color.Value.w * hovered_text_animation.AnimationData->second ),
-		ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ] ), selected_text_animation.AnimationData->second );
+		ImColor( accent_color.Value.x, accent_color.Value.y, accent_color.Value.z ), selected_text_animation.AnimationData->second );
 
 	PushStyleColor( ImGuiCol_Text, blended_color );
 
@@ -7116,13 +7178,18 @@ bool ImGui::BeginListBox( const char* label, const ImVec2& size_arg )
 	if ( window->SkipItems )
 		return false;
 
+	window->DC.CursorPos += ImVec2( 18.f, 0.f );
+
 	const ImGuiStyle& style = g.Style;
 	const ImGuiID id        = GetID( label );
 	const ImVec2 label_size = CalcTextSize( label, NULL, true );
 
 	// Size default to hold ~7.25 items.
 	// Fractional number of items helps seeing that we can scroll down/up without looking at scrollbar.
-	ImVec2 size       = ImFloor( CalcItemSize( size_arg, CalcItemWidth( ), GetTextLineHeightWithSpacing( ) * 7.25f + style.FramePadding.y * 2.0f ) );
+	ImVec2 size = ImFloor( CalcItemSize( size_arg, CalcItemWidth( ), GetTextLineHeightWithSpacing( ) * 7.25f + style.FramePadding.y * 2.0f ) );
+
+	size -= ImVec2( 27.f, 0.f );
+
 	ImVec2 frame_size = ImVec2( size.x, ImMax( size.y, label_size.y ) );
 	ImRect frame_bb( window->DC.CursorPos, window->DC.CursorPos + frame_size );
 	ImRect bb( frame_bb.Min, frame_bb.Max + ImVec2( label_size.x > 0.0f ? style.ItemInnerSpacing.x + label_size.x : 0.0f, 0.0f ) );
@@ -7222,6 +7289,17 @@ bool ImGui::ListBox( const char* label, int* current_item, bool ( *items_getter 
 		MarkItemEdited( g.LastItemData.ID );
 
 	return value_changed;
+}
+
+void ImGui::ListBox( const char* label, int* current_item, std::function< const char*( int ) > function, int items_count, int height_in_items )
+{
+	ListBox(
+		label, current_item,
+		[]( void* data, int index, const char** out_text ) {
+			*out_text = ( *static_cast< std::function< const char*( int ) >* >( data ) )( index );
+			return true;
+		},
+		&function, items_count, height_in_items );
 }
 
 //-------------------------------------------------------------------------

@@ -3,6 +3,8 @@
 
 #include "../enums/weapon_stat_trak_module_type.hpp"
 #include "../enums/weapon_strange_type.hpp"
+#include "../enums/weapon_type.hpp"
+
 #include "../macros.hpp"
 #include "c_base_combat_weapon.hpp"
 #include "c_econ_entity.hpp"
@@ -53,9 +55,9 @@ namespace sdk
 			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 330 ) )( this );
 		}
 
-		int get_weapon_id( )
+		tf_weapon_type get_weapon_id( )
 		{
-			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 381 ) )( this );
+			return reinterpret_cast< tf_weapon_type( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 381 ) )( this );
 		}
 
 		// char* get_name( )

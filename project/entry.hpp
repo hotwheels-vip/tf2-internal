@@ -1,6 +1,6 @@
 #pragma once
 
-#pragma comment( lib, "freetype" )
+// #pragma comment( lib, "freetype" )
 
 #include <iostream>
 #include <windows.h>

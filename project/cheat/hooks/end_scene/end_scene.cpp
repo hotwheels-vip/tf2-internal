@@ -26,7 +26,7 @@ LONG end_scene::detour( IDirect3DDevice9* device )
 
 	const auto increment_per_frame = 1.f / ( 0.2f / ImGui::GetIO( ).DeltaTime );
 	g_menu->alpha                  = std::clamp( g_menu->alpha + ( g_menu->open ? increment_per_frame : -increment_per_frame ), 0.f, 1.f );
-	const auto ease_animation      = QuadraticEaseInOut( g_menu->alpha );
+	const auto ease_animation      = g_menu->alpha;
 
 	ImGui::PushStyleVar( ImGuiStyleVar_Alpha, ease_animation );
 
