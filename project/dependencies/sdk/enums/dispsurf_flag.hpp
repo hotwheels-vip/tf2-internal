@@ -1,6 +1,5 @@
+#pragma once
 
-#ifndef WEDNESDAY_WTF_DISPSURF_FLAG_HPP
-#define WEDNESDAY_WTF_DISPSURF_FLAG_HPP
 namespace sdk
 {
 
@@ -13,4 +12,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-#endif // WEDNESDAY_WTF_DISPSURF_FLAG_HPP

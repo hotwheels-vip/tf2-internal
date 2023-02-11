@@ -37,7 +37,7 @@ namespace sdk
 
 		c_tf_weapon_info& get_weapon_info( )
 		{
-			auto get_tf_weapon_data_address = g_signatures[ HASH( "0F B7 81 ? ? ? ? 50 E8 ? ? ? ? 83 C4 ? C3" ) ];
+			auto get_tf_weapon_data_address = g_database[ HASH( "0F B7 81 ? ? ? ? 50 E8 ? ? ? ? 83 C4 ? C3" ) ];
 			using get_tf_weapon_data_type   = c_tf_weapon_info&( __thiscall* )( void* );
 
 			return get_tf_weapon_data_address.as< get_tf_weapon_data_type >( )( this );
@@ -50,18 +50,18 @@ namespace sdk
 
 		int get_slot( )
 		{
-			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 329 ) )( this );
+			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 330 ) )( this );
 		}
 
 		int get_weapon_id( )
 		{
-			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 379 ) )( this );
+			return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 381 ) )( this );
 		}
 
-		//char* get_name( )
+		// char* get_name( )
 		//{
 		//	return reinterpret_cast< char*( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 331 ) )( this );
-		//}
+		// }
 
 		bool can_attack_primary( sdk::c_tf_player* owner );
 		bool can_attack_secondary( sdk::c_tf_player* owner );

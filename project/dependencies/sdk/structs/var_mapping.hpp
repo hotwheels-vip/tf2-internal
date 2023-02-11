@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_VAR_MAPPING_HPP
-#define WEDNESDAY_WTF_VAR_MAPPING_HPP
+#pragma once
 
 #include "var_map_entry.hpp"
 
@@ -13,5 +12,3 @@ namespace sdk
 		float last_interpolation_time;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_VAR_MAPPING_HPP

@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_INCLUDE_HPP
-#define WEDNESDAY_WTF_INCLUDE_HPP
+#pragma once
 
 #include "helpers/math.hpp"
 
@@ -33,11 +32,11 @@
 #include "structs/c_tf_player.hpp"
 #include "structs/c_tf_sniper_rifle.hpp"
 #include "structs/c_user_cmd.hpp"
+#include "structs/client_class.hpp"
+#include "structs/dt_recv.hpp"
 #include "structs/i_collideable.hpp"
 #include "structs/key_values.hpp"
 #include "structs/player_info.hpp"
-#include "structs/dt_recv.hpp"
-#include "structs/client_class.hpp"
 
 #include "structs/box.hpp"
 #include "structs/color.hpp"
@@ -45,10 +44,9 @@
 #include "structs/qangle.hpp"
 #include "structs/vector.hpp"
 
+#include "enums/client_frame_stage.hpp"
 #include "enums/flags.hpp"
 #include "enums/hitboxes.hpp"
 #include "enums/tf_cond.hpp"
-#include "enums/client_frame_stage.hpp"
 #include "enums/trace_defs.hpp"
-
-#endif // WEDNESDAY_WTF_INCLUDE_HPP
+#include "enums/weapon_type.hpp"

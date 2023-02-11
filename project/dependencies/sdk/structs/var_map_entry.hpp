@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_VAR_MAP_ENTRY_HPP
-#define WEDNESDAY_WTF_VAR_MAP_ENTRY_HPP
+#pragma once
 
 namespace sdk
 {
@@ -13,5 +12,3 @@ namespace sdk
 		void* watcher;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_VAR_MAP_ENTRY_HPP

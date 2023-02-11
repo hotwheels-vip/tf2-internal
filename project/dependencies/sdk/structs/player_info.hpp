@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_PLAYER_INFO_HPP
-#define WEDNESDAY_WTF_PLAYER_INFO_HPP
+#pragma once
 
 #include <iostream>
 #include <sdk/crc32.hpp>
@@ -20,5 +19,3 @@ namespace sdk
 		unsigned char filesDownloaded;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_PLAYER_INFO_HPP

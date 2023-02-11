@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_CLIENT_THINKABLE_HPP
-#define WEDNESDAY_WTF_I_CLIENT_THINKABLE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -23,5 +22,3 @@ namespace sdk
 		virtual void release( ) = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CLIENT_THINKABLE_HPP

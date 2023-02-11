@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_CLIENT_ENTITY_LIST_HPP
-#define WEDNESDAY_WTF_I_CLIENT_ENTITY_LIST_HPP
+#pragma once
 
 #include "../structs/c_base_handle.hpp"
 
@@ -45,5 +44,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CLIENT_ENTITY_LIST_HPP

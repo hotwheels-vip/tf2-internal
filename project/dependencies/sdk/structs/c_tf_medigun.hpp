@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_TF_MEDIGUN_HPP
-#define WEDNESDAY_WTF_C_TF_MEDIGUN_HPP
+#pragma once
 
 #include "c_tf_weapon_base.hpp"
 
@@ -17,5 +16,3 @@ namespace sdk
 		NETVAR( charge_level, float, "CWeaponMedigun", "m_flChargeLevel" );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_TF_MEDIGUN_HPP

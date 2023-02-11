@@ -1,5 +1,5 @@
-#ifndef WEDNESDAY_WTF_STUDIO_HDR_HPP
-#define WEDNESDAY_WTF_STUDIO_HDR_HPP
+#pragma once
+
 #include "mstudio.hpp"
 
 namespace sdk
@@ -60,4 +60,3 @@ namespace sdk
 
 	}; // size=0x00d4
 } // namespace sdk
-#endif // WEDNESDAY_WTF_STUDIO_HDR_HPP

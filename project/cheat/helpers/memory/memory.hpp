@@ -12,7 +12,6 @@ class memory
 {
 public:
 	struct address {
-	public:
 		std::uintptr_t address_{ };
 
 		address( ) = default;
@@ -32,7 +31,7 @@ public:
 		template< typename T = address >
 		T to( )
 		{
-			return *( T* )( address_ );
+			return *reinterpret_cast< T* >( address_ );
 		}
 
 		template< typename T = address >
@@ -44,7 +43,7 @@ public:
 		template< typename T = address >
 		T at( std::ptrdiff_t offset )
 		{
-			return *( T* )( address_ + offset );
+			return *reinterpret_cast< T* >( address_ + offset );
 		}
 
 		template< typename T = address >
@@ -63,7 +62,7 @@ public:
 		T get( std::size_t dereference = 1 )
 		{
 			for ( std::size_t i = 0; i < dereference; i++ )
-				address_ = *( std::uintptr_t* )( address_ );
+				address_ = *reinterpret_cast< std::uintptr_t* >( address_ );
 
 			return ( T )( address_ );
 		}
@@ -71,16 +70,16 @@ public:
 		template< typename T = address >
 		void set( T& value )
 		{
-			*( T* )( address_ ) = value;
+			*reinterpret_cast< T* >( address_ ) = value;
 		}
 
 		template< typename T = address >
 		T relative( std::ptrdiff_t offset )
 		{
-			std::uintptr_t address_      = address_ + offset;
-			std::int32_t relative_offset = *( std::int32_t* )( address_ );
+			std::uintptr_t address       = address_ + offset;
+			std::int32_t relative_offset = *reinterpret_cast< std::int32_t* >( address );
 
-			return ( T )( address_ + relative_offset + sizeof( std::int32_t ) );
+			return reinterpret_cast< T >( address + relative_offset + sizeof( std::int32_t ) );
 		}
 	};
 
@@ -95,7 +94,6 @@ class modules
 {
 public:
 	struct module {
-	public:
 		std::string module_name{ };
 		HMODULE module_{ };
 
@@ -106,18 +104,18 @@ public:
 			}
 		}
 
-		memory::address Scan( std::string_view pattern )
+		memory::address scan( std::string_view pattern )
 		{
-			std::uint8_t* module_address = ( std::uint8_t* )module_;
-			PIMAGE_DOS_HEADER dos_header = ( PIMAGE_DOS_HEADER )module_address;
-			PIMAGE_NT_HEADERS nt_headers = ( PIMAGE_NT_HEADERS )( module_address + dos_header->e_lfanew );
+			std::uint8_t* module_address = reinterpret_cast< std::uint8_t* >( module_ );
+			PIMAGE_DOS_HEADER dos_header = reinterpret_cast< PIMAGE_DOS_HEADER >( module_address );
+			PIMAGE_NT_HEADERS nt_headers = reinterpret_cast< PIMAGE_NT_HEADERS >( module_address + dos_header->e_lfanew );
 
 			return g_memory->find_pattern( module_address, nt_headers->OptionalHeader.SizeOfImage, pattern.data( ) );
 		}
 	};
 
-	void run( );
-	void end( );
+	bool run( );
+	bool end( );
 };
 
 inline modules* g_modules = new modules( );
@@ -130,7 +128,7 @@ class virtuals
 {
 public:
 	std::uintptr_t* get_virtual_table( void* address_ );
-	std::uintptr_t* get_virtual_function( void* address_, std::size_t iIndex );
+	std::uintptr_t* get_virtual_function( void* address_, std::size_t index );
 };
 
 inline virtuals* g_virtuals = new virtuals( );
@@ -138,21 +136,25 @@ inline virtuals* g_virtuals = new virtuals( );
 class signatures
 {
 public:
+	bool run( );
+	bool end( );
+};
+
+class database
+{
+public:
 	struct signature {
-	public:
 		const char* pattern{ };
 		modules::module* module{ };
 	};
 
-	std::unordered_map< std::uint32_t, memory::address > database{ };
+	std::unordered_map< std::uint32_t, memory::address > database_{ };
 
 	memory::address operator[]( std::uint32_t pattern )
 	{
-		return database[ pattern ];
+		return database_[ pattern ];
 	}
-
-	void run( );
-	void end( );
 };
 
-inline signatures g_signatures{ };
+inline database g_database{ };
+inline signatures* g_signatures = new signatures{ };

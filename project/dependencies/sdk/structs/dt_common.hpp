@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_DT_COMMON_HPP
-#define WEDNESDAY_WTF_DT_COMMON_HPP
+#pragma once
 
 #include <stdio.h>
 
@@ -100,7 +99,7 @@ namespace sdk
 	class send_prop;
 
 	// the day we do this, we break all mods until they recompile.
-	//#define supports_int64
+	// #define supports_int64
 
 	typedef enum {
 		dpt_int = 0,
@@ -188,5 +187,3 @@ namespace sdk
 		return n_bits;
 	}
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_DT_COMMON_HPP

@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_COLLIDEABLE_HPP
-#define WEDNESDAY_WTF_I_COLLIDEABLE_HPP
+#pragma once
 
 #include "matrix.hpp"
 #include "vector.hpp"
@@ -70,5 +69,3 @@ namespace sdk
 		virtual i_physics_object* get_v_physics_object( ) const                    = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_COLLIDEABLE_HPP

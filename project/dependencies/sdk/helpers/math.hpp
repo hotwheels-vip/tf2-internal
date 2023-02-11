@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_MATH_HPP
-#define WEDNESDAY_WTF_MATH_HPP
+#pragma once
 
 #include <cmath>
 #include <directxmath.h>
@@ -7,6 +6,7 @@
 #include "../../sdk/structs/matrix.hpp"
 #include "../../sdk/structs/qangle.hpp"
 #include "../../sdk/structs/vector.hpp"
+#include <imgui/imgui.h>
 
 #define PI           3.14159265358979323846f
 #define RADPI        57.295779513082f
@@ -30,6 +30,6 @@ namespace math
 	sdk::vector solve_quadratic( sdk::vector a, sdk::vector v, sdk::vector p, sdk::vector p0 );
 
 	float remap_val_clamped( float val, float a, float b, float c, float d );
-} // namespace math
 
-#endif // WEDNESDAY_WTF_MATH_HPP
+	std::pair< ImVec2, bool > world_to_screen( sdk::vector position );
+} // namespace math

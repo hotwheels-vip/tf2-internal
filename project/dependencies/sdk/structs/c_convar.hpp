@@ -1,7 +1,8 @@
-#ifndef WEDNESDAY_WTF_C_CONVAR_HPP
-#define WEDNESDAY_WTF_C_CONVAR_HPP
+#pragma once
+
 #include "../enums/cvar_flags.hpp"
 #include "c_con_command_base.hpp"
+
 namespace sdk
 {
 	struct c_con_var {
@@ -76,5 +77,3 @@ namespace sdk
 		return ( parent->string_ ) ? parent->string_ : "";
 	}
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_CONVAR_HPP

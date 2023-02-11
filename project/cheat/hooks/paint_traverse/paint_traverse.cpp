@@ -14,8 +14,10 @@ void paint_traverse::detour( void* ecx, void* edx, unsigned int panel, bool forc
 		}
 	}
 
+	g_paint_traverse->matrix = g_interfaces->engine_client->world_to_screen_matrix( );
+
 	if ( overlay_panel == panel ) {
-		g_interfaces->panel->set_mouse_input_enabled( panel, g_menu->open && ( *menu_disabled_inputs & 1 << 0 ) );
-		g_interfaces->panel->set_key_board_input_enabled( panel, g_menu->open && ( *menu_disabled_inputs & 1 << 1 ) );
+		g_interfaces->panel->set_mouse_input_enabled( panel, g_menu->open && *menu_disabled_inputs & 1 << 0 );
+		g_interfaces->panel->set_key_board_input_enabled( panel, g_menu->open && *menu_disabled_inputs & 1 << 1 );
 	}
 }

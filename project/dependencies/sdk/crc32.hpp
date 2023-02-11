@@ -1,9 +1,4 @@
-//
-// Created by liga on 11/13/2022.
-//
-
-#ifndef HOTWHEELS_TF2_INTERNAL_CRC32_HPP
-#define HOTWHEELS_TF2_INTERNAL_CRC32_HPP
+#pragma once
 
 typedef unsigned int CRC32_t;
 
@@ -22,5 +17,3 @@ inline CRC32_t CRC32_ProcessSingleBuffer( const void* p, int len )
 
 	return crc;
 }
-
-#endif // HOTWHEELS_TF2_INTERNAL_CRC32_HPP

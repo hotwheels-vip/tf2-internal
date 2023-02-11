@@ -2,7 +2,12 @@
 
 int sdk::c_base_entity::max_health( )
 {
-	return reinterpret_cast< int( __thiscall* )( void* ) >( g_virtuals->get_virtual_function( this, 107 ) )( this );
+	auto addr = g_virtuals->get_virtual_function( this, 107 );
+
+	if ( !addr || reinterpret_cast< int >( addr ) == 0xFFFFFFFF )
+		return 0;
+
+	return reinterpret_cast< int( __thiscall* )( void* ) >( addr )( this );
 }
 
 sdk::matrix_3x4& sdk::c_base_entity::rgfl_coordinate_frame( )
@@ -12,7 +17,7 @@ sdk::matrix_3x4& sdk::c_base_entity::rgfl_coordinate_frame( )
 
 void sdk::c_base_entity::set_abs_origin( sdk::vector& position )
 {
-	static auto set_abs_origin_address = g_signatures[ HASH( "55 8B EC 56 57 8B F1 E8 ? ? ? ? 8B 7D 08 F3" ) ].as< std::uintptr_t >( );
+	static auto set_abs_origin_address = g_database[ HASH( "55 8B EC 56 57 8B F1 E8 ? ? ? ? 8B 7D 08 F3" ) ].as< std::uintptr_t >( );
 	using set_abs_origin_type          = void( __thiscall* )( void*, const sdk::vector& );
 
 	return reinterpret_cast< set_abs_origin_type >( set_abs_origin_address )( this, position );
@@ -20,7 +25,7 @@ void sdk::c_base_entity::set_abs_origin( sdk::vector& position )
 
 void sdk::c_base_entity::invalidate_bone_cache( )
 {
-	static auto invalidate_bone_cache_address = g_signatures[ HASH( "A1 ? ? ? ? 48 C7 81" ) ].as< std::uintptr_t >( );
+	static auto invalidate_bone_cache_address = g_database[ HASH( "A1 ? ? ? ? 48 C7 81" ) ].as< std::uintptr_t >( );
 	using invalidate_bone_cache_type          = void( __thiscall* )( void* );
 
 	return reinterpret_cast< invalidate_bone_cache_type >( invalidate_bone_cache_address )( this );

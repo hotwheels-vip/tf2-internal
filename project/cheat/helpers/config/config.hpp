@@ -5,6 +5,7 @@
 #include <imgui/imgui.h>
 #include <iostream>
 #include <json/json.hpp>
+#include <spdlog/spdlog.h>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -71,20 +72,27 @@ public:
 		}
 	};
 
-	std::unordered_map< std::int32_t, option > settings{ };
+	std::unordered_map< std::string, option > settings{ };
 
-	void run( );
-	void end( );
+	bool run( );
+	bool end( );
 
 	void save( std::string name );
 	void load( std::string name );
 
-	void insert( std::int32_t hash, option value );
+	void insert( std::string name, option value );
 
 	template< typename T >
-	T* find( std::uint32_t hash )
+	T* find( std::string name )
 	{
-		auto it = settings.find( hash );
+		using namespace spdlog;
+
+		auto it = settings.find( name );
+
+		if ( it == settings.end( ) ) {
+			critical( "failed to find config value {}", name );
+			return { };
+		}
 
 		switch ( it->second.type ) {
 		case variable::VARIABLE_BOOL:
@@ -107,4 +115,4 @@ public:
 
 inline config* g_config = new config( );
 
-#define CONFIG( name, type ) static type* name = g_config->find< type >( HASH( #name ) )
+#define CONFIG( name, type ) static type* name = g_config->find< type >( #name )

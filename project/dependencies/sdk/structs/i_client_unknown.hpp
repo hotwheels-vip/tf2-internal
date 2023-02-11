@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_CLIENT_UNKNOWN_HPP
-#define WEDNESDAY_WTF_I_CLIENT_UNKNOWN_HPP
+#pragma once
 
 #include "i_handle_entity.hpp"
 
@@ -22,5 +21,3 @@ namespace sdk
 		virtual i_client_thinkable* get_client_thinkable( )     = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CLIENT_UNKNOWN_HPP

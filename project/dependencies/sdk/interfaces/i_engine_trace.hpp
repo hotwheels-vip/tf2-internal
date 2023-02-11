@@ -1,11 +1,11 @@
-#ifndef WEDNESDAY_WTF_I_ENGINE_TRACE_HPP
-#define WEDNESDAY_WTF_I_ENGINE_TRACE_HPP
+#pragma once
+
 #include "../enums/dispsurf_flag.hpp"
 #include "../enums/trace_type.hpp"
 #include "../structs/c_base_player.hpp"
+#include "../structs/client_class.hpp"
 #include "../structs/qangle.hpp"
 #include "../structs/vector_aligned.hpp"
-#include "../structs/client_class.hpp"
 
 // @blanket: my cmake is so fucked, im not making new files for each of these!! it'd take years.
 namespace sdk
@@ -137,10 +137,10 @@ namespace sdk
 			auto entity = reinterpret_cast< c_base_entity* >( server_entity );
 
 			switch ( entity->get_client_class( )->class_id ) {
-			case e_class_ids::c_func_area_portal_window:
-			case e_class_ids::c_func_respawn_room_visualizer:
-			case e_class_ids::c_sniper_dot:
-			case e_class_ids::ctf_knife:
+			case class_ids::c_func_area_portal_window:
+			case class_ids::c_func_respawn_room_visualizer:
+			case class_ids::c_sniper_dot:
+			case class_ids::ctf_knife:
 				return false;
 			}
 
@@ -232,7 +232,7 @@ namespace sdk
 		virtual i_collideable* get_collideable( i_handle_entity* p_entity )                                                                = 0;
 		virtual int get_stat_by_index( int index, bool b_clear )                                                                           = 0;
 		virtual void get_brushes_in_aabb( const vector& v_mins, const vector& v_maxs, void* /*c_utl_vector<int>**/ p_output,
-		                                  int i_contents_mask = 0xffffffff )                                                               = 0;
+		                                  int i_contents_mask = 0xFFFFFFFF )                                                               = 0;
 		virtual /*c_phys_collide*/ void* get_collidable_from_displacements_in_aabb( const vector& mins, const vector& maxs )               = 0;
 		virtual bool get_brush_info( int i_brush, void* /*c_utl_vector<vector4d>**/ p_planes_out, int* p_contents_out )                    = 0;
 		virtual bool point_outside_world( const vector& pt_test )                                                                          = 0;
@@ -240,4 +240,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-#endif // WEDNESDAY_WTF_I_ENGINE_TRACE_HPP

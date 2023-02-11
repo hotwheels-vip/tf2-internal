@@ -1,9 +1,4 @@
-//
-// Created by Liga on 2/25/2022.
-//
-
-#ifndef WEDNESDAY_WTF_C_BASE_ENTITY_HPP
-#define WEDNESDAY_WTF_C_BASE_ENTITY_HPP
+#pragma once
 
 #include "../macros.hpp"
 
@@ -86,7 +81,7 @@ namespace sdk
 
 		bool is_player( )
 		{
-			static auto is_player_address = g_signatures[ HASH( "55 8B EC 56 8B 75 ? 85 F6 74 ? 8B 16 8B CE" ) ].as< std::uintptr_t >( );
+			static auto is_player_address = g_database[ HASH( "55 8B EC 56 8B 75 ? 85 F6 74 ? 8B 16 8B CE" ) ].as< std::uintptr_t >( );
 			using is_player_type          = void*( __cdecl* )( void* );
 
 			return reinterpret_cast< is_player_type >( is_player_address )( this );
@@ -131,7 +126,7 @@ namespace sdk
 		{
 			sdk::vector buffer;
 
-			static auto estimate_abs_velocity_address = g_signatures[ HASH( "55 8B EC 83 EC ? 56 8B F1 E8 ? ? ? ? 3B F0" ) ].as< std::uintptr_t >( );
+			static auto estimate_abs_velocity_address = g_database[ HASH( "55 8B EC 83 EC ? 56 8B F1 E8 ? ? ? ? 3B F0" ) ].as< std::uintptr_t >( );
 			using estimate_abs_velocity_type          = void( __thiscall* )( void*, sdk::vector* );
 
 			reinterpret_cast< estimate_abs_velocity_type >( estimate_abs_velocity_address )( this, &buffer );
@@ -140,5 +135,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_BASE_ENTITY_HPP

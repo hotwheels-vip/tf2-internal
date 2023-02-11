@@ -1,19 +1,23 @@
 #include "hooks.hpp"
 
 #include "cl_move/cl_move.hpp"
+#include "cl_send_move/cl_send_move.hpp"
 #include "create_move/create_move.hpp"
+#include "draw_model_execute/draw_model_execute.hpp"
 #include "end_scene/end_scene.hpp"
 #include "frame_stage_notify/frame_stage_notify.hpp"
 #include "get_time/get_time.hpp"
 #include "is_playing_back/is_playing_back.hpp"
 #include "item_post_frame/item_post_frame.hpp"
+#include "packet_start/packet_start.hpp"
 #include "paint_traverse/paint_traverse.hpp"
 #include "process_tick/process_tick.hpp"
 #include "run_command/run_command.hpp"
+#include "scene_end/scene_end.hpp"
 #include "send_net_msg/send_net_msg.hpp"
 #include "wndproc/wndproc.hpp"
 
-void hooks::run( )
+bool hooks::run( )
 {
 	MH_Initialize( );
 
@@ -29,11 +33,18 @@ void hooks::run( )
 	g_send_net_msg->run( );
 	g_item_post_frame->run( );
 	g_get_time->run( );
+	g_packet_start->run( );
+	g_cl_send_move->run( );
+	g_scene_end->run( );
+	g_draw_model_execute->run( );
 
+	// ReSharper disable once CppZeroConstantCanBeReplacedWithNullptr
 	MH_EnableHook( MH_ALL_HOOKS );
+
+	return true;
 }
 
-void hooks::end( )
+bool hooks::end( )
 {
 	g_wndproc->end( );
 	g_end_scene->end( );
@@ -47,6 +58,12 @@ void hooks::end( )
 	g_send_net_msg->end( );
 	g_item_post_frame->end( );
 	g_get_time->end( );
+	g_packet_start->end( );
+	g_cl_send_move->end( );
+	g_scene_end->end( );
+	g_draw_model_execute->end( );
 
 	MH_Uninitialize( );
+
+	return true;
 }

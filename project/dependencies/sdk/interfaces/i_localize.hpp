@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_LOCALIZE_HPP
-#define WEDNESDAY_WTF_I_LOCALIZE_HPP
+#pragma once
 
 #include "../structs/key_values.hpp"
 
@@ -61,5 +60,3 @@ namespace sdk
 		                               key_values* localization_variables ) = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_LOCALIZE_HPP

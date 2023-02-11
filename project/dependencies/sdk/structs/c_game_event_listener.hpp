@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_GAME_EVENT_LISTENER_HPP
-#define WEDNESDAY_WTF_C_GAME_EVENT_LISTENER_HPP
+#pragma once
 
 #include "i_game_event.hpp"
 
@@ -15,5 +14,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_GAME_EVENT_LISTENER_HPP

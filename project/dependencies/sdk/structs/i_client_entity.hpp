@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_CLIENT_ENTITY_HPP
-#define WEDNESDAY_WTF_I_CLIENT_ENTITY_HPP
+#pragma once
 
 #include "i_client_networkable.hpp"
 #include "i_client_renderable.hpp"
@@ -28,5 +27,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CLIENT_ENTITY_HPP

@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_BASE_COMBAT_CHARACTER_HPP
-#define WEDNESDAY_WTF_C_BASE_COMBAT_CHARACTER_HPP
+#pragma once
 
 #include "c_base_flex.hpp"
 
@@ -14,5 +13,3 @@ namespace sdk
 		NETVAR( old_glow_enabled, bool, "CBaseCombatCharacter", "m_bOldGlowEnabled" );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_BASE_COMBAT_CHARACTER_HPP

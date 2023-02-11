@@ -39,11 +39,10 @@ public:
 	sdk::i_localize* localize{ };
 	sdk::i_base_client_state* client_state{ };
 
-	void run( );
-	void end( );
-
-	void* get_interface( const char* module, std::uint32_t hash );
-	std::uintptr_t jump_address( std::uintptr_t address );
+	bool run( );
+	bool end( );
+	static void* get_interface( const char* module, std::uint32_t hash );
+	static std::uintptr_t jump_address( std::uintptr_t address );
 };
 
 inline interfaces* g_interfaces = new interfaces( );

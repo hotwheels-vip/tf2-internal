@@ -13,23 +13,23 @@ void config::save( std::string name )
 	for ( auto& setting : settings ) {
 		switch ( setting.second.type ) {
 		case variable::VARIABLE_BOOL:
-			reader[ std::to_string( setting.first ) ] = setting.second.bool_value;
+			reader[ setting.first ] = setting.second.bool_value;
 			break;
 		case variable::VARIABLE_INT:
-			reader[ std::to_string( setting.first ) ] = setting.second.int_value;
+			reader[ setting.first ] = setting.second.int_value;
 			break;
 		case variable::VARIABLE_FLOAT:
-			reader[ std::to_string( setting.first ) ] = setting.second.float_value;
+			reader[ setting.first ] = setting.second.float_value;
 			break;
 		case variable::VARIABLE_STRING:
-			reader[ std::to_string( setting.first ) ] = setting.second.string_value;
+			reader[ setting.first ] = setting.second.string_value;
 			break;
 		case variable::VARIABLE_COLOR:
-			reader[ std::to_string( setting.first ) ] = { setting.second.color_value.x, setting.second.color_value.y, setting.second.color_value.z,
-				                                          setting.second.color_value.w };
+			reader[ setting.first ] = { setting.second.color_value.x, setting.second.color_value.y, setting.second.color_value.z,
+				                        setting.second.color_value.w };
 			break;
 		case variable::VARIABLE_VECTOR:
-			reader[ std::to_string( setting.first ) ] = { setting.second.vector_value.x, setting.second.vector_value.y };
+			reader[ setting.first ] = { setting.second.vector_value.x, setting.second.vector_value.y };
 			break;
 		}
 	}
@@ -59,33 +59,31 @@ void config::load( std::string name )
 		reader >> j;
 
 		for ( auto& setting : settings ) {
-			if ( !j.contains( std::to_string( setting.first ) ) ) {
-				error( "failed to load config, missing key {}", std::to_string( setting.first ) );
+			if ( !j.contains( setting.first ) ) {
+				error( "failed to load config, missing key {}", setting.first );
 
 				continue;
 			}
 
 			switch ( setting.second.type ) {
 			case variable::VARIABLE_BOOL:
-				setting.second.bool_value = j[ std::to_string( setting.first ) ].get< bool >( );
+				setting.second.bool_value = j[ setting.first ].get< bool >( );
 				break;
 			case variable::VARIABLE_INT:
-				setting.second.int_value = j[ std::to_string( setting.first ) ].get< int >( );
+				setting.second.int_value = j[ setting.first ].get< int >( );
 				break;
 			case variable::VARIABLE_FLOAT:
-				setting.second.float_value = j[ std::to_string( setting.first ) ].get< float >( );
+				setting.second.float_value = j[ setting.first ].get< float >( );
 				break;
 			case variable::VARIABLE_STRING:
-				setting.second.string_value = j[ std::to_string( setting.first ) ].get< std::string >( );
+				setting.second.string_value = j[ setting.first ].get< std::string >( );
 				break;
 			case variable::VARIABLE_COLOR:
-				setting.second.color_value =
-					ImVec4( j[ std::to_string( setting.first ) ][ 0 ].get< float >( ), j[ std::to_string( setting.first ) ][ 1 ].get< float >( ),
-				            j[ std::to_string( setting.first ) ][ 2 ].get< float >( ), j[ std::to_string( setting.first ) ][ 3 ].get< float >( ) );
+				setting.second.color_value = ImVec4( j[ setting.first ][ 0 ].get< float >( ), j[ setting.first ][ 1 ].get< float >( ),
+				                                     j[ setting.first ][ 2 ].get< float >( ), j[ setting.first ][ 3 ].get< float >( ) );
 				break;
 			case variable::VARIABLE_VECTOR:
-				setting.second.vector_value =
-					ImVec2( j[ std::to_string( setting.first ) ][ 0 ].get< float >( ), j[ std::to_string( setting.first ) ][ 1 ].get< float >( ) );
+				setting.second.vector_value = ImVec2( j[ setting.first ][ 0 ].get< float >( ), j[ setting.first ][ 1 ].get< float >( ) );
 				break;
 			}
 		}
@@ -98,30 +96,55 @@ void config::load( std::string name )
 	info( "loaded config {}", file_name );
 }
 
-void config::insert( std::int32_t hash, config::option value )
+void config::insert( std::string name, config::option value )
 {
-	settings.insert( std::make_pair( hash, value ) );
+	settings.insert( std::make_pair( name, value ) );
 }
 
-void config::run( )
+bool config::run( )
 {
-	insert( HASH( "aimbot_mouse_enabled" ), false );
-	insert( HASH( "aimbot_mouse_fov" ), 0.f );
-	insert( HASH( "aimbot_mouse_smoothing" ), 1.f );
-	insert( HASH( "aimbot_mouse_hitboxes" ), 0 );
-	insert( HASH( "aimbot_mouse_curve_a" ), ImVec2{ 0.f, 0.f } );
-	insert( HASH( "aimbot_mouse_curve_b" ), ImVec2{ 1.f, 1.f } );
+	insert( "aimbot_mouse_enabled", false );
+	insert( "aimbot_mouse_fov", 0.f );
+	insert( "aimbot_mouse_smoothing", 1.f );
+	insert( "aimbot_mouse_hitboxes", 0b0 );
+	insert( "aimbot_mouse_curve_a", ImVec2{ 0.f, 0.f } );
+	insert( "aimbot_mouse_curve_b", ImVec2{ 1.f, 1.f } );
+	insert( "aimbot_silent_enabled", false );
+	insert( "aimbot_silent_fov", 0.f );
+	insert( "aimbot_silent_hitboxes", 0b0 );
+	insert( "aimbot_projectile_enabled", false );
+	insert( "aimbot_projectile_invisible", false );
+	insert( "aimbot_projectile_feet", false );
+	insert( "aimbot_projectile_steps", 2 );
+	insert( "aimbot_lagcomp_enabled", false );
+	insert( "aimbot_lagcomp_time", 200 );
 
-	insert( HASH( "aimbot_silent_enabled" ), false );
-	insert( HASH( "aimbot_silent_fov" ), 0.f );
-	insert( HASH( "aimbot_silent_hitboxes" ), 0 );
+	insert( "visuals_player_enabled", false );
+	insert( "visuals_player_teams", 0b0 );
+	insert( "visuals_player_box", false );
+	insert( "visuals_player_box_color", ImVec4{ 1.f, 1.f, 1.f, 1.f } );
+	insert( "visuals_player_box_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+	insert( "visuals_player_name", false );
+	insert( "visuals_player_name_color", ImVec4{ 1.f, 1.f, 1.f, 1.f } );
+	insert( "visuals_player_name_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+	insert( "visuals_player_health_bar", false );
+	insert( "visuals_player_health_bar_color", ImVec4{ 0.f, 1.f, 0.f, 1.f } );
+	insert( "visuals_player_health_bar_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+	insert( "visuals_player_health_bar_thickness", 2 );
+	insert( "visuals_player_health_text", false );
+	insert( "visuals_player_health_text_color", ImVec4{ 0.f, 1.f, 0.f, 1.f } );
+	insert( "visuals_player_health_text_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
+	insert( "visuals_player_health_text_minimum", -10 );
+	insert( "visuals_player_class", false );
+	insert( "visuals_player_class_color", ImVec4{ 1.f, 1.f, 1.f, 1.f } );
+	insert( "visuals_player_class_outline_color", ImVec4{ 0.f, 0.f, 0.f, 0.5f } );
 
-	insert( HASH( "aimbot_projectile_enabled" ), false );
-	insert( HASH( "aimbot_projectile_invisible" ), false );
-	insert( HASH( "aimbot_projectile_feet" ), false );
-	insert( HASH( "aimbot_projectile_steps" ), 2 );
+	insert( "menu_disabled_inputs", 0b11 );
 
-	insert( HASH( "menu_disabled_inputs" ), 3 ); // 0b11
+	return true;
 }
 
-void config::end( ) { }
+bool config::end( )
+{
+	return true;
+}

@@ -8,15 +8,35 @@ void menu::run( )
 	CONFIG( aimbot_mouse_hitboxes, int );
 	CONFIG( aimbot_mouse_curve_a, ImVec2 );
 	CONFIG( aimbot_mouse_curve_b, ImVec2 );
-
 	CONFIG( aimbot_silent_enabled, bool );
 	CONFIG( aimbot_silent_fov, float );
 	CONFIG( aimbot_silent_hitboxes, int );
-
 	CONFIG( aimbot_projectile_enabled, bool );
 	CONFIG( aimbot_projectile_invisible, bool );
 	CONFIG( aimbot_projectile_feet, bool );
 	CONFIG( aimbot_projectile_steps, int );
+	CONFIG( aimbot_lagcomp_enabled, bool );
+	CONFIG( aimbot_lagcomp_time, int );
+
+	CONFIG( visuals_player_enabled, bool );
+	CONFIG( visuals_player_teams, int );
+	CONFIG( visuals_player_box, bool );
+	CONFIG( visuals_player_box_color, ImVec4 );
+	CONFIG( visuals_player_box_outline_color, ImVec4 );
+	CONFIG( visuals_player_name, bool );
+	CONFIG( visuals_player_name_color, ImVec4 );
+	CONFIG( visuals_player_name_outline_color, ImVec4 );
+	CONFIG( visuals_player_health_bar, bool );
+	CONFIG( visuals_player_health_bar_color, ImVec4 );
+	CONFIG( visuals_player_health_bar_outline_color, ImVec4 );
+	CONFIG( visuals_player_health_bar_thickness, int );
+	CONFIG( visuals_player_health_text, bool );
+	CONFIG( visuals_player_health_text_color, ImVec4 );
+	CONFIG( visuals_player_health_text_outline_color, ImVec4 );
+	CONFIG( visuals_player_health_text_minimum, int );
+	CONFIG( visuals_player_class, bool );
+	CONFIG( visuals_player_class_color, ImVec4 );
+	CONFIG( visuals_player_class_outline_color, ImVec4 );
 
 	CONFIG( menu_disabled_inputs, int );
 
@@ -79,7 +99,7 @@ void menu::run( )
 			RenderFadedGradientLine( draw_list, ImVec2( position.x, position.y + size.y - background_height ), ImVec2( size.x, 1.f ),
 			                         ImColor( Accent[ 0 ], Accent[ 1 ], Accent[ 2 ], style.Alpha ) );
 
-			std::vector< const char* > tab_names = { "aimbot", "visuals", "movement", "misc", "settings" };
+			std::vector< const char* > tab_names = { "aimbot", "visuals", "chams", "misc", "settings" };
 			for ( int iterator = { }; iterator < tab_names.size( ); iterator++ ) {
 				if ( !( iterator < tab_names.size( ) ) )
 					break;
@@ -287,32 +307,71 @@ void menu::run( )
 			ImGui::SameLine( );
 			ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
 
-			if ( ImGui::BeginChild( "other aimbot",
+			if ( ImGui::BeginChild( "lagcomp aimbot",
 			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ),
 			                        true, 0, true ) ) {
+				ImGui::Checkbox( "lagcomp enabled", aimbot_lagcomp_enabled );
+				ImGui::SliderInt( "lagcomp time", aimbot_lagcomp_time, 0, 200, "%dms" );
+
 				ImGui::EndChild( );
 			}
 
 			break;
 		}
-		case 4: {
-			if ( ImGui::BeginChild( "menu settings",
-			                        ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ImGui::GetContentRegionAvail( ).y - background_height - 20.f ),
-			                        true, 0, true ) ) {
-				std::vector< bool > buffer_inputs = { ( bool )( *menu_disabled_inputs & 1 << 0 ), ( bool )( *menu_disabled_inputs & 1 << 1 ) };
+		case 1: {
+			if ( ImGui::BeginChild(
+					 "player visuals",
+					 ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ( ImGui::GetContentRegionAvail( ).y / 2.f ) - background_height - 20.f ), true,
+					 0, true ) ) {
+				std::vector< bool > buffer_teams = { static_cast< bool >( *visuals_player_teams & 1 << 0 ),
+					                                 static_cast< bool >( *visuals_player_teams & 1 << 1 ) };
 
-				ImGui::MultiCombo( "disabled inputs", buffer_inputs, { "mouse", "keyboard" }, buffer_inputs.size( ) );
+				ImGui::Checkbox( "visuals enabled", visuals_player_enabled );
+				ImGui::MultiCombo( "visuals teams", buffer_teams, { "allies", "enemies" }, buffer_teams.size( ) );
 
-				if ( buffer_inputs[ 0 ] ) {
-					*menu_disabled_inputs |= 1 << 0;
+				if ( buffer_teams[ 0 ] ) {
+					*visuals_player_teams |= 1 << 0;
 				} else {
-					*menu_disabled_inputs &= ~( 1 << 0 );
+					*visuals_player_teams &= ~( 1 << 0 );
 				}
-				if ( buffer_inputs[ 1 ] ) {
-					*menu_disabled_inputs |= 1 << 1;
+				if ( buffer_teams[ 1 ] ) {
+					*visuals_player_teams |= 1 << 1;
 				} else {
-					*menu_disabled_inputs &= ~( 1 << 1 );
+					*visuals_player_teams &= ~( 1 << 1 );
 				}
+
+				ImGui::Checkbox( "player boxes", visuals_player_box );
+				ImGui::ColorEdit4( "##visuals_player_box_outline_color", reinterpret_cast< float* >( visuals_player_box_outline_color ),
+				                   color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_box_color", reinterpret_cast< float* >( visuals_player_box_color ), color_picker_alpha_flags );
+
+				ImGui::Checkbox( "player names", visuals_player_name );
+				ImGui::ColorEdit4( "##visuals_player_name_outline_color", reinterpret_cast< float* >( visuals_player_name_outline_color ),
+				                   color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_name_color", reinterpret_cast< float* >( visuals_player_name_color ), color_picker_alpha_flags );
+
+				ImGui::Checkbox( "player health bars", visuals_player_health_bar );
+				ImGui::ColorEdit4( "##visuals_player_health_bar_outline_color", reinterpret_cast< float* >( visuals_player_health_bar_outline_color ),
+				                   color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_health_bar_color", reinterpret_cast< float* >( visuals_player_health_bar_color ),
+				                   color_picker_alpha_flags );
+
+				ImGui::Checkbox( "player health text", visuals_player_health_text );
+				ImGui::ColorEdit4( "##visuals_player_health_bar_outline_color",
+				                   reinterpret_cast< float* >( visuals_player_health_text_outline_color ), color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_health_bar_color", reinterpret_cast< float* >( visuals_player_health_text_color ),
+				                   color_picker_alpha_flags );
+
+				ImGui::Checkbox( "player class names", visuals_player_class );
+				ImGui::ColorEdit4( "##visuals_player_class_outline_color", reinterpret_cast< float* >( visuals_player_class_outline_color ),
+				                   color_picker_alpha_flags );
+				ImGui::SetCursorPosX( ImGui::GetCursorPosX( ) + 25.f );
+				ImGui::ColorEdit4( "##visuals_player_class_color", reinterpret_cast< float* >( visuals_player_class_color ),
+				                   color_picker_alpha_flags );
 
 				ImGui::EndChild( );
 			}
@@ -320,9 +379,52 @@ void menu::run( )
 			ImGui::SameLine( );
 			ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
 
+			if ( ImGui::BeginChild(
+					 "building visuals",
+					 ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y / 2.f ) - background_height - 20.f ), true, 0,
+					 true ) ) {
+				ImGui::EndChild( );
+			}
+
+			if ( ImGui::BeginChild(
+					 "projectile visuals",
+					 ImVec2( ImGui::GetContentRegionAvail( ).x / 2.f, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ), true, 0,
+					 true ) ) {
+				ImGui::EndChild( );
+			}
+
+			ImGui::SameLine( );
+			ImGui::SetCursorPosY( ImGui::GetCursorPosY( ) - 20.f );
+
+			if ( ImGui::BeginChild( "other visuals",
+			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ( ImGui::GetContentRegionAvail( ).y ) - background_height - 20.f ),
+			                        true, 0, true ) ) {
+				ImGui::SliderInt( "health bar thickness", visuals_player_health_bar_thickness, 1, 3, "%dpx" );
+				ImGui::SliderInt( "health text minimum", visuals_player_health_text_minimum, -20, 0, "%dhp" );
+
+				ImGui::EndChild( );
+			}
+
+			break;
+		}
+		case 4: {
 			if ( ImGui::BeginChild( "config settings",
 			                        ImVec2( ImGui::GetContentRegionAvail( ).x, ImGui::GetContentRegionAvail( ).y - background_height - 20.f ), true,
 			                        0, true ) ) {
+				static auto config_name = std::string{ };
+
+				ImGui::InputText( "config name", config_name.data( ), config_name.capacity( ) );
+
+				if ( ImGui::Button( "load", ImVec2( 110.f, 0 ) ) ) {
+					g_config->load( fmt::format( "C:\\Hotwheels\\Configs\\{}.hw", config_name.data( ) ) );
+				}
+
+				ImGui::SameLine( );
+
+				if ( ImGui::Button( "save", ImVec2( 111.f, 0 ) ) ) {
+					g_config->save( fmt::format( "C:\\Hotwheels\\Configs\\{}.hw", config_name.data( ) ) );
+				}
+
 				ImGui::EndChild( );
 			}
 

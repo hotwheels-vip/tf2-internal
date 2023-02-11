@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_BASE_PLAYER_HPP
-#define WEDNESDAY_WTF_C_BASE_PLAYER_HPP
+#pragma once
 
 #include "../enums/life_state.hpp"
 #include "c_base_combat_character.hpp"
@@ -100,5 +99,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_BASE_PLAYER_HPP

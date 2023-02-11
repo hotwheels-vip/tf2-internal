@@ -1,5 +1,5 @@
-#ifndef WEDNESDAY_WTF_TRACE_TYPE_HPP
-#define WEDNESDAY_WTF_TRACE_TYPE_HPP
+#pragma once
+
 namespace sdk
 {
 	enum trace_type {
@@ -9,4 +9,3 @@ namespace sdk
 		TRACE_EVERYTHING_FILTER_PROPS,
 	};
 } // namespace sdk
-#endif // WEDNESDAY_WTF_TRACE_TYPE_HPP

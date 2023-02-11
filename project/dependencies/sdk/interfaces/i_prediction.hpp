@@ -1,9 +1,10 @@
-#ifndef WEDNESDAY_WTF_I_PREDICTION_HPP
-#define WEDNESDAY_WTF_I_PREDICTION_HPP
+#pragma once
+
 #include "../structs/c_user_cmd.hpp"
 #include "../structs/vector.hpp"
 
 #include <cstdint>
+
 namespace sdk
 {
 	struct c_base_player;
@@ -95,5 +96,3 @@ namespace sdk
 		float ideal_pitch;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_PREDICTION_HPP

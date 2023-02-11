@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_GLOBAL_VARS_BASE_HPP
-#define WEDNESDAY_WTF_I_GLOBAL_VARS_BASE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -60,5 +59,3 @@ namespace sdk
 		int teimstamp_randomize_window;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_GLOBAL_VARS_BASE_HPP

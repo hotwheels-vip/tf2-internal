@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_TF_PLAYER_HPP
-#define WEDNESDAY_WTF_C_TF_PLAYER_HPP
+#pragma once
 
 #include "c_base_player.hpp"
 
@@ -176,13 +175,14 @@ namespace sdk
 		NETVAR( player_skin_override, int, "CTFPlayer", "m_iPlayerSkinOverride" );
 		NETVAR( viewing_cyoapda, bool, "CTFPlayer", "m_bViewingCYOAPDA" );
 
+		const char* class_name( );
+
 		c_base_animating* get_server_base_animating( ); // im sad to say credit for this goes to fedorahack
 		void draw_client_hitbox( const float& duration = 0.f );
 
 		bool can_hit( const vector pos, c_base_entity* ent = nullptr );
+		bool could_hit( vector pos );
 		void post_think( );
 		void pre_think( );
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_TF_PLAYER_HPP

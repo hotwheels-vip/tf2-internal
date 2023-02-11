@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_MSTUDIO_HPP
-#define WEDNESDAY_WTF_MSTUDIO_HPP
+#pragma once
 
 #include "matrix.hpp"
 #include "qangle.hpp"
@@ -103,5 +102,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_MSTUDIO_HPP

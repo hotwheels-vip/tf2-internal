@@ -1,9 +1,4 @@
-//
-// Created by Liga on 2/26/2022.
-//
-
-#ifndef WEDNESDAY_WTF_CLIENT_FRAME_STAGE_HPP
-#define WEDNESDAY_WTF_CLIENT_FRAME_STAGE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -27,5 +22,3 @@ namespace sdk
 		frame_render_end
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_CLIENT_FRAME_STAGE_HPP

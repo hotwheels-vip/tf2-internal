@@ -1,9 +1,5 @@
-//
-// Created by blanket on 2/25/2022.
-//
+#pragma once
 
-#ifndef WEDNESDAY_WTF_DT_RECV_HPP
-#define WEDNESDAY_WTF_DT_RECV_HPP
 #include "dt_common.hpp"
 
 namespace sdk
@@ -363,7 +359,7 @@ recv_prop recv_prop_quaternion(
 	inline void recv_prop::init_array( int nelements, int element_stride )
 	{
 		recv_type      = dpt_array;
-		nelements     = nelements;
+		nelements      = nelements;
 		element_stride = element_stride;
 	}
 
@@ -492,5 +488,3 @@ recv_prop recv_prop_quaternion(
 		parent_array_prop_name = p_array_prop_name;
 	}
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_DT_RECV_HPP

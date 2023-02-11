@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_LIFE_STATE_HPP
-#define WEDNESDAY_WTF_LIFE_STATE_HPP
+#pragma once
 
 namespace sdk
 {
@@ -13,5 +12,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_LIFE_STATE_HPP

@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_GAME_MOVEMENT_HPP
-#define WEDNESDAY_WTF_GAME_MOVEMENT_HPP
+#pragma once
 
 #include "../../helpers/memory/memory.hpp"
 #include "../structs/i_client_entity.hpp"
@@ -47,4 +46,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-#endif // WEDNESDAY_WTF_GAME_MOVEMENT_HPP

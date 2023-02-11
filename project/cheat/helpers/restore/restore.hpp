@@ -9,7 +9,7 @@ private:
 
 public:
 	restore( ) = default;
-	restore( T* address ) : address( address ), value( *address ){ };
+	explicit restore( T* address ) : value( *address ), address( address ){ };
 
 	void run( )
 	{

@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_CLIENT_NETWORKABLE_HPP
-#define WEDNESDAY_WTF_I_CLIENT_NETWORKABLE_HPP
+#pragma once
 
 #include "../enums/class_ids.hpp"
 
@@ -70,5 +69,3 @@ namespace sdk
 		virtual void on_data_unchanged_in_pvs( ) = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CLIENT_NETWORKABLE_HPP

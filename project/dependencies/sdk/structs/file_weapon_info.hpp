@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_FILE_WEAPON_INFO_HPP
-#define WEDNESDAY_WTF_FILE_WEAPON_INFO_HPP
+#pragma once
 
 namespace sdk
 {
@@ -64,5 +63,3 @@ namespace sdk
 	};
 
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_FILE_WEAPON_INFO_HPP

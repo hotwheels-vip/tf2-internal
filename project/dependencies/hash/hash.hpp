@@ -22,8 +22,8 @@ namespace hash
 {
 	namespace holder
 	{
-		constexpr static UINT32 seed  = 0x45C3370D;
-		constexpr static UINT32 prime = 0x1000193;
+		constexpr static std::uint32_t seed  = 0x811C9DC5;
+		constexpr static std::uint32_t prime = 0x01000193;
 	} // namespace holder
 
 	inline UINT32 fnv1a_rt( const char* key, const UINT32 val = hash::holder::seed )

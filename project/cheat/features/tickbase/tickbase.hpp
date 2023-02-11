@@ -8,7 +8,7 @@ public:
 	void* clock_drift{ };
 	int last_tick{ };
 
-	void run( );
+	static void run( );
 };
 
 inline tickbase* g_tickbase = new tickbase( );

@@ -4,7 +4,7 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
-LRESULT wndproc::detour( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT wndproc::detour( const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam )
 {
 	if ( g_menu->open )
 		ImGui_ImplWin32_WndProcHandler( hWnd, uMsg, wParam, lParam );

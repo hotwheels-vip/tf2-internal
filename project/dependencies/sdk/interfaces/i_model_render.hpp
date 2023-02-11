@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_MODEL_RENDER_HPP
-#define WEDNESDAY_WTF_I_MODEL_RENDER_HPP
+#pragma once
 
 #include "../structs/c_tf_player.hpp"
 #include "../structs/color.hpp"
@@ -97,5 +96,3 @@ namespace sdk
 		virtual void get_material_override( i_material** pp_out_forced_material, override_type_t* p_out_override_type ) = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_MODEL_RENDER_HPP

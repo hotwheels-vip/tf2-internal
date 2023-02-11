@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_CLIENT_LEAF_SYSTEM_HPP
-#define WEDNESDAY_WTF_I_CLIENT_LEAF_SYSTEM_HPP
+#pragma once
 
 #include "../structs/renderable_info.hpp"
 
@@ -16,5 +15,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CLIENT_LEAF_SYSTEM_HPP

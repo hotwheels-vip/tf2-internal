@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_KEY_VALUES_HPP
-#define WEDNESDAY_WTF_KEY_VALUES_HPP
+#pragma once
 
 #include "color.hpp"
 
@@ -364,5 +363,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_KEY_VALUES_HPP

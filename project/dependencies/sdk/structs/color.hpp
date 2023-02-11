@@ -1,9 +1,4 @@
-//
-// Created by Liga on 2/24/2022.
-//
-
-#ifndef WEDNESDAY_WTF_COLOR_HPP
-#define WEDNESDAY_WTF_COLOR_HPP
+#pragma once
 
 #include <d3dx9.h>
 #include <iostream>
@@ -157,5 +152,3 @@ namespace sdk
 		}
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_COLOR_HPP

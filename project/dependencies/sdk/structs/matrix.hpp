@@ -1,9 +1,5 @@
-//
-// Created by blanket on 2/24/2022.
-//
+#pragma once
 
-#ifndef WEDNESDAY_WTF_MATRIX_HPP
-#define WEDNESDAY_WTF_MATRIX_HPP
 #include "qangle.hpp"
 #include "vector.hpp"
 #include <iostream>
@@ -141,5 +137,3 @@ namespace sdk
 		view_matrix( ) = default;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_MATRIX_HPP

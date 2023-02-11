@@ -7,7 +7,8 @@ class movement
 public:
 	void run( );
 
-	void move_fix( sdk::c_user_cmd* cmd, sdk::qangle angle );
+	void move_fix( sdk::qangle angle );
+	void auto_stop( );
 };
 
 inline movement* g_movement = new movement( );

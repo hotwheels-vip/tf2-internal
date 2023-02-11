@@ -7,13 +7,13 @@
 void sdk::c_tf_player::pre_think( )
 {
 	static auto pre_think =
-		g_signatures[ HASH( "56 8B F1 8B 06 FF 90 ? ? ? ? 8B 06 8B CE FF 90 ? ? ? ? 8B CE" ) ].as< void( __thiscall* )( void* ) >( );
+		g_database[ HASH( "56 8B F1 8B 06 FF 90 ? ? ? ? 8B 06 8B CE FF 90 ? ? ? ? 8B CE" ) ].as< void( __thiscall* )( void* ) >( );
 	pre_think( this );
 }
 
 void sdk::c_tf_player::post_think( )
 {
-	static auto post_think = g_signatures[ HASH( "53 56 8B 35 ? ? ? ? 8B D9 8B CE 8B 06" ) ].as< void( __thiscall* )( void* ) >( );
+	static auto post_think = g_database[ HASH( "53 56 8B 35 ? ? ? ? 8B D9 8B CE 8B 06" ) ].as< void( __thiscall* )( void* ) >( );
 	post_think( this );
 }
 
@@ -23,7 +23,7 @@ bool sdk::c_tf_player::can_hit( const vector pos, sdk::c_base_entity* ent )
 	sdk::c_trace_filter_hitscan filter;
 	sdk::ray_t ray;
 
-	if ( g_entity_list->weapon && g_aimbot->get_weapon_info( ).speed != 0 )
+	if ( g_weapon && g_aimbot->get_weapon_info( ).speed != 0 )
 		ray.init( this->eye_position( ), pos, { -2, -2, -2 }, { 2, 2, 2 } );
 	else
 		ray.init( this->eye_position( ), pos );
@@ -33,6 +33,24 @@ bool sdk::c_tf_player::can_hit( const vector pos, sdk::c_base_entity* ent )
 	g_interfaces->engine_trace->trace_ray( ray, ( MASK_SHOT | CONTENTS_GRATE ), &filter, &trace );
 
 	return ( ent && trace.entity == ent ) || trace.fraction > 0.99f;
+}
+
+bool sdk::c_tf_player::could_hit( vector pos )
+{
+	sdk::c_game_trace trace;
+	sdk::c_trace_filter_hitscan filter;
+	sdk::ray_t ray;
+
+	if ( g_weapon && g_aimbot->get_weapon_info( ).speed != 0 )
+		ray.init( this->eye_position( ), pos, { -2, -2, -2 }, { 2, 2, 2 } );
+	else
+		ray.init( this->eye_position( ), pos );
+
+	filter.skip = this;
+
+	g_interfaces->engine_trace->trace_ray( ray, ( MASK_SHOT | CONTENTS_GRATE ), &filter, &trace );
+
+	return trace.fraction > 0.99f;
 }
 
 void sdk::c_tf_player::draw_client_hitbox( const float& duration )
@@ -64,9 +82,35 @@ void sdk::c_tf_player::draw_client_hitbox( const float& duration )
 	}
 }
 
+const char* sdk::c_tf_player::class_name( )
+{
+	switch ( this->class_id( ) ) {
+	case 1:
+		return "scou";
+	case 2:
+		return "snip";
+	case 3:
+		return "sold";
+	case 4:
+		return "demo";
+	case 5:
+		return "medi";
+	case 6:
+		return "heav";
+	case 7:
+		return "pyro";
+	case 8:
+		return "spy";
+	case 9:
+		return "engi";
+	default:
+		return "unkn";
+	}
+}
+
 sdk::c_base_animating* sdk::c_tf_player::get_server_base_animating( )
 {
-	static auto server_base_animating = g_signatures[ HASH( "55 8B EC 8B 55 ? 85 D2 7E ? A1" ) ].as< sdk::c_base_animating*( __cdecl* )( int ) >( );
+	static auto server_base_animating = g_database[ HASH( "55 8B EC 8B 55 ? 85 D2 7E ? A1" ) ].as< sdk::c_base_animating*( __cdecl* )( int ) >( );
 
 	return server_base_animating( entindex( ) );
 }

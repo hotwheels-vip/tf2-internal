@@ -1,9 +1,4 @@
-//
-// Created by Liga on 2/23/2022.
-//
-
-#ifndef WEDNESDAY_WTF_I_ENGINE_CLIENT_HPP
-#define WEDNESDAY_WTF_I_ENGINE_CLIENT_HPP
+#pragma once
 
 #include <iostream>
 
@@ -393,5 +388,3 @@ namespace sdk
 		virtual int get_instances_running_count( ) = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_ENGINE_CLIENT_HPP

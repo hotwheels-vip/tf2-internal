@@ -13,6 +13,8 @@ private:
 public:
 	static void __fastcall detour( void* ecx, void* edx, unsigned int panel, bool force_repaint, bool allow_force );
 
+	sdk::view_matrix matrix{ };
+
 	void run( )
 	{
 		_hook.create( g_virtuals->get_virtual_function( g_interfaces->panel, 41 ), detour, "paint_traverse" );

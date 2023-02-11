@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_C_COMMAND_CONTEXT_HPP
-#define WEDNESDAY_WTF_C_COMMAND_CONTEXT_HPP
+#pragma once
 
 #include "c_user_cmd.hpp"
 
@@ -12,5 +11,3 @@ namespace sdk
 		int command_number;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_C_COMMAND_CONTEXT_HPP

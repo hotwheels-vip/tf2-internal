@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_APP_SYSTEM_HPP
-#define WEDNESDAY_WTF_I_APP_SYSTEM_HPP
+#pragma once
 
 namespace sdk
 {
@@ -20,4 +19,3 @@ namespace sdk
 		virtual void shutdown( )        = 0;
 	};
 } // namespace sdk
-#endif // WEDNESDAY_WTF_I_APP_SYSTEM_HPP

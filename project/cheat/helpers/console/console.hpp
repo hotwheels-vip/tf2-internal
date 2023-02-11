@@ -7,12 +7,12 @@
 class console
 {
 private:
-	HANDLE console;
+	HANDLE console_handle;
 	FILE* file;
 
 public:
-	void run( );
-	void end( );
+	bool run( );
+	bool end( );
 
 	//	Deprecated
 	//	template< fmt::color COLOR = fmt::color::white_smoke, typename... ARGS >

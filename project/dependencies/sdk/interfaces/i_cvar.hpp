@@ -1,7 +1,4 @@
-
-
-#ifndef WEDNESDAY_WTF_I_CVAR_HPP
-#define WEDNESDAY_WTF_I_CVAR_HPP
+#pragma once
 
 #include "../structs/c_convar.hpp"
 #include "i_app_system.hpp"
@@ -41,5 +38,3 @@ namespace sdk
 		virtual int process_queued_material_thread_con_var_sets( )                                                = 0;
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_CVAR_HPP

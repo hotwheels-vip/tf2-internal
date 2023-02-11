@@ -1,5 +1,4 @@
-#ifndef WEDNESDAY_WTF_I_DEBUG_OVERLAY_HPP
-#define WEDNESDAY_WTF_I_DEBUG_OVERLAY_HPP
+#pragma once
 
 #include "../structs/qangle.hpp"
 #include "../structs/vector.hpp"
@@ -46,5 +45,3 @@ namespace sdk
 		     calls wrong function) */
 	};
 } // namespace sdk
-
-#endif // WEDNESDAY_WTF_I_DEBUG_OVERLAY_HPP

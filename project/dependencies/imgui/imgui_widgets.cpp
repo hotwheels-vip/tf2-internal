@@ -173,6 +173,9 @@ void ImGui::TextEx( const char* text, const char* text_end, ImGuiTextFlags flags
 		return;
 	ImGuiContext& g = *GImGui;
 
+	auto style = g.Style;
+	auto h     = GetFrameHeight( ) - 2.f;
+
 	// Accept null ranges
 	if ( text == text_end )
 		text = text_end = "";
@@ -182,7 +185,7 @@ void ImGui::TextEx( const char* text, const char* text_end, ImGuiTextFlags flags
 	if ( text_end == NULL )
 		text_end = text + strlen( text ); // FIXME-OPT
 
-	const ImVec2 text_pos( window->DC.CursorPos.x, window->DC.CursorPos.y + window->DC.CurrLineTextBaseOffset );
+	const ImVec2 text_pos( window->DC.CursorPos.x + 3.f + style.ItemInnerSpacing.x + h, window->DC.CursorPos.y + window->DC.CurrLineTextBaseOffset );
 	const float wrap_pos_x  = window->DC.TextWrapPos;
 	const bool wrap_enabled = ( wrap_pos_x >= 0.0f );
 	if ( text_end - text <= 2000 || wrap_enabled ) {
