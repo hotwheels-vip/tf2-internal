@@ -1,7 +1,7 @@
 #include "indicators.hpp"
 
 #include "../../hooks/cl_move/cl_move.hpp"
-#include <nameof/nameof.hpp>
+#include <nameof.hpp>
 
 void indicators::run( )
 {

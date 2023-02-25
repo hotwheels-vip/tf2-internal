@@ -2,8 +2,8 @@
 
 #include "../helpers/include.hpp"
 
+#include <MinHook.h>
 #include <imgui/imgui.h>
-#include <minhook/include/MinHook.h>
 
 template< class T, class R >
 class hook

@@ -87,7 +87,7 @@ float math::get_fov( const sdk::qangle& view_angles, const sdk::vector& start, c
 
 	forward = angle_to_vector( view_angles );
 
-	return std::max( RAD2DEG( std::acos( forward.dot_product( direction ) ) ), 0.f );
+	return max( RAD2DEG( std::acos( forward.dot_product( direction ) ) ), 0.f );
 }
 
 float math::calculate_angle_fov( const sdk::qangle& ang1, const sdk::qangle& ang2 )
